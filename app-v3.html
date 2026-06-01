@@ -1,0 +1,1099 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>i9 Smart ERP v5.0.8</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{
+  --purple:#7c3aed;--purple-d:#4c1d95;--purple-l:#f5f3ff;
+  --green:#16a34a;--green-l:#f0fdf4;--green-b:#bbf7d0;
+  --red:#ef4444;--red-l:#fef2f2;--red-b:#fca5a5;
+  --amber:#d97706;--amber-l:#fffbeb;--amber-b:#fde68a;
+  --blue:#0369a1;--blue-l:#eff6ff;--blue-b:#bfdbfe;
+  --teal:#0f6e56;--teal-l:#e1f5ee;
+  --i9:#004077;
+  --bg:#f0efff;--card:#fff;--bdr:rgba(0,0,0,0.08);
+  --tx:#111827;--tx2:#6b7280;--tx3:#9ca3af;
+  --r:15px;--rsm:10px;
+  font-family:'Inter','Segoe UI',system-ui,sans-serif;
+}
+html,body{height:100%;overflow:hidden;background:#1a1a2e}
+body{display:flex;align-items:center;justify-content:center}
+.phone{width:390px;height:844px;background:var(--bg);border-radius:40px;overflow:hidden;position:relative;
+  box-shadow:0 30px 80px rgba(0,0,0,.6),0 0 0 1px rgba(255,255,255,.1);display:flex;flex-direction:column}
+.hdr{flex-shrink:0;padding:50px 18px 34px;position:relative;overflow:hidden}
+.hdr::before{content:'';position:absolute;top:-50px;right:-50px;width:180px;height:180px;border-radius:50%;background:rgba(255,255,255,.06);pointer-events:none}
+.hrow{display:flex;align-items:center;gap:11px}
+.av{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:600;color:#fff;flex-shrink:0;box-shadow:0 0 0 2px rgba(255,255,255,.2)}
+.kstrip{display:flex;gap:7px;margin-top:12px}
+.kc{flex:1;background:rgba(255,255,255,.12);border:.5px solid rgba(255,255,255,.18);border-radius:10px;padding:8px 9px}
+.kc p:first-child{color:rgba(255,255,255,.6);font-size:9px;font-weight:500;margin-bottom:2px}
+.kc p:last-child{font-weight:700;font-size:13px;letter-spacing:-.3px}
+.fc-wrap{background:var(--card);border-radius:var(--r);padding:15px 17px;box-shadow:0 8px 30px rgba(0,0,0,.13);border:.5px solid var(--bdr);margin:-20px 13px 0;position:relative;z-index:10;flex-shrink:0}
+.scr{flex:1;overflow-y:auto;overflow-x:hidden;padding:13px 13px 4px}
+.scr::-webkit-scrollbar{width:2px}
+.scr::-webkit-scrollbar-thumb{background:rgba(0,0,0,.12);border-radius:99px}
+.bnav{flex-shrink:0;background:rgba(255,255,255,.97);backdrop-filter:blur(16px);border-top:.5px solid var(--bdr);display:flex;padding:4px 4px 10px;height:68px;align-items:flex-start}
+.nb{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 3px;border:none;background:transparent;cursor:pointer;border-radius:9px;transition:background .12s;min-width:0}
+.nb.on{background:var(--purple-l)}
+.nb i{font-size:21px;color:var(--tx3);transition:color .12s}
+.nb.on i{color:var(--purple)}
+.nb span{font-size:9px;font-weight:600;color:var(--tx3);transition:color .12s;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.nb.on span{color:var(--purple)}
+.card{background:var(--card);border:.5px solid var(--bdr);border-radius:var(--r);padding:14px;margin-bottom:10px}
+.ct{font-size:13px;font-weight:700;color:var(--tx);margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px}
+.sbox{background:#f9fafb;border:.5px solid var(--bdr);border-radius:var(--rsm);padding:9px;text-align:center}
+.sbox .v{font-size:18px;font-weight:700;color:var(--tx)}
+.sbox .l{font-size:9px;color:var(--tx3);margin-top:1px}
+.pill{display:inline-flex;align-items:center;gap:3px;font-size:10px;font-weight:600;padding:2px 8px;border-radius:20px;white-space:nowrap}
+.p-ok{background:var(--green-l);color:var(--green)}
+.p-err{background:var(--red-l);color:var(--red)}
+.p-warn{background:var(--amber-l);color:var(--amber)}
+.p-info{background:var(--blue-l);color:var(--blue)}
+.p-neu{background:#f3f4f6;color:var(--tx2)}
+.p-pur{background:var(--purple-l);color:var(--purple)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:5px;padding:8px 13px;border-radius:var(--rsm);font-size:12px;font-weight:600;cursor:pointer;border:.5px solid var(--bdr);background:var(--card);color:var(--tx);font-family:inherit;transition:all .12s}
+.btn:active{transform:scale(.97)}
+.b-prim{background:var(--purple);border-color:var(--purple);color:#fff;box-shadow:0 4px 12px rgba(124,58,237,.25)}
+.b-ok{background:var(--green-l);border-color:var(--green-b);color:var(--green)}
+.b-err{background:var(--red-l);border-color:var(--red-b);color:var(--red)}
+.b-warn{background:var(--amber-l);border-color:var(--amber-b);color:var(--amber)}
+.b-info{background:var(--blue-l);border-color:var(--blue-b);color:var(--blue)}
+.b-i9{background:var(--i9);border-color:var(--i9);color:#fff}
+.b-full{width:100%}
+.b-dis{opacity:.35;pointer-events:none}
+.hold{position:relative;overflow:hidden;border-radius:13px;border:1.5px solid var(--hb,var(--purple));height:74px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer;user-select:none;-webkit-user-select:none;flex:1;transition:box-shadow .2s}
+.hold .hf{position:absolute;left:0;top:0;bottom:0;width:0;border-radius:11px;transition:none}
+.hold .hi{font-size:22px;position:relative;z-index:1;line-height:1}
+.hold .hl{font-size:11px;font-weight:700;position:relative;z-index:1}
+.hold .hh{font-size:8px;position:relative;z-index:1;opacity:.6}
+.fb{height:4px;background:#f3f4f6;border-radius:99px;overflow:hidden}
+.ff{height:100%;border-radius:99px;transition:width .4s}
+.row{display:flex;align-items:center;gap:9px;padding:9px 0;border-bottom:.5px solid var(--bdr)}
+.row:last-child{border-bottom:none}
+.avr{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;flex-shrink:0}
+.fld{margin-bottom:9px}
+.fld label{font-size:11px;font-weight:500;color:var(--tx2);display:block;margin-bottom:3px}
+.fld input,.fld select,.fld textarea{width:100%;border:.5px solid rgba(0,0,0,.12);border-radius:9px;padding:9px 11px;font-size:13px;color:var(--tx);background:#fff;outline:none;font-family:inherit;transition:border-color .15s}
+.fld input:focus,.fld select:focus,.fld textarea:focus{border-color:var(--purple);box-shadow:0 0 0 3px rgba(124,58,237,.1)}
+.fld textarea{resize:vertical;min-height:70px}
+.pg{display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-top:10px}
+.pc{border-radius:9px;padding:7px 8px;text-align:center;border:.5px solid var(--bdr);background:#f9fafb;transition:all .2s}
+.pc.m{background:var(--green-l);border-color:var(--green-b)}
+.geo-map{width:100%;height:130px;background:linear-gradient(135deg,#e0f2fe,#bfdbfe);border-radius:12px;position:relative;overflow:hidden;border:.5px solid var(--bdr)}
+.geo-pin{position:absolute;top:50%;left:50%;transform:translate(-50%,-70%);font-size:26px}
+.geo-circle{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:70px;height:70px;border-radius:50%;background:rgba(59,130,246,.15);border:2px solid rgba(59,130,246,.4);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{transform:translate(-50%,-50%) scale(1)}50%{transform:translate(-50%,-50%) scale(1.1);opacity:.7}}
+.sw{display:flex;align-items:center;gap:8px;padding:9px 0;border-bottom:.5px solid var(--bdr)}
+.sw:last-child{border-bottom:none}
+.sw-lbl{flex:1;font-size:12px;color:var(--tx)}
+.sw-sub{font-size:10px;color:var(--tx3);margin-top:1px}
+.sw-tog{width:38px;height:21px;border-radius:20px;border:none;cursor:pointer;position:relative;transition:background .2s;flex-shrink:0}
+.sw-tog::after{content:'';position:absolute;width:15px;height:15px;border-radius:50%;background:#fff;top:3px;left:3px;transition:transform .2s;box-shadow:0 1px 3px rgba(0,0,0,.2)}
+.sw-tog.on{background:var(--purple)}
+.sw-tog.on::after{transform:translateX(17px)}
+.sw-tog.off{background:#d1d5db}
+.logo-up{width:68px;height:68px;border-radius:50%;border:2px dashed var(--bdr);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;transition:all .2s;background:#f9fafb;overflow:hidden;flex-shrink:0}
+.logo-up:hover{border-color:var(--purple);background:var(--purple-l)}
+.logo-up img{width:100%;height:100%;object-fit:cover;border-radius:50%}
+.rs{position:fixed;top:10px;left:10px;z-index:500;background:rgba(255,255,255,.95);border:.5px solid var(--bdr);border-radius:10px;padding:5px 8px;box-shadow:0 4px 16px rgba(0,0,0,.15)}
+.rs select{border:none;background:transparent;font-size:11px;font-weight:600;color:var(--purple);cursor:pointer;outline:none;font-family:inherit}
+.toast{position:absolute;top:12px;left:50%;transform:translateX(-50%);background:#111827;color:#fff;padding:8px 15px;border-radius:10px;font-size:12px;font-weight:500;z-index:300;white-space:nowrap;opacity:0;transition:opacity .2s;pointer-events:none;box-shadow:0 4px 20px rgba(0,0,0,.25)}
+.toast.show{opacity:1}
+.mbg{position:absolute;inset:0;background:rgba(0,0,0,.5);z-index:150;display:none;align-items:flex-end;justify-content:center;border-radius:40px;overflow:hidden}
+.mbg.open{display:flex}
+.mbox{background:#fff;border-radius:20px 20px 0 0;padding:18px 17px 26px;width:100%;max-height:90%;overflow-y:auto}
+.mhead{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+.mhead p{font-size:15px;font-weight:700;color:var(--tx)}
+.mclose{background:none;border:none;font-size:20px;cursor:pointer;color:var(--tx3)}
+.lscr{position:absolute;inset:0;background:linear-gradient(135deg,#1e1b4b,#4c1d95);z-index:200;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:30px 24px;border-radius:40px}
+.lscr.hidden{display:none}
+.set-item{display:flex;align-items:center;gap:12px;padding:14px 0;border-bottom:.5px solid var(--bdr);cursor:pointer;min-height:52px;transition:background .1s}
+.set-item:last-child{border-bottom:none}
+.set-item:active{background:rgba(0,0,0,.03)}
+.set-icon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.set-lbl{flex:1;font-size:13px;font-weight:500;color:var(--tx)}
+.set-sub{font-size:10px;color:var(--tx3);margin-top:2px}
+.tabs{display:flex;gap:4px;background:rgba(0,0,0,.04);border-radius:10px;padding:3px;margin-bottom:13px}
+.tabx{flex:1;padding:8px 0;border:none;border-radius:8px;font-size:11px;font-weight:600;color:var(--tx3);cursor:pointer;background:transparent;font-family:inherit;transition:all .12s}
+.tabx.on{background:#fff;color:var(--purple);box-shadow:0 1px 4px rgba(0,0,0,.08)}
+.humor-row{display:flex;gap:8px;margin:12px 0}
+.hbtn{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;padding:10px 4px;border-radius:12px;border:1.5px solid var(--bdr);cursor:pointer;background:#fff;transition:all .15s;font-family:inherit}
+.hbtn.sel-excelente{background:#f0fdf4;border-color:#22c55e}
+.hbtn.sel-bem{background:#eff6ff;border-color:#3b82f6}
+.hbtn.sel-neutro{background:#fefce8;border-color:#eab308}
+.hbtn.sel-estressado{background:#fff7ed;border-color:#f97316}
+.hbtn.sel-mal{background:#fef2f2;border-color:#ef4444}
+.abtn{display:flex;flex-direction:column;align-items:center;gap:5px;padding:12px 8px;border-radius:13px;border:1.5px solid var(--bdr);cursor:pointer;background:#fff;transition:all .15s;flex:1;font-family:inherit}
+.abtn.sel-feliz{background:#f0fdf4;border-color:#22c55e;border-width:2px}
+.abtn.sel-mmm{background:#fefce8;border-color:#eab308;border-width:2px}
+.abtn.sel-triste{background:#fef2f2;border-color:#ef4444;border-width:2px}
+.plano-card{background:#fff;border:.5px solid var(--bdr);border-radius:12px;padding:13px;margin-bottom:9px}
+.sdiv{font-size:10px;font-weight:600;color:var(--tx3);text-transform:uppercase;letter-spacing:.06em;margin:13px 0 7px;padding-left:2px}
+.i9-badge{display:flex;align-items:center;gap:8px;background:var(--i9);border-radius:11px;padding:9px 13px}
+.i9-icon{width:32px;height:32px;border-radius:8px;background:#fff;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:var(--i9);flex-shrink:0}
+@keyframes fu{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+.card,.hold{animation:fu .15s ease}
+</style>
+</head>
+<body>
+
+<!-- Role switcher -->
+<div class="rs"><select id="rsel" onchange="changeRole(this.value)">
+  <option value="suporte">👑 Suporte (i9 Smart)</option>
+  <option value="gestor">👔 Gestor</option>
+  <option value="professor_colab">📚 Prof+Colab</option>
+  <option value="colaborador" selected>⏱ Colaborador</option>
+  <option value="responsavel">👨‍👩‍👧 Responsável</option>
+  <option value="aluno">🎓 Aluno</option>
+</select></div>
+
+<div class="phone" id="phone">
+<div class="toast" id="toast"></div>
+
+<!-- LOGIN -->
+<div class="lscr" id="lscr">
+  <div style="text-align:center;margin-bottom:28px">
+    <div style="width:60px;height:60px;border-radius:16px;background:#fff;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:800;color:var(--i9);margin:0 auto 12px">i9</div>
+    <p style="color:#fff;font-size:20px;font-weight:700">i9 Smart ERP</p>
+    <p style="color:rgba(255,255,255,.6);font-size:12px;margin-top:4px" id="llbl">Portal do Colaborador</p>
+  </div>
+  <div style="width:100%;background:rgba(255,255,255,.1);border-radius:14px;padding:18px;margin-bottom:14px">
+    <div class="fld" style="margin-bottom:10px">
+      <label style="color:rgba(255,255,255,.7)">E-mail</label>
+      <input id="lemail" type="email" placeholder="seu@email.com" style="background:rgba(255,255,255,.15);border:.5px solid rgba(255,255,255,.2);color:#fff">
+    </div>
+    <div class="fld" style="margin-bottom:0">
+      <label style="color:rgba(255,255,255,.7)">Senha</label>
+      <input id="lsenha" type="password" placeholder="••••••••" style="background:rgba(255,255,255,.15);border:.5px solid rgba(255,255,255,.2);color:#fff">
+    </div>
+  </div>
+  <button class="btn b-full" style="background:#fff;color:var(--i9);font-weight:700;padding:13px;font-size:14px;border-radius:12px;margin-bottom:10px" onclick="doLogin()">Entrar</button>
+  <button class="btn b-full" style="background:rgba(255,255,255,.1);color:#fff;border:.5px solid rgba(255,255,255,.2);padding:13px;font-size:13px;border-radius:12px;margin-bottom:20px" onclick="doBio()">
+    <i class="ti ti-fingerprint" style="font-size:18px"></i> Entrar com biometria
+  </button>
+  <p style="color:rgba(255,255,255,.4);font-size:10px;text-align:center">i9 Smart ERP · v5.0.8</p>
+</div>
+
+<!-- MODAIS -->
+<div class="mbg" id="m-pix" onclick="cm('m-pix',event)"><div class="mbox">
+  <div class="mhead"><p>⚡ Pagar com Pix</p><button class="mclose" onclick="cl('m-pix')">✕</button></div>
+  <div style="width:128px;height:128px;background:#f3f4f6;border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;margin:0 auto 13px;border:.5px solid var(--bdr)">
+    <span style="font-size:36px">📱</span><span style="font-size:10px;color:var(--tx3);margin-top:4px">QR Code Pix</span><span style="font-size:10px;color:var(--tx3)">R$ 280,00</span>
+  </div>
+  <div style="background:#f8fafc;border:.5px solid var(--bdr);border-radius:8px;padding:9px 11px;font-size:10px;font-family:monospace;word-break:break-all;margin-bottom:11px;color:var(--tx)">00020126...pix...Studio Arte...6304ABCD</div>
+  <button class="btn b-prim b-full" id="pbtn" onclick="cpix()">📋 Copiar código Pix</button>
+</div></div>
+
+<div class="mbg" id="m-conv" onclick="cm('m-conv',event)"><div class="mbox">
+  <div class="mhead"><p>🔗 Novo convite</p><button class="mclose" onclick="cl('m-conv')">✕</button></div>
+  <div class="fld"><label>Perfil</label>
+    <select id="crole" onchange="updConv()">
+      <option value="gestor" id="cog" style="display:none">Gestor</option>
+      <option value="professor">Professor</option>
+      <option value="professor_colab">Professor + Colaborador</option>
+      <option value="colaborador">Colaborador (só ponto)</option>
+      <option value="responsavel">Pais / Responsável</option>
+      <option value="aluno">Aluno</option>
+    </select>
+  </div>
+  <div class="fld"><label>Nome</label><input id="cnome" placeholder="Nome completo"></div>
+  <div class="fld"><label>E-mail</label><input id="cemail" type="email" placeholder="email@exemplo.com"></div>
+  <div class="fld" id="ctw"><label>Turma</label>
+    <select id="cturma"><option>Ballet Infantil A</option><option>Ballet Infantil B</option><option>Robótica Avançada</option><option>Violão Iniciante</option></select>
+  </div>
+  <div style="background:var(--blue-l);border:.5px solid var(--blue-b);border-radius:9px;padding:9px 12px;margin-bottom:10px;font-size:11px;color:var(--blue)">
+    📱 O link inclui o instalador do app específico para este perfil.
+  </div>
+  <button class="btn b-prim b-full" onclick="genConv()" style="margin-bottom:8px">🔗 Gerar link + instalador</button>
+  <div id="cresult" style="display:none">
+    <div style="background:#f9fafb;border:.5px solid var(--bdr);border-radius:9px;padding:10px 12px;margin-bottom:8px">
+      <p style="font-size:10px;font-weight:600;color:var(--tx2);margin-bottom:3px">🔗 Link (7 dias · uso único · inclui app)</p>
+      <p id="clink" style="font-size:10px;font-family:monospace;color:var(--tx);word-break:break-all"></p>
+    </div>
+    <button class="btn b-ok b-full" onclick="ccopy()">📋 Copiar link</button>
+  </div>
+</div></div>
+
+<div class="mbg" id="m-pm" onclick="cm('m-pm',event)"><div class="mbox">
+  <div class="mhead"><p>📝 Ponto Manual</p><button class="mclose" onclick="cl('m-pm')">✕</button></div>
+  <div style="background:var(--amber-l);border:.5px solid var(--amber-b);border-radius:10px;padding:9px 12px;margin-bottom:12px;font-size:11px;color:#92400e">⚠️ Ficará pendente para aprovação do gestor.</div>
+  <div class="fld"><label>Tipo</label><select id="pmtipo"><option>Entrada</option><option>Início Intervalo</option><option>Fim Intervalo</option><option>Saída</option></select></div>
+  <div class="fld"><label>Data</label><input type="date" id="pmdata" value="2026-05-24"></div>
+  <div class="fld"><label>Horário esquecido</label><input type="time" id="pmhora" value="08:00"></div>
+  <div class="fld"><label>Motivo</label>
+    <select id="pmmot" onchange="pmm()">
+      <option value="e">Esquecimento</option><option value="t">Problema técnico</option><option value="o">Outro</option>
+    </select>
+  </div>
+  <div class="fld" id="pmjw" style="display:none"><label>Justificativa</label><textarea placeholder="Descreva..."></textarea></div>
+  <button class="btn b-warn b-full" onclick="envPM()">📤 Enviar para aprovação</button>
+</div></div>
+
+<div class="mbg" id="m-ea" onclick="cm('m-ea',event)"><div class="mbox">
+  <div class="mhead"><p>✏️ Editar aluno</p><button class="mclose" onclick="cl('m-ea')">✕</button></div>
+  <div class="fld"><label>Nome</label><input id="eanome" value="Sofia Almeida"></div>
+  <div class="fld"><label>Data de nascimento</label><input type="date" value="2018-03-15"></div>
+  <div class="fld"><label>Status da matrícula</label><select><option selected>Ativa</option><option>Suspensa</option><option>Cancelada</option><option>Inadimplente</option></select></div>
+  <div class="fld"><label>Mensalidade (R$)</label><input type="number" id="eaval" value="280" step="10"></div>
+  <div class="fld"><label>Dia de vencimento</label><input type="number" value="5" min="1" max="28"></div>
+  <div class="fld"><label>Observações</label><textarea>Nenhuma observação.</textarea></div>
+  <button class="btn b-prim b-full" onclick="toast('✅ Aluno atualizado!');cl('m-ea')">💾 Salvar</button>
+</div></div>
+
+<div class="mbg" id="m-ec" onclick="cm('m-ec',event)"><div class="mbox">
+  <div class="mhead"><p>✏️ Corrigir chamada</p><button class="mclose" onclick="cl('m-ec')">✕</button></div>
+  <div style="background:var(--amber-l);border:.5px solid var(--amber-b);border-radius:9px;padding:9px 12px;margin-bottom:11px;font-size:11px;color:#92400e">⚠️ Registrado no log de auditoria.</div>
+  <div class="fld"><label>Aluno</label><select><option>Sofia Almeida</option><option>Isabella Costa</option><option>Laura Mendes</option><option>Valentina Rocha</option></select></div>
+  <div class="fld"><label>Data da aula</label><input type="date" value="2026-05-24"></div>
+  <div class="fld"><label>Situação correta</label><select><option>✅ Presente</option><option>❌ Falta</option><option>📝 Falta Justificada</option></select></div>
+  <div class="fld"><label>Justificativa</label><textarea placeholder="Motivo da correção..."></textarea></div>
+  <button class="btn b-prim b-full" onclick="toast('✅ Chamada corrigida!');cl('m-ec')">💾 Salvar correção</button>
+</div></div>
+
+<div class="mbg" id="m-es" onclick="cm('m-es',event)"><div class="mbox">
+  <div class="mhead"><p>💰 Editar salário</p><button class="mclose" onclick="cl('m-es')">✕</button></div>
+  <div class="fld"><label>Colaborador</label><select><option>Ana Paula Ferreira — CLT</option><option>Carlos Lima — CLT</option><option>Sônia Ramos — PJ</option></select></div>
+  <div class="fld"><label>Salário bruto (R$)</label><input type="number" value="3800" step="100"></div>
+  <div class="fld"><label>Regime</label><select><option>CLT</option><option>PJ</option><option>Estágio</option></select></div>
+  <div class="fld"><label>Carga horária diária (h)</label><input type="number" value="8" min="1" max="12"></div>
+  <div class="fld"><label>Justificativa</label><textarea placeholder="Motivo do reajuste..."></textarea></div>
+  <button class="btn b-prim b-full" onclick="toast('✅ Salário atualizado!');cl('m-es')">💾 Salvar</button>
+</div></div>
+
+<div class="mbg" id="m-geo" onclick="cm('m-geo',event)"><div class="mbox">
+  <div class="mhead"><p>📍 Geofence de ponto</p><button class="mclose" onclick="cl('m-geo')">✕</button></div>
+  <div class="geo-map" style="margin-bottom:11px">
+    <div class="geo-pin">📍</div><div class="geo-circle"></div>
+    <div style="position:absolute;bottom:7px;right:8px;background:rgba(255,255,255,.9);border-radius:7px;padding:3px 8px;font-size:10px;font-weight:600;color:var(--blue)">Santa Maria-RS</div>
+  </div>
+  <div class="fld"><label>Endereço / Local</label><input id="geoend" value="Rua XV de Novembro, 450 — Santa Maria-RS"></div>
+  <div class="fld"><label>Raio permitido</label><select id="georaio"><option>50m</option><option selected>100m</option><option>200m</option><option>500m</option></select></div>
+  <div class="card" style="padding:0 13px;margin-bottom:0">
+    <div class="sw"><div style="flex:1"><div class="sw-lbl">Geofence ativo</div><div class="sw-sub">Bloquear fora da área</div></div><button class="sw-tog on" onclick="toggleSw(this)"></button></div>
+    <div class="sw"><div style="flex:1"><div class="sw-lbl">Notificar gestor</div><div class="sw-sub">Alerta de tentativa fora da área</div></div><button class="sw-tog on" onclick="toggleSw(this)"></button></div>
+  </div>
+  <button class="btn b-prim b-full" style="margin-top:11px" onclick="toast('✅ Geofence salvo!');cl('m-geo')">💾 Salvar</button>
+</div></div>
+
+<div class="mbg" id="m-plano" onclick="cm('m-plano',event)"><div class="mbox">
+  <div class="mhead"><p>📋 Plano de aula</p><button class="mclose" onclick="cl('m-plano')">✕</button></div>
+  <div class="fld"><label>Título</label><input id="plt" placeholder="Ex: Variações de Barra — Básico"></div>
+  <div class="fld"><label>Turma</label><select><option>Ballet Infantil A</option><option>Ballet Infantil B</option><option>Robótica Avançada</option><option>Violão Iniciante</option></select></div>
+  <div class="g2" style="margin-bottom:9px">
+    <div class="fld" style="margin-bottom:0"><label>Ordem</label><input type="number" value="1" min="1"></div>
+    <div class="fld" style="margin-bottom:0"><label>Duração (min)</label><input type="number" value="60"></div>
+  </div>
+  <div class="fld"><label>Acesso ao professor</label><select><option>🔒 Bloqueado</option><option>✅ Liberado</option></select></div>
+  <div class="fld"><label>Descrição</label><textarea placeholder="Objetivos da aula..."></textarea></div>
+  <p style="font-size:11px;font-weight:600;color:var(--tx2);margin-bottom:7px">Materiais</p>
+  <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:11px">
+    <button class="btn" style="font-size:11px;padding:6px 10px" onclick="toast('Selecionar MP4')">🎬 Vídeo</button>
+    <button class="btn" style="font-size:11px;padding:6px 10px" onclick="toast('Selecionar MP3')">🎵 Áudio</button>
+    <button class="btn" style="font-size:11px;padding:6px 10px" onclick="toast('Selecionar PDF')">📄 PDF</button>
+    <button class="btn" style="font-size:11px;padding:6px 10px" onclick="toast('Inserir link')">🔗 Link</button>
+    <button class="btn" style="font-size:11px;padding:6px 10px" onclick="toast('Selecionar imagem')">🖼️ Imagem</button>
+  </div>
+  <button class="btn b-prim b-full" onclick="salvarPlano()">💾 Salvar plano</button>
+</div></div>
+
+<div class="mbg" id="m-logo" onclick="cm('m-logo',event)"><div class="mbox">
+  <div class="mhead"><p>🖼️ Logo da escola</p><button class="mclose" onclick="cl('m-logo')">✕</button></div>
+  <p style="font-size:11px;color:var(--tx2);margin-bottom:13px">A logo aparece em todos os portais. Somente o suporte pode alterar.</p>
+  <div style="display:flex;align-items:center;gap:13px;margin-bottom:14px">
+    <div class="logo-up" id="logoprev" onclick="document.getElementById('logofile').click()">
+      <i class="ti ti-camera" style="font-size:22px;color:var(--tx3)"></i>
+      <span style="font-size:9px;color:var(--tx3);margin-top:2px">JPG/PNG</span>
+    </div>
+    <div>
+      <p style="font-size:13px;font-weight:600;color:var(--tx)">Selecionar imagem</p>
+      <p style="font-size:11px;color:var(--tx3);margin-top:3px">Máx 2MB · formato quadrado</p>
+      <input type="file" accept=".jpg,.jpeg,.png" id="logofile" style="display:none" onchange="loadLogo(this)">
+      <button class="btn" style="margin-top:6px;font-size:11px;padding:5px 10px" onclick="document.getElementById('logofile').click()">📂 Abrir pasta</button>
+    </div>
+  </div>
+  <div class="fld"><label>Nome da escola</label><input id="logonom" value="Studio Arte em Movimento"></div>
+  <button class="btn b-prim b-full" onclick="salvarLogo()">💾 Aplicar em todos os portais</button>
+</div></div>
+
+<div class="mbg" id="m-rm" onclick="cm('m-rm',event)"><div class="mbox">
+  <div class="mhead"><p>🗑️ Remover acesso</p><button class="mclose" onclick="cl('m-rm')">✕</button></div>
+  <div style="background:var(--red-l);border:.5px solid var(--red-b);border-radius:10px;padding:11px 12px;margin-bottom:13px">
+    <p style="font-size:12px;font-weight:700;color:var(--red);margin-bottom:3px">⚠️ Ação irreversível</p>
+    <p style="font-size:11px;color:var(--red)">O acesso ao app será <strong>bloqueado imediatamente</strong>. Apenas o suporte pode reverter.</p>
+  </div>
+  <div class="fld"><label>Selecionar usuário</label>
+    <select><option>Ana Paula Ferreira — Professor</option><option>Carlos Lima — Colaborador</option><option>Carla Almeida — Responsável</option><option>Sofia Almeida — Aluno</option></select>
+  </div>
+  <div class="fld"><label>Motivo</label><textarea placeholder="Descreva o motivo..."></textarea></div>
+  <button class="btn b-err b-full" onclick="toast('✅ Acesso bloqueado. Usuário removido do sistema.');cl('m-rm')">🗑️ Confirmar remoção</button>
+</div></div>
+
+<div class="mbg" id="m-pgr" onclick="cm('m-pgr',event)"><div class="mbox">
+  <div class="mhead"><p>🔒 Relato PGR</p><button class="mclose" onclick="cl('m-pgr')">✕</button></div>
+  <div style="background:#fef2f2;border:.5px solid #fca5a5;border-radius:10px;padding:10px 12px;margin-bottom:12px;font-size:11px;color:#7f1d1d">
+    🔐 Dados protegidos por lei (NR-1 PGR). Imutáveis — nem o suporte técnico pode alterar.
+  </div>
+  <div class="fld"><label>Categoria</label>
+    <select><option>Assédio moral</option><option>Assédio sexual</option><option>Discriminação</option><option>Condições inadequadas</option><option>Relacionamento</option><option>Outro</option></select>
+  </div>
+  <div class="fld"><label>Descrição</label><textarea placeholder="Descreva com detalhes..."></textarea></div>
+  <div class="fld"><label>Pessoas envolvidas (opcional)</label><input placeholder="Nomes ou cargos..."></div>
+  <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
+    <input type="checkbox" checked id="pgranon" style="width:16px;height:16px;accent-color:var(--purple)">
+    <label for="pgranon" style="font-size:12px;color:var(--tx)">Manter relato anônimo</label>
+  </div>
+  <div style="display:flex;align-items:center;gap:8px;margin-bottom:13px">
+    <input type="checkbox" id="pgrcont" style="width:16px;height:16px;accent-color:var(--purple)">
+    <label for="pgrcont" style="font-size:12px;color:var(--tx)">Quero que o RH entre em contato</label>
+  </div>
+  <button class="btn b-err b-full" onclick="envPGR()">📤 Registrar relato (imutável)</button>
+</div></div>
+
+<div class="mbg" id="m-fb" onclick="cm('m-fb',event)"><div class="mbox">
+  <div class="mhead"><p>💬 Feedback</p><button class="mclose" onclick="cl('m-fb')">✕</button></div>
+  <div class="fld"><label>Para</label>
+    <select><option>Gestor — Maria Fernanda</option><option>Ana Paula Ferreira — Professor</option><option>Carlos Lima — Colaborador</option></select>
+  </div>
+  <div class="fld"><label>Tipo</label>
+    <select><option>🌟 Elogio</option><option>💡 Sugestão</option><option>⚠️ Alerta</option><option>💬 Geral</option></select>
+  </div>
+  <div class="fld"><label>Título</label><input placeholder="Assunto do feedback..."></div>
+  <div class="fld"><label>Mensagem</label><textarea placeholder="Escreva seu feedback..."></textarea></div>
+  <button class="btn b-prim b-full" onclick="toast('💬 Feedback enviado!');cl('m-fb')">📤 Enviar</button>
+</div></div>
+
+<div class="mbg" id="m-fin" onclick="cm('m-fin',event)"><div class="mbox">
+  <div class="mhead"><p>💰 Dados Financeiros</p><button class="mclose" onclick="cl('m-fin')">✕</button></div>
+  <div style="background:#f5f3ff;border:.5px solid #c4b5fd;border-radius:12px;padding:14px;text-align:center;margin-bottom:13px">
+    <p style="font-size:10px;color:var(--tx3)">Salário Líquido — Maio 2026</p>
+    <p style="font-size:26px;font-weight:800;color:#4338ca;letter-spacing:-.5px">R$ 3.239,60</p>
+    <p style="font-size:11px;color:var(--tx3);margin-top:3px">Próx. pagamento: 05/06/2026</p>
+  </div>
+  <div style="background:#f9fafb;border:.5px solid var(--bdr);border-radius:11px;padding:12px;margin-bottom:12px">
+    <div style="display:flex;justify-content:space-between;padding:7px 0"><span style="font-size:12px;color:var(--tx2)">Salário Bruto</span><span style="font-size:12px;font-weight:500;color:var(--tx)">R$ 3.800,00</span></div>
+    <div style="display:flex;justify-content:space-between;padding:7px 0;border-top:.5px solid var(--bdr)"><span style="font-size:12px;color:var(--tx2)">(-) INSS 9%</span><span style="font-size:12px;color:var(--red)">R$ 342,00</span></div>
+    <div style="display:flex;justify-content:space-between;padding:7px 0;border-top:.5px solid var(--bdr)"><span style="font-size:12px;color:var(--tx2)">(-) IRRF</span><span style="font-size:12px;color:var(--red)">R$ 218,40</span></div>
+    <div style="display:flex;justify-content:space-between;padding:7px 0;border-top:.5px solid var(--bdr)"><span style="font-size:12px;font-weight:700;color:var(--tx)">Salário Líquido</span><span style="font-size:12px;font-weight:700;color:#4338ca">R$ 3.239,60</span></div>
+  </div>
+  <p style="font-size:12px;font-weight:600;color:var(--tx);margin-bottom:9px">📄 Holerites</p>
+  <div style="display:flex;align-items:center;gap:9px;padding:8px 0;border-bottom:.5px solid var(--bdr)"><div style="flex:1"><p style="font-size:12px;font-weight:600;color:var(--tx)">Maio 2026</p></div><span class="pill p-warn">A receber</span><button class="btn" style="padding:4px 8px;font-size:11px;margin-left:6px" onclick="toast('Baixando...')"><i class="ti ti-download"></i></button></div>
+  <div style="display:flex;align-items:center;gap:9px;padding:8px 0;border-bottom:.5px solid var(--bdr)"><div style="flex:1"><p style="font-size:12px;font-weight:600;color:var(--tx)">Abril 2026</p></div><span class="pill p-ok">✓ Pago</span><button class="btn" style="padding:4px 8px;font-size:11px;margin-left:6px" onclick="toast('Baixando...')"><i class="ti ti-download"></i></button></div>
+  <div style="display:flex;align-items:center;gap:9px;padding:8px 0"><div style="flex:1"><p style="font-size:12px;font-weight:600;color:var(--tx)">Março 2026</p></div><span class="pill p-ok">✓ Pago</span><button class="btn" style="padding:4px 8px;font-size:11px;margin-left:6px" onclick="toast('Baixando...')"><i class="ti ti-download"></i></button></div>
+</div></div>
+
+<div class="mbg" id="m-humor" onclick="cm('m-humor',event)"><div class="mbox">
+  <div class="mhead"><p>😊 Como você está hoje?</p><button class="mclose" onclick="cl('m-humor')">✕</button></div>
+  <p style="font-size:11px;color:var(--tx2);margin-bottom:12px">Termômetro emocional — NR-1 PGR. Confidencial.</p>
+  <div class="humor-row">
+    <button class="hbtn" id="h-ex" onclick="selH('excelente')"><span style="font-size:24px">😄</span><span style="font-size:9px;font-weight:600;color:var(--tx2)">Excelente</span></button>
+    <button class="hbtn" id="h-bm" onclick="selH('bem')"><span style="font-size:24px">🙂</span><span style="font-size:9px;font-weight:600;color:var(--tx2)">Bem</span></button>
+    <button class="hbtn" id="h-nt" onclick="selH('neutro')"><span style="font-size:24px">😐</span><span style="font-size:9px;font-weight:600;color:var(--tx2)">Neutro</span></button>
+    <button class="hbtn" id="h-st" onclick="selH('estressado')"><span style="font-size:24px">😟</span><span style="font-size:9px;font-weight:600;color:var(--tx2)">Estressado</span></button>
+    <button class="hbtn" id="h-ml" onclick="selH('mal')"><span style="font-size:24px">😡</span><span style="font-size:9px;font-weight:600;color:var(--tx2)">Mal</span></button>
+  </div>
+  <div id="hextra" style="display:none">
+    <div class="fld"><label>Quer nos contar mais? (opcional)</label><textarea placeholder="O que está acontecendo..."></textarea></div>
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:11px">
+      <input type="checkbox" id="hcont" style="width:16px;height:16px;accent-color:var(--purple)">
+      <label for="hcont" style="font-size:12px;color:var(--tx)">Quero que o RH entre em contato</label>
+    </div>
+  </div>
+  <button class="btn b-prim b-full" onclick="envH()">📤 Registrar</button>
+  <button class="btn b-err b-full" style="margin-top:8px" onclick="cl('m-humor');op('m-pgr')">🚨 Fazer relato PGR</button>
+</div></div>
+
+<div class="mbg" id="m-aval" onclick="cm('m-aval',event)"><div class="mbox">
+  <div class="mhead"><p>⭐ Avaliar aula</p><button class="mclose" onclick="cl('m-aval')">✕</button></div>
+  <p style="font-size:11px;color:var(--tx2);margin-bottom:13px">Como foi a aula? Você pode alterar esta avaliação quando quiser.</p>
+  <div style="display:flex;gap:10px;margin-bottom:14px">
+    <button class="abtn" id="av-feliz" onclick="selAv('feliz')"><span style="font-size:30px">😄</span><span style="font-size:11px;font-weight:600;color:var(--green)">Feliz</span></button>
+    <button class="abtn" id="av-mmm" onclick="selAv('mmm')"><span style="font-size:30px">😐</span><span style="font-size:11px;font-weight:600;color:var(--amber)">Mais ou menos</span></button>
+    <button class="abtn" id="av-triste" onclick="selAv('triste')"><span style="font-size:30px">😢</span><span style="font-size:11px;font-weight:600;color:var(--red)">Triste</span></button>
+  </div>
+  <div class="fld"><label>Comentário (opcional)</label><textarea placeholder="O que achou da aula?"></textarea></div>
+  <button class="btn b-prim b-full" onclick="toast('⭐ Avaliação salva! Pode ser alterada quando quiser.');cl('m-aval')">💾 Salvar avaliação</button>
+</div></div>
+
+<!-- APP -->
+<div class="hdr" id="hdr"></div>
+<div id="fc" style="display:none"></div>
+<div class="scr" id="scr"></div>
+<nav class="bnav" id="bnav"></nav>
+</div>
+
+<script>
+// ════ ESTADO ════════════════════════════════════════════════════════════════
+const S={
+  role:'colaborador',page:'ponto',logado:false,
+  biometria:false,somMarcacao:true,notifPush:true,
+  empresa:{nome:'Studio Arte em Movimento',logo:null},
+  pontos:{entrada:null,intervalo:null,retorno:null,saida:null},
+  geoAtivo:true,geoRaio:100,
+  humorSel:null,avalSel:null,profileTab:'pessoal',
+  planos:[
+    {titulo:'Variações de Barra — Básico',turma:'Ballet Infantil B',ordem:1,dur:60,status:'publicado',mats:['PDF','Vídeo']},
+    {titulo:'Pliés e Relevés',turma:'Ballet Infantil B',ordem:2,dur:60,status:'publicado',mats:['PDF']},
+    {titulo:'Sequência de Valsa',turma:'Ballet Infantil B',ordem:3,dur:90,status:'bloqueado',mats:['MP3','PDF','Link']},
+    {titulo:'Grand Battement',turma:'Ballet Infantil B',ordem:4,dur:60,status:'bloqueado',mats:['PDF']},
+  ],
+  alunos:[
+    {ini:'SA',nome:'Sofia Almeida',freq:87,s:'pend',valor:280,venc:5},
+    {ini:'IC',nome:'Isabella Costa',freq:100,s:'pend',valor:280,venc:5},
+    {ini:'LM',nome:'Laura Mendes',freq:68,s:'pend',valor:280,venc:5},
+    {ini:'VR',nome:'Valentina Rocha',freq:93,s:'pend',valor:280,venc:5},
+    {ini:'BL',nome:'Beatriz Lima',freq:75,s:'pend',valor:280,venc:5},
+    {ini:'CF',nome:'Clara Ferreira',freq:100,s:'pend',valor:280,venc:5},
+  ],
+  convites:[
+    {nome:'Ana Paula Ferreira',role:'professor_colab',st:'usado',dt:'22/05',t:'Ballet B'},
+    {nome:'Carla Almeida',role:'responsavel',st:'pendente',dt:'24/05',t:'—'},
+    {nome:'Sofia Almeida',role:'aluno',st:'pendente',dt:'24/05',t:'Ballet B'},
+  ],
+  pontosManual:[],
+  feedbacks:[{de:'Gestor',para:'Você',tipo:'elogio',titulo:'Excelente trabalho!',msg:'Parabéns.',lido:false,dt:'24/05'}],
+};
+const R={
+  suporte:{l:'Suporte i9 Smart',av:'i9',cor:'#004077',g:'linear-gradient(135deg,#003060,#004077)',n:'Suporte i9 Smart',sub:'Acesso total ao sistema'},
+  gestor:{l:'Gestor',av:'MF',cor:'#1e1b4b',g:'linear-gradient(135deg,#1e1b4b,#312e81)',n:'Maria Fernanda',sub:'Studio Arte em Movimento'},
+  professor_colab:{l:'Professor',av:'AP',cor:'#085041',g:'linear-gradient(135deg,#085041,#0f6e56)',n:'Ana Paula F.',sub:'Professor + Colaborador'},
+  colaborador:{l:'Colaborador',av:'AP',cor:'#4338ca',g:'linear-gradient(135deg,#4338ca,#6d28d9)',n:'Ana Paula Ferreira',sub:'Instrutora · CLT'},
+  responsavel:{l:'Responsável',av:'CA',cor:'#0369a1',g:'linear-gradient(135deg,#0369a1,#0c4a6e)',n:'Carla Almeida',sub:'Mãe da Sofia Almeida'},
+  aluno:{l:'Aluno',av:'SA',cor:'#854f0b',g:'linear-gradient(135deg,#854f0b,#92400e)',n:'Sofia Almeida',sub:'Ballet Infantil B'},
+};
+const NAV={
+  suporte:[{i:'ti-building-community',l:'Escolas',id:'escolas'},{i:'ti-link',l:'Convites',id:'convites'},{i:'ti-users-group',l:'Turmas',id:'turmas'},{i:'ti-tools',l:'Config',id:'config'}],
+  gestor:[{i:'ti-layout-dashboard',l:'Dashboard',id:'dashboard'},{i:'ti-users-group',l:'Turmas',id:'turmas'},{i:'ti-chart-bar',l:'Financeiro',id:'financeiro'},{i:'ti-book',l:'Planos',id:'planos'},{i:'ti-link',l:'Acessos',id:'convites'}],
+  professor_colab:[{i:'ti-users-group',l:'Turmas',id:'turmas'},{i:'ti-clipboard-check',l:'Chamada',id:'chamada'},{i:'ti-book',l:'Planos',id:'planos_prof'},{i:'ti-clock',l:'Ponto',id:'ponto'}],
+  colaborador:[{i:'ti-clock',l:'Ponto',id:'ponto'},{i:'ti-calendar',l:'Histórico',id:'historico'},{i:'ti-user',l:'Perfil',id:'perfil'},{i:'ti-settings',l:'Config',id:'settings'}],
+  responsavel:[{i:'ti-calendar-check',l:'Frequência',id:'frequencia'},{i:'ti-receipt',l:'Mensalidades',id:'cobrancas'},{i:'ti-id-badge',l:'Dados',id:'dados'},{i:'ti-settings',l:'Config',id:'settings'}],
+  aluno:[{i:'ti-users-group',l:'Turma',id:'turma'},{i:'ti-calendar-check',l:'Frequência',id:'frequencia'},{i:'ti-book',l:'Atividades',id:'atividades'},{i:'ti-settings',l:'Config',id:'settings'}],
+};
+// ════ HELPERS ════════════════════════════════════════════════════════════════
+function fc2(f){return f>=80?'#16a34a':f>=60?'#d97706':'#ef4444'}
+function fb2(f){return f>=80?'#f0fdf4':f>=60?'#fffbeb':'#fef2f2'}
+function nt(){return new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})}
+let toastT;
+function toast(m,ms=3000){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('show'),ms)}
+function cm(id,e){if(e.target.id===id)document.getElementById(id).classList.remove('open')}
+function cl(id){document.getElementById(id).classList.remove('open')}
+function op(id){document.getElementById(id).classList.add('open')}
+function cpix(){const b=document.getElementById('pbtn');b.textContent='✅ Copiado!';setTimeout(()=>b.textContent='📋 Copiar código Pix',2200);toast('Código Pix copiado!')}
+function toggleSw(el){el.classList.toggle('on');el.classList.toggle('off')}
+function pmm(){const v=document.getElementById('pmmot').value;document.getElementById('pmjw').style.display=v==='e'?'none':'block'}
+function canEdit(){return['suporte','gestor'].includes(S.role)}
+function updConv(){const v=document.getElementById('crole').value;document.getElementById('ctw').style.display=v==='responsavel'?'none':'block';if(S.role==='suporte')document.getElementById('cog').style.display='block'}
+function loadLogo(inp){if(inp.files&&inp.files[0]){const r=new FileReader();r.onload=e=>{S.empresa.logo=e.target.result;const p=document.getElementById('logoprev');p.innerHTML=`<img src="${e.target.result}" alt="Logo">`;toast('Logo carregada! Clique em Salvar.')};r.readAsDataURL(inp.files[0])}}
+function salvarLogo(){S.empresa.nome=document.getElementById('logonom').value;cl('m-logo');toast('✅ Logo aplicada em todos os portais!',3500);renderHdr()}
+function salvarPlano(){const t=document.getElementById('plt').value.trim();if(!t){toast('Preencha o título');return}S.planos.push({titulo:t,turma:'Ballet Infantil B',ordem:S.planos.length+1,dur:60,status:'bloqueado',mats:[]});cl('m-plano');toast('✅ Plano salvo!');renderScr()}
+function genConv(){const n=document.getElementById('cnome').value.trim(),e=document.getElementById('cemail').value.trim();if(!n||!e.includes('@')){toast('Preencha nome e e-mail');return}const tok=[...Array(32)].map(()=>Math.floor(Math.random()*16).toString(16)).join('');const role=document.getElementById('crole').value;const link=`https://app.i9smart.com.br/instalar/${role}?token=${tok}`;document.getElementById('clink').textContent=link;document.getElementById('cresult').style.display='block';S.convites.unshift({nome:n,role,st:'pendente',dt:new Date().toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'}),t:'—'});toast('✅ Convite + instalador gerado!')}
+function ccopy(){toast('📋 Link copiado!')}
+function envPM(){S.pontosManual.push({tipo:'Saída',data:'24/05',hora:'17:05',motivo:'Esquecimento',status:'pendente'});cl('m-pm');toast('📤 Ponto manual enviado para aprovação!',4000)}
+function selH(h){S.humorSel=h;['ex','bm','nt','st','ml'].forEach((id,i)=>{const k=['excelente','bem','neutro','estressado','mal'][i];const el=document.getElementById('h-'+id);el.className='hbtn'+(k===h?' sel-'+k:'')});document.getElementById('hextra').style.display=['estressado','mal'].includes(h)?'block':'none'}
+function envH(){if(!S.humorSel){toast('Selecione seu estado emocional');return}cl('m-humor');toast('✅ Estado emocional registrado confidencialmente.',3500);S.humorSel=null}
+function envPGR(){cl('m-pgr');toast('🔒 Relato PGR registrado. Dados imutáveis por lei.',5000)}
+function selAv(v){S.avalSel=v;['feliz','mmm','triste'].forEach(x=>{const el=document.getElementById('av-'+x);el.className='abtn'+(x===v?' sel-'+x:'')})}
+// ════ HOLD BUTTON ════════════════════════════════════════════════════════════
+const holds={};
+function mkHold(el,cb){
+  if(!el||el._hs)return;el._hs=1;
+  function start(e){e.preventDefault();if(el.dataset.done==='1')return;holds[el.id]={t:performance.now()};const f=el.querySelector('.hf'),lbl=el.querySelector('.hl'),cor=el.dataset.cor||'#7c3aed';el.style.boxShadow=`0 0 0 5px ${cor}22`;const tick=()=>{if(!holds[el.id])return;const p=Math.min((performance.now()-holds[el.id].t)/3000*100,100);if(f)f.style.width=p+'%';if(lbl)lbl.textContent=Math.round(p/100*3)+'s...';if(p<100)holds[el.id].r=requestAnimationFrame(tick);else done()};holds[el.id].r=requestAnimationFrame(tick)}
+  function stop(){if(!holds[el.id])return;cancelAnimationFrame(holds[el.id].r);delete holds[el.id];const f=el.querySelector('.hf'),lbl=el.querySelector('.hl');if(f)f.style.width='0%';if(lbl&&el.dataset.done!=='1')lbl.textContent=el.dataset.lbl||'Segurar 3s';el.style.boxShadow='none'}
+  function done(){delete holds[el.id];el.dataset.done='1';el.style.pointerEvents='none';const cor=el.dataset.cor||'#7c3aed';el.style.background=cor;el.style.borderColor=cor;el.style.boxShadow=`0 4px 16px ${cor}40`;const ic=el.querySelector('.hi'),lbl=el.querySelector('.hl'),hh=el.querySelector('.hh'),f=el.querySelector('.hf');if(ic)ic.textContent='✅';if(lbl){lbl.textContent='Registrado!';lbl.style.color='#fff'}if(hh)hh.style.display='none';if(f){f.style.width='100%';f.style.background='rgba(255,255,255,.18)'}cb()}
+  el.addEventListener('mousedown',start);el.addEventListener('mouseup',stop);el.addEventListener('mouseleave',stop);el.addEventListener('touchstart',start,{passive:false});el.addEventListener('touchend',stop)
+}
+// ════ RENDER ══════════════════════════════════════════════════════════════════
+function render(){renderHdr();renderFC();renderNav();renderScr()}
+function renderHdr(){
+  const Ri=R[S.role],h=document.getElementById('hdr');h.style.background=Ri.g;
+  const kmap={
+    colaborador:`<div class="kstrip"><div class="kc"><p>Banco de Horas</p><p style="color:#a3e635">+3h 20min</p></div><div class="kc"><p>Férias</p><p style="color:#fde68a">15 dias</p></div></div>`,
+    professor_colab:`<div class="kstrip"><div class="kc"><p>Turmas</p><p style="color:#a7f3d0">2</p></div><div class="kc"><p>Alunos</p><p style="color:#a7f3d0">21</p></div><div class="kc"><p>Banco Hrs</p><p style="color:#a3e635">+3h20</p></div></div>`,
+    suporte:`<div class="kstrip"><div class="kc"><p>Escolas</p><p style="color:#93c5fd">2</p></div><div class="kc"><p>Alunos</p><p style="color:#93c5fd">160</p></div><div class="kc"><p>Turmas</p><p style="color:#93c5fd">14</p></div></div>`,
+    gestor:`<div class="kstrip"><div class="kc"><p>Alunos</p><p style="color:#c7d2fe">48</p></div><div class="kc"><p>Faturamento</p><p style="color:#a3e635">R$14.280</p></div><div class="kc"><p>Inadimp.</p><p style="color:#fca5a5">R$2.520</p></div></div>`,
+    responsavel:`<div class="kstrip"><div class="kc"><p>Frequência</p><p style="color:#93c5fd">87%</p></div><div class="kc"><p>Pendente</p><p style="color:#fde68a">R$280</p></div></div>`,
+    aluno:`<div class="kstrip"><div class="kc"><p>Frequência</p><p style="color:#fde68a">87%</p></div><div class="kc"><p>Aulas</p><p style="color:#fde68a">16</p></div></div>`,
+  };
+  const logoHtml=S.empresa.logo?`<img src="${S.empresa.logo}" style="width:40px;height:40px;border-radius:50%;object-fit:cover;box-shadow:0 0 0 2px rgba(255,255,255,.3)" alt="Logo">`:S.role==='suporte'?`<div style="width:40px;height:40px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;color:var(--i9)">i9</div>`:`<div class="av" style="background:${Ri.cor}55">${Ri.av}</div>`;
+  const pgs={suporte:['escolas'],gestor:['dashboard'],professor_colab:['turmas'],colaborador:['ponto'],responsavel:['frequencia'],aluno:['turma']};
+  const showBack=['suporte','gestor','professor_colab'].includes(S.role)&&!pgs[S.role].includes(S.page)&&pageHistory.length>0;
+  const backBtn=showBack?`<button style="display:flex;align-items:center;gap:6px;background:rgba(255,255,255,.12);border:.5px solid rgba(255,255,255,.2);border-radius:9px;padding:6px 11px;color:#fff;font-size:12px;font-weight:500;cursor:pointer;border-style:solid;margin-bottom:10px;font-family:inherit" onclick="goBack()"><i class="ti ti-arrow-left" style="font-size:16px"></i> Voltar</button>`:'';
+  h.innerHTML=`${backBtn}<div class="hrow">${logoHtml}<div style="flex:1"><p style="color:rgba(255,255,255,.6);font-size:10px">${S.empresa.nome}</p><p style="color:#fff;font-size:15px;font-weight:700;margin-top:1px">${Ri.n}</p><p style="color:rgba(255,255,255,.55);font-size:10px;margin-top:1px">${Ri.sub}</p></div>${!['aluno','responsavel'].includes(S.role)?`<button style="background:rgba(255,255,255,.1);border:.5px solid rgba(255,255,255,.2);border-radius:9px;padding:7px 9px;color:#fff;font-size:13px;cursor:pointer;border-style:solid" onclick="toast('Sem novas notificações')">🔔</button>`:''}</div>${kmap[S.role]||''}`
+}
+let clkI=null;
+function renderFC(){
+  const el=document.getElementById('fc');
+  if(['colaborador','professor_colab'].includes(S.role)&&S.page==='ponto'){
+    el.style.display='block';el.className='fc-wrap';
+    const pts=['entrada','intervalo','retorno','saida'],lb={entrada:'Entrada',intervalo:'Intervalo',retorno:'Retorno',saida:'Saída'},bg2={entrada:'#ecfdf5',intervalo:'#fffbeb',retorno:'#eff6ff',saida:'#fdf4ff'},cl2={entrada:'#065f46',intervalo:'#713f12',retorno:'#1e40af',saida:'#6b21a8'},any=pts.some(t=>S.pontos[t]);
+    el.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:${any?9:0}px"><div><p style="font-size:10px;color:var(--tx2);font-weight:500">Horário atual</p><p id="clk" style="font-size:26px;font-weight:800;color:var(--tx);letter-spacing:-1px;font-variant-numeric:tabular-nums">--:--:--</p><p style="font-size:10px;color:var(--tx3);margin-top:1px">Domingo, 24 de maio de 2026</p></div><div style="display:flex;flex-direction:column;gap:4px;align-items:flex-end"><div style="background:${S.pontos.entrada?'var(--green-l)':'#f9fafb'};border:.5px solid ${S.pontos.entrada?'var(--green-b)':'var(--bdr)'};border-radius:8px;padding:4px 10px;text-align:right"><p style="font-size:9px;font-weight:600;color:${S.pontos.saida?'var(--tx2)':S.pontos.entrada?'var(--green)':'var(--tx3)'}">${S.pontos.saida?'Encerrada':S.pontos.entrada?'🟢 Em jornada':'⚪ Sem registro'}</p></div><div style="background:${S.geoAtivo?'var(--green-l)':'var(--red-l)'};border:.5px solid ${S.geoAtivo?'var(--green-b)':'var(--red-b)'};border-radius:8px;padding:3px 9px"><p style="font-size:9px;font-weight:600;color:${S.geoAtivo?'var(--green)':'var(--red)'}">${S.geoAtivo?'📍 Na área':'🚫 Fora da área'}</p></div></div></div>${any?`<div class="pg">${pts.map(t=>`<div class="pc${S.pontos[t]?' m':''}" ${S.pontos[t]?`style="background:${bg2[t]};border-color:${cl2[t]}40"`:''}>  <p style="font-size:8px;font-weight:600;color:${S.pontos[t]?cl2[t]:'var(--tx3)'}">${lb[t]}</p><p style="font-size:12px;font-weight:700;color:${S.pontos[t]?'var(--tx)':'#d1d5db'}">${S.pontos[t]||'--:--'}</p></div>`).join('')}</div>`:''}`;
+    clearInterval(clkI);const tick=()=>{const e=document.getElementById('clk');if(e)e.textContent=new Date().toLocaleTimeString('pt-BR')};tick();clkI=setInterval(tick,1000);
+  }else{el.style.display='none';el.innerHTML=''}
+}
+function renderNav(){const nav=document.getElementById('bnav');nav.innerHTML=(NAV[S.role]||[]).map(it=>`<button class="nb${it.id===S.page?' on':''}" onclick="gp('${it.id}')"><i class="ti ${it.i}"></i><span>${it.l}</span></button>`).join('')}
+const pageHistory=[];
+function gp(p){pageHistory.push(S.page);S.page=p;renderFC();renderNav();renderScr()}
+function goBack(){if(pageHistory.length>0){S.page=pageHistory.pop();renderFC();renderNav();renderScr()}}
+function renderScr(){
+  const area=document.getElementById('scr');
+  const fn={suporte:{escolas:vEscolas,convites:vConvites,turmas:vGTurmas,config:vSConfig},gestor:{dashboard:vGDash,turmas:vGTurmas,financeiro:vGFin,planos:vPlanos,convites:vConvites},professor_colab:{turmas:vPTurmas,chamada:vChamada,planos_prof:vPlanosProf,ponto:vPonto},colaborador:{ponto:vPonto,historico:vHist,perfil:vPerfil,settings:vSettings},responsavel:{frequencia:vRFreq,cobrancas:vRCob,dados:vRDados,settings:vSettings},aluno:{turma:vATurma,frequencia:vAFreq,atividades:vAAtiv,settings:vSettings}};
+  const view=((fn[S.role]||{})[S.page]);
+  area.innerHTML=view?view():`<div class="card"><p style="color:var(--tx3);text-align:center;padding:20px">Em desenvolvimento</p></div>`;
+  document.querySelectorAll('.hold:not([data-done="1"])').forEach(el=>{
+    const tipo=el.dataset.tipo,idx=el.dataset.idx;
+    if(tipo){mkHold(el,()=>{S.pontos[tipo]=nt();toast(`⏱ ${tipo==='entrada'?'Entrada':tipo==='intervalo'?'Intervalo':tipo==='retorno'?'Retorno':'Saída'} às ${S.pontos[tipo]}`);renderFC();renderScr();if(tipo==='entrada')setTimeout(()=>op('m-humor'),1200)})}
+    else if(idx!==undefined){mkHold(el,()=>{S.alunos[idx].s='p';toast('✅ Presença — '+S.alunos[idx].nome);renderScr()})}
+  });
+}
+</script>
+
+<script>
+// ════ VIEWS ══════════════════════════════════════════════════════════════════
+
+// ── SUPORTE ──────────────────────────────────────────────────────────────────
+function vEscolas(){return`
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+    <p style="font-size:14px;font-weight:700;color:var(--tx)">Escolas</p>
+    <div style="display:flex;gap:6px">
+      <button class="btn" style="font-size:11px;padding:6px 10px" onclick="op('m-logo')">🖼️ Logo</button>
+      <button class="btn b-prim" style="font-size:11px;padding:6px 10px">+ Nova</button>
+    </div>
+  </div>
+  ${[{n:'Studio Arte em Movimento',s:'Escola de Dança · Santa Maria-RS',a:48,t:5,g:'Maria F.',ok:true},
+     {n:'Lab Maker Marista',s:'Escola de Robótica · Santa Maria-RS',a:112,t:9,g:'Carlos L.',ok:true}].map(e=>`
+  <div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px">
+      <div><p style="font-size:14px;font-weight:700;color:var(--tx)">${e.n}</p><p style="font-size:10px;color:var(--tx3);margin-top:2px">${e.s}</p></div>
+      <span class="pill p-ok">✅ Ativa</span>
+    </div>
+    <div class="g3" style="margin-bottom:10px">
+      <div class="sbox"><div class="v">${e.a}</div><div class="l">Alunos</div></div>
+      <div class="sbox"><div class="v">${e.t}</div><div class="l">Turmas</div></div>
+      <div class="sbox"><div class="v" style="font-size:11px">${e.g}</div><div class="l">Gestor</div></div>
+    </div>
+    <div style="display:flex;gap:6px;margin-bottom:7px">
+      <button class="btn b-prim" style="flex:1;font-size:11px" onclick="toast('Acessando ${e.n}...')">Acessar portal</button>
+      <button class="btn" style="flex:1;font-size:11px" onclick="toast('Editando ${e.n}')">✏️ Editar</button>
+    </div>
+    <div style="background:var(--red-l);border:.5px solid var(--red-b);border-radius:9px;padding:8px 11px;display:flex;justify-content:space-between;align-items:center">
+      <span style="font-size:11px;color:var(--red);font-weight:500">⚠️ Remoção da escola (30 dias BKP)</span>
+      <button class="btn b-err" style="font-size:10px;padding:4px 9px" onclick="toast('Escola removida. Prazo de 30 dias para backup de dados.',5000)">🗑️</button>
+    </div>
+  </div>`).join('')}`}
+
+function vSConfig(){return`
+  <div class="i9-badge" style="margin-bottom:14px">
+    <div class="i9-icon">i9</div>
+    <div><p style="color:#fff;font-size:13px;font-weight:700">i9 Smart ERP</p><p style="color:rgba(255,255,255,.6);font-size:10px">Versão 5.0.8 · build 10013073</p></div>
+  </div>
+  <p class="sdiv">Ferramentas de suporte</p>
+  <div style="display:flex;flex-direction:column;gap:7px">
+    ${[
+      {i:'ti-photo',c:'var(--purple)',l:'Logo das escolas',s:'JPG/PNG para todos os portais',fn:`op('m-logo')`},
+      {i:'ti-map-pin',c:'var(--blue)',l:'Geofence de ponto',s:'Raio e local permitido',fn:`op('m-geo')`},
+      {i:'ti-cash',c:'var(--green)',l:'Editar salários',s:'Remuneração dos colaboradores',fn:`op('m-es')`},
+      {i:'ti-user-minus',c:'var(--red)',l:'Remover usuários',s:'Bloqueia acesso imediatamente',fn:`op('m-rm')`},
+      {i:'ti-edit',c:'var(--amber)',l:'Corrigir chamada',s:'Auditado com log de alteração',fn:`op('m-ec')`},
+      {i:'ti-link',c:'var(--i9)',l:'Gerar convite gestor',s:'Somente suporte cria gestores',fn:`document.getElementById('cog').style.display='block';op('m-conv')`},
+    ].map(a=>`<button class="btn b-full" style="justify-content:flex-start;gap:10px;min-height:52px" onclick="${a.fn}">
+      <i class="ti ${a.i}" style="font-size:18px;color:${a.c}"></i>
+      <div style="text-align:left;flex:1"><div style="color:${a.c};font-size:12px">${a.l}</div><div style="font-size:10px;color:var(--tx3)">${a.s}</div></div>
+      <i class="ti ti-chevron-right" style="color:var(--tx3)"></i>
+    </button>`).join('')}
+  </div>
+  <p class="sdiv">Sistema global</p>
+  <div class="card" style="padding:0 13px">
+    <div class="sw"><div style="flex:1"><div class="sw-lbl">Notificações de inadimplência</div><div class="sw-sub">Alertar responsáveis após 5 dias</div></div><button class="sw-tog on" onclick="toggleSw(this)"></button></div>
+    <div class="sw"><div style="flex:1"><div class="sw-lbl">Aprovação de ponto manual</div><div class="sw-sub">Gestor aprova registros manuais</div></div><button class="sw-tog on" onclick="toggleSw(this)"></button></div>
+    <div class="sw"><div style="flex:1"><div class="sw-lbl">Dashboard PGR ativo</div><div class="sw-sub">Termômetro emocional da equipe</div></div><button class="sw-tog on" onclick="toggleSw(this)"></button></div>
+  </div>
+  <div style="text-align:center;margin-top:16px;padding-top:12px;border-top:.5px solid var(--bdr)">
+    <p style="font-size:10px;color:var(--tx3)">powered by i9 Smart</p>
+    <p style="font-size:10px;color:var(--tx3)">Versão: 5.0.8 (10013073)</p>
+  </div>`}
+
+// ── GESTOR ───────────────────────────────────────────────────────────────────
+function vGDash(){return`
+  <div class="g2">
+    ${[['Alunos ativos','48','5 turmas','#4338ca'],['Faturamento','R$14.280','Maio 2026','#16a34a'],['Inadimplência','R$2.520','9 alunos','#ef4444'],['Freq. média','87%','4 semanas','#0369a1']].map(k=>`
+    <div class="card" style="padding:13px"><p style="font-size:10px;color:var(--tx3)">${k[0]}</p><p style="font-size:19px;font-weight:700;color:${k[3]};margin:3px 0;letter-spacing:-.5px">${k[1]}</p><p style="font-size:10px;color:var(--tx3)">${k[2]}</p></div>`).join('')}
+  </div>
+  <div class="card">
+    <p class="ct">📅 Aulas de hoje</p>
+    ${[['08:00','Ballet Infantil A','Sala 1',11,true],['09:00','Ballet Infantil B','Sala 2',10,true],['10:00','Violão Iniciante','Sala 3',12,false],['14:00','Robótica Avançada','Lab',8,false]].map(a=>`
+    <div class="row"><span style="font-size:11px;font-weight:700;color:#4338ca;min-width:38px">${a[0]}</span><div style="flex:1"><p style="font-size:12px;font-weight:600;color:var(--tx)">${a[1]}</p><p style="font-size:10px;color:var(--tx3)">${a[2]} · ${a[3]} alunos</p></div><span class="pill ${a[4]?'p-ok':'p-neu'}">${a[4]?'🟢 Andamento':'⏳'}</span></div>`).join('')}
+  </div>
+  <p class="sdiv">Ferramentas</p>
+  <div style="display:flex;flex-direction:column;gap:7px">
+    ${[
+      {i:'ti-cash',c:'var(--green)',l:'Editar salário',s:'Remuneração do colaborador',fn:`op('m-es')`},
+      {i:'ti-map-pin',c:'var(--blue)',l:'Geofence de ponto',s:'Raio: ${S.geoRaio}m',fn:`op('m-geo')`},
+      {i:'ti-edit',c:'var(--amber)',l:'Corrigir chamada',s:'Editar presença/falta · auditado',fn:`op('m-ec')`},
+      {i:'ti-user-edit',c:'var(--purple)',l:'Editar dados de aluno',s:'Nome, mensalidade, status',fn:`op('m-ea')`},
+      {i:'ti-user-minus',c:'var(--red)',l:'Remover usuário',s:'Bloqueia acesso ao app',fn:`op('m-rm')`},
+      {i:'ti-currency-dollar',c:'#854f0b',l:'Marcar pago em dinheiro',s:'Para pagamento presencial',fn:`toast('Selecione a matrícula e marque como pago.')`},
+      {i:'ti-mood-smile',c:'var(--teal)',l:'Dashboard PGR / Humor',s:'Visão anônima da equipe',fn:`gp('financeiro')`},
+    ].map(a=>`<button class="btn b-full" style="justify-content:flex-start;gap:10px;min-height:52px" onclick="${a.fn}">
+      <i class="ti ${a.i}" style="font-size:18px;color:${a.c}"></i>
+      <div style="text-align:left;flex:1"><div style="color:${a.c};font-size:12px">${a.l}</div><div style="font-size:10px;color:var(--tx3)">${a.s}</div></div>
+      <i class="ti ti-chevron-right" style="color:var(--tx3)"></i>
+    </button>`).join('')}
+  </div>`}
+
+function vGTurmas(){return`
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+    <p style="font-size:14px;font-weight:700;color:var(--tx)">Turmas</p>
+    <button class="btn b-prim" style="font-size:11px;padding:7px 11px" onclick="toast('Formulário de nova turma')">+ Nova turma</button>
+  </div>
+  ${[{n:'Ballet Infantil A',p:'Ana Paula F.',h:'Qua/Sex 08h',v:12,m:11,pc:91},
+     {n:'Ballet Infantil B',p:'Ana Paula F.',h:'Sáb 09h',    v:12,m:10,pc:83},
+     {n:'Robótica Avançada',p:'Carlos Lima', h:'Ter/Qui 14h',v:10,m:8, pc:80},
+     {n:'Violão Iniciante', p:'Sônia Ramos', h:'Seg/Qua 10h',v:15,m:12,pc:80},
+     {n:'Dança Contemp.',   p:'Beatriz Nery',h:'Ter 19h',    v:12,m:7, pc:58}].map(t=>`
+  <div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:9px">
+      <div><p style="font-size:13px;font-weight:700;color:var(--tx)">${t.n}</p><p style="font-size:10px;color:var(--tx3);margin-top:2px">👤 ${t.p} · 🕐 ${t.h}</p></div>
+      <span class="pill ${t.pc>=80?'p-ok':t.pc>=60?'p-warn':'p-err'}">${t.m}/${t.v}</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:7px;margin-bottom:9px">
+      <div class="fb" style="flex:1"><div class="ff" style="width:${t.pc}%;background:${fc2(t.pc)}"></div></div>
+      <span style="font-size:10px;font-weight:700;color:${fc2(t.pc)}">${t.pc}%</span>
+    </div>
+    <div style="display:flex;gap:6px">
+      <button class="btn b-ok" style="flex:1;font-size:11px" onclick="S.role='professor_colab';S.page='chamada';render();document.getElementById('rsel').value='professor_colab'">📋 Chamada</button>
+      <button class="btn" style="flex:1;font-size:11px" onclick="op('m-ea')">✏️ Aluno</button>
+      <button class="btn b-prim" style="padding:7px 10px;font-size:11px" onclick="op('m-conv')">🔗</button>
+    </div>
+  </div>`).join('')}`}
+
+function vGFin(){return`
+  <div class="card">
+    <p class="ct">💰 Maio 2026</p>
+    <div style="display:flex;align-items:center;gap:13px;margin-bottom:12px">
+      <div style="position:relative;width:74px;height:74px;flex-shrink:0">
+        <svg viewBox="0 0 74 74" style="transform:rotate(-90deg);width:74px;height:74px">
+          <circle cx="37" cy="37" r="27" fill="none" stroke="#f3f4f6" stroke-width="9"/>
+          <circle cx="37" cy="37" r="27" fill="none" stroke="#4338ca" stroke-width="9" stroke-dasharray="139 170" stroke-linecap="round"/>
+        </svg>
+        <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:#4338ca">82%</div>
+      </div>
+      <div style="flex:1">
+        <div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="font-size:10px;color:var(--tx2)">Recebido</span><span style="font-size:11px;font-weight:700;color:var(--green)">R$ 11.760</span></div>
+        <div class="fb" style="margin-bottom:7px"><div class="ff" style="width:82%;background:var(--green)"></div></div>
+        <div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="font-size:10px;color:var(--tx2)">Inadimplência</span><span style="font-size:11px;font-weight:700;color:var(--red)">R$ 2.520</span></div>
+        <div class="fb"><div class="ff" style="width:18%;background:var(--red)"></div></div>
+      </div>
+    </div>
+  </div>
+  <div class="card"><p class="ct">😊 Dashboard PGR — Equipe</p>
+    <div class="g3" style="margin-bottom:10px">
+      <div class="sbox"><div style="font-size:22px">😄</div><div class="v" style="font-size:14px;color:var(--green)">2</div><div class="l">Excelente/Bem</div></div>
+      <div class="sbox"><div style="font-size:22px">😐</div><div class="v" style="font-size:14px;color:var(--amber)">1</div><div class="l">Neutro</div></div>
+      <div class="sbox" style="background:var(--red-l)"><div style="font-size:22px">😟</div><div class="v" style="font-size:14px;color:var(--red)">0</div><div class="l">Estressado</div></div>
+    </div>
+    <div style="background:var(--green-l);border:.5px solid var(--green-b);border-radius:9px;padding:8px 11px;font-size:11px;color:var(--green)">✅ 0 relatos PGR ativos · Equipe saudável</div>
+  </div>
+  <div class="card" style="padding:0 14px">
+    <p class="ct" style="padding-top:13px">⚠️ Inadimplentes</p>
+    ${[{n:'Gabriela Oliveira',d:19,v:280},{n:'Pedro Henrique',d:34,v:350}].map(a=>`
+    <div class="row">
+      <div class="avr" style="background:${a.d>30?'var(--red-l)':'var(--amber-l)'};color:${a.d>30?'var(--red)':'var(--amber)'}">${a.n.split(' ').map(x=>x[0]).slice(0,2).join('')}</div>
+      <div style="flex:1;min-width:0"><p style="font-size:12px;font-weight:600;color:var(--tx);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${a.n}</p><p style="font-size:10px;color:${a.d>30?'var(--red)':'var(--amber)'}">⏰ ${a.d} dias em atraso</p></div>
+      <button class="btn b-ok" style="padding:5px 9px;font-size:10px" onclick="toast('Cobrança enviada!')">Cobrar</button>
+      <button class="btn" style="padding:5px 7px;font-size:10px;margin-left:4px" onclick="toast('✅ Marcado como pago em dinheiro!')">💵</button>
+    </div>`).join('')}
+  </div>`}
+
+function vPlanos(){return`
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+    <p style="font-size:14px;font-weight:700;color:var(--tx)">Planos de Aula</p>
+    <button class="btn b-prim" style="font-size:11px;padding:7px 11px" onclick="op('m-plano')">+ Novo</button>
+  </div>
+  <div style="background:var(--blue-l);border:.5px solid var(--blue-b);border-radius:9px;padding:9px 12px;margin-bottom:11px;font-size:11px;color:var(--blue)">
+    🔒 Bloqueado = professor não visualiza. ✅ Publicado = professor acessa a pasta com os materiais.
+  </div>
+  ${S.planos.map((pl,i)=>`
+  <div class="plano-card">
+    <div style="display:flex;align-items:flex-start;gap:9px;margin-bottom:8px">
+      <div style="width:30px;height:30px;border-radius:8px;background:var(--purple-l);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:var(--purple);flex-shrink:0">${pl.ordem}</div>
+      <div style="flex:1;min-width:0"><p style="font-size:13px;font-weight:700;color:var(--tx)">${pl.titulo}</p><p style="font-size:10px;color:var(--tx3);margin-top:2px">🎓 ${pl.turma} · ⏱ ${pl.dur}min</p></div>
+      <span class="pill ${pl.status==='publicado'?'p-ok':'p-neu'}">${pl.status==='publicado'?'✅ Liberado':'🔒 Bloqueado'}</span>
+    </div>
+    <div style="margin-bottom:9px">${pl.mats.map(m=>`<span class="pill p-info" style="font-size:9px;margin-right:4px">${m.includes('PDF')?'📄':m.includes('Vídeo')||m.includes('MP4')?'🎬':m.includes('MP3')?'🎵':'🔗'} ${m}</span>`).join('')}</div>
+    <div style="display:flex;gap:6px">
+      <button class="btn" style="flex:1;font-size:11px" onclick="toast('Editando plano ${i+1}')">✏️ Editar</button>
+      <button class="btn ${pl.status==='publicado'?'b-warn':'b-ok'}" style="flex:1;font-size:11px" onclick="S.planos[${i}].status=S.planos[${i}].status==='publicado'?'bloqueado':'publicado';renderScr();toast(S.planos[${i}].status==='publicado'?'✅ Liberado para o professor!':'🔒 Bloqueado!')">
+        ${pl.status==='publicado'?'🔒 Bloquear':'✅ Liberar'}
+      </button>
+      <button class="btn b-err" style="padding:7px 9px;font-size:11px" onclick="S.planos.splice(${i},1);renderScr();toast('Plano removido')">🗑️</button>
+    </div>
+  </div>`).join('')}`}
+
+// ── PROFESSOR ────────────────────────────────────────────────────────────────
+function vPTurmas(){return`
+  ${[{n:'Ballet Infantil B',h:'Sáb 09h–10h30',sala:'Sala 2',a:10,f:87,prx:'31/05'},
+     {n:'Ballet Infantil A',h:'Qua/Sex 08h',sala:'Sala 1',a:11,f:91,prx:'28/05'}].map(t=>`
+  <div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px">
+      <div><p style="font-size:14px;font-weight:700;color:var(--tx)">${t.n}</p><p style="font-size:10px;color:var(--tx3);margin-top:2px">🕐 ${t.h} · ${t.sala}</p></div>
+      <span class="pill p-ok">${t.a} alunos</span>
+    </div>
+    <div class="g3" style="margin-bottom:10px">
+      <div class="sbox"><div class="v" style="color:var(--green)">${t.f}%</div><div class="l">Frequência</div></div>
+      <div class="sbox"><div class="v">16</div><div class="l">Aulas</div></div>
+      <div class="sbox"><div class="v" style="font-size:11px">${t.prx}</div><div class="l">Próxima</div></div>
+    </div>
+    <div style="display:flex;gap:6px">
+      <button class="btn b-ok" style="flex:1;font-size:11px" onclick="gp('chamada')">📋 Chamada</button>
+      <button class="btn b-prim" style="flex:1;font-size:11px" onclick="gp('planos_prof')">📋 Planos</button>
+    </div>
+  </div>`).join('')}
+  <div style="background:#f3f4f6;border:.5px solid var(--bdr);border-radius:11px;padding:10px 12px;display:flex;align-items:center;gap:7px">
+    <i class="ti ti-lock" style="color:var(--tx3)"></i>
+    <span style="font-size:10px;color:var(--tx3)">Dados financeiros não disponíveis para este perfil</span>
+  </div>`}
+
+function vPlanosProf(){
+  const pub=S.planos.filter(p=>p.status==='publicado'),blk=S.planos.filter(p=>p.status!=='publicado');
+  return`
+  <p style="font-size:14px;font-weight:700;color:var(--tx);margin-bottom:12px">Planos de Aula</p>
+  ${pub.length?`<p class="sdiv">✅ Aulas liberadas pelo gestor</p>
+  ${pub.map(pl=>`<div class="plano-card">
+    <div style="display:flex;align-items:center;gap:9px;margin-bottom:8px">
+      <div style="width:30px;height:30px;border-radius:8px;background:var(--teal-l);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:var(--teal);flex-shrink:0">${pl.ordem}</div>
+      <div style="flex:1;min-width:0"><p style="font-size:13px;font-weight:700;color:var(--tx)">${pl.titulo}</p><p style="font-size:10px;color:var(--tx3)">⏱ ${pl.dur}min</p></div>
+    </div>
+    <div style="margin-bottom:8px">${pl.mats.map(m=>`<span class="pill p-info" style="font-size:9px;margin-right:4px">${m}</span>`).join('')}</div>
+    <button class="btn b-ok b-full" style="font-size:11px" onclick="toast('Abrindo pasta: ${pl.titulo}')">📂 Abrir pasta / executar aula</button>
+  </div>`).join('')}`:''}
+  ${blk.length?`<p class="sdiv">🔒 Próximas aulas (aguardando liberação)</p>
+  ${blk.map(pl=>`<div class="plano-card" style="opacity:.45">
+    <div style="display:flex;align-items:center;gap:9px">
+      <div style="width:30px;height:30px;border-radius:8px;background:#f3f4f6;display:flex;align-items:center;justify-content:center;font-size:13px;color:var(--tx3);flex-shrink:0">${pl.ordem}</div>
+      <div style="flex:1"><p style="font-size:13px;font-weight:600;color:var(--tx)">${pl.titulo}</p><p style="font-size:10px;color:var(--tx3)">🔒 Conteúdo bloqueado pelo gestor</p></div>
+    </div>
+  </div>`).join('')}`:''}`;
+}
+
+function vChamada(){
+  const p=S.alunos.filter(a=>a.s==='p').length,f=S.alunos.filter(a=>a.s==='f').length,nd=S.alunos.filter(a=>a.s==='pend').length;
+  return`
+  <div class="g3" style="margin-bottom:10px">
+    <div class="sbox"><div class="v" style="color:var(--green)">${p}</div><div class="l">Presentes</div></div>
+    <div class="sbox"><div class="v" style="color:var(--red)">${f}</div><div class="l">Faltas</div></div>
+    <div class="sbox"><div class="v" style="color:var(--tx3)">${nd}</div><div class="l">Pendentes</div></div>
+  </div>
+  <div class="card" style="padding:0 14px;margin-bottom:10px">
+    ${S.alunos.map((a,i)=>`
+    <div class="row" style="background:${a.s==='p'?'var(--green-l)':a.s==='f'?'var(--red-l)':'transparent'};margin:0 -14px;padding:9px 14px;border-radius:0;transition:background .2s">
+      <div class="avr" style="background:${fb2(a.freq)};color:${fc2(a.freq)}">${a.ini}</div>
+      <div style="flex:1;min-width:0">
+        <p style="font-size:12px;font-weight:600;color:var(--tx)">${a.nome}</p>
+        <div style="display:flex;align-items:center;gap:5px;margin-top:2px">
+          <div class="fb" style="max-width:60px"><div class="ff" style="width:${a.freq}%;background:${fc2(a.freq)}"></div></div>
+          <span style="font-size:10px;color:${fc2(a.freq)}">${a.freq}%</span>
+        </div>
+      </div>
+      ${a.s==='pend'?`
+        <div id="hch${i}" class="hold" data-idx="${i}" data-cor="#16a34a" data-lbl="Segurar 3s" style="--hb:#16a34a;width:90px;height:46px;border-radius:9px;flex:none">
+          <div class="hf" style="background:#16a34a22"></div>
+          <span class="hi" style="font-size:13px">✋</span>
+          <span class="hl" style="font-size:9px;color:#16a34a">Segurar 3s</span>
+        </div>
+        <button class="btn b-err" style="padding:5px 7px;font-size:12px;flex-shrink:0;height:46px;border-radius:9px" onclick="S.alunos[${i}].s='f';renderScr();toast('❌ Falta — ${a.nome}')">✕</button>`
+      :`<div style="width:32px;height:32px;border-radius:50%;background:${a.s==='p'?'var(--green-l)':'var(--red-l)'};display:flex;align-items:center;justify-content:center;font-size:16px">${a.s==='p'?'✅':'❌'}</div>`}
+    </div>`).join('')}
+  </div>
+  <button class="btn ${nd>0?'b-dis':'b-prim'} b-full" ${nd>0?'disabled':''} onclick="S.alunos.forEach(a=>a.s='pend');renderScr();toast('✅ Chamada salva! Data/hora registrados automaticamente.',4000)">
+    ${nd>0?`⚠️ ${nd} pendente(s)`:'✅ Finalizar chamada'}
+  </button>`}
+
+// ── COLABORADOR ──────────────────────────────────────────────────────────────
+function vPonto(){
+  const tipos=[{id:'entrada',ic:'🏁',l:'Entrada',cor:'#4F46E5'},{id:'intervalo',ic:'☕',l:'Intervalo',cor:'#f59e0b'},{id:'retorno',ic:'🔄',l:'Retorno',cor:'#0ea5e9'},{id:'saida',ic:'🚪',l:'Saída',cor:'#7c3aed'}];
+  const deps={entrada:[],intervalo:['entrada'],retorno:['entrada','intervalo'],saida:['entrada','intervalo','retorno']};
+  return`
+  <div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+      <p class="ct" style="margin-bottom:0">Registrar Ponto</p>
+      <div style="background:${S.geoAtivo?'var(--green-l)':'var(--red-l)'};border:.5px solid ${S.geoAtivo?'var(--green-b)':'var(--red-b)'};border-radius:8px;padding:4px 9px">
+        <p style="font-size:9px;font-weight:600;color:${S.geoAtivo?'var(--green)':'var(--red)'}">${S.geoAtivo?'📍 Na área':'🚫 Fora da área'}</p>
+      </div>
+    </div>
+    <p style="font-size:11px;color:var(--tx3);margin-bottom:12px">Pressione e <strong>segure 3 segundos</strong> para confirmar.</p>
+    <div class="g2" style="gap:8px">
+      ${tipos.map(t=>{const done=!!S.pontos[t.id],ok=deps[t.id].every(d=>S.pontos[d]),dis=done||!ok||(!S.geoAtivo&&!done);return`<div id="hpt${t.id}" class="hold${done?' done':''}" data-tipo="${t.id}" data-cor="${t.cor}" data-lbl="${t.l}" style="--hb:${dis&&!done?'#e5e7eb':t.cor};background:${done?t.cor:'transparent'};opacity:${dis&&!done?.35:1};pointer-events:${dis?'none':'auto'}"><div class="hf" style="background:${t.cor}22"></div><span class="hi">${done?'✅':t.ic}</span><span class="hl" style="color:${done?'#fff':t.cor}">${done?'Registrado!':t.l}</span>${!done?`<span class="hh" style="color:${t.cor}">Segure 3s</span>`:''}</div>`}).join('')}
+    </div>
+    <p style="font-size:10px;color:var(--tx3);text-align:center;margin-top:10px">📍 GPS + timestamp server-side · Imutável</p>
+  </div>
+  <div class="g2" style="gap:8px;margin-bottom:10px">
+    <button class="btn b-warn b-full" onclick="op('m-pm')" style="min-height:48px">📝 Ponto manual</button>
+    <button class="btn b-full" onclick="op('m-fin')" style="min-height:48px;background:var(--purple-l);border-color:#c4b5fd;color:var(--purple)">💰 Financeiro</button>
+  </div>
+  <div class="g2" style="gap:8px;margin-bottom:10px">
+    <button class="btn b-full" onclick="op('m-humor')" style="min-height:48px;background:var(--green-l);border-color:var(--green-b);color:var(--green)">😊 Termômetro emocional</button>
+    <button class="btn b-full" onclick="op('m-fb')" style="min-height:48px;background:var(--blue-l);border-color:var(--blue-b);color:var(--blue)">💬 Feedback</button>
+  </div>
+  ${S.pontosManual.length?`<div class="card"><p class="ct">📋 Pontos manuais enviados</p>
+    ${S.pontosManual.map(pm=>`<div class="row"><div style="flex:1"><p style="font-size:12px;font-weight:600;color:var(--tx)">${pm.tipo} — ${pm.data} ${pm.hora}</p><p style="font-size:10px;color:var(--tx3)">${pm.motivo}</p></div><span class="pill p-warn">⏳ Aguardando</span></div>`).join('')}
+  </div>`:''}
+  <div class="card"><p class="ct">⏱ Banco de Horas</p>
+    <div style="display:flex;align-items:center;gap:14px">
+      <div style="text-align:center"><p style="font-size:28px;font-weight:800;color:#4338ca;letter-spacing:-1px">+3h20</p><p style="font-size:10px;color:var(--tx3)">saldo</p></div>
+      <div style="flex:1">
+        <div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="font-size:11px;color:var(--tx3)">Esta semana</span><span style="font-size:11px;font-weight:700;color:var(--green)">+0h 45min</span></div>
+        <div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="font-size:11px;color:var(--tx3)">Este mês</span><span style="font-size:11px;font-weight:700;color:#4338ca">+3h 20min</span></div>
+        <div style="display:flex;justify-content:space-between"><span style="font-size:11px;color:var(--tx3)">Carga diária</span><span style="font-size:11px;font-weight:600;color:var(--tx2)">8h 00min</span></div>
+      </div>
+    </div>
+  </div>`}
+
+function vHist(){return`
+  <p style="font-size:13px;font-weight:700;color:var(--tx);margin-bottom:11px">Histórico — Maio 2026</p>
+  ${[{d:'Sex 23/05',ok:true,h:'8h 02min',m:{e:'08:02',i:'12:00',r:'13:01',s:'17:05'}},
+     {d:'Qui 22/05',ok:true,h:'8h 00min',m:{e:'07:58',i:'12:00',r:'13:00',s:'17:00'}},
+     {d:'Qua 21/05',ok:true,h:'7h 55min',m:{e:'08:10',i:'12:05',r:'13:00',s:'17:10'}},
+     {d:'Ter 20/05',ok:false,h:'—',m:{e:'08:05',i:'12:00',r:'—',s:'—'}}].map(dia=>`
+  <div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:9px">
+      <div style="display:flex;align-items:center;gap:9px">
+        <div style="width:36px;height:36px;border-radius:8px;background:${dia.ok?'#f5f3ff':'var(--red-l)'};display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1.1">
+          <span style="font-size:8px;color:${dia.ok?'#7c3aed':'var(--red)'};font-weight:700">${dia.d.split(' ')[0].toUpperCase()}</span>
+          <span style="font-size:13px;font-weight:800;color:var(--tx)">${dia.d.split(' ')[1].split('/')[0]}</span>
+        </div>
+        <div><p style="font-size:12px;font-weight:600;color:var(--tx)">${dia.d.split(' ')[1]}</p><p style="font-size:10px;color:var(--tx3)">${dia.h}</p></div>
+      </div>
+      <span class="pill ${dia.ok?'p-ok':'p-err'}">${dia.ok?'✓ Completo':'⚠ Incompleto'}</span>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:5px">
+      ${[['Entrada',dia.m.e,'#ecfdf5','#065f46'],['Intervalo',dia.m.i,'#fefce8','#713f12'],['Retorno',dia.m.r,'#eff6ff','#1e40af'],['Saída',dia.m.s,'#fdf4ff','#6b21a8']].map(([l,v,bg,c])=>`
+      <div style="display:flex;align-items:center;gap:5px;background:${v!=='—'?bg:'#f9fafb'};border:.5px solid ${v!=='—'?c+'30':'var(--bdr)'};border-radius:7px;padding:6px 8px">
+        <span style="font-size:8px;font-weight:600;padding:1px 5px;border-radius:20px;background:${v!=='—'?bg:'#f3f4f6'};color:${v!=='—'?c:'var(--tx3)'}">${l}</span>
+        <span style="font-size:12px;font-weight:700;color:${v!=='—'?'var(--tx)':'#d1d5db'};margin-left:auto">${v}</span>
+      </div>`).join('')}
+    </div>
+  </div>`).join('')}`}
+
+function vPerfil(){
+  const abas=['pessoal','profissional','contratual'];
+  const itens={
+    pessoal:[{i:'ti-user',l:'Dados pessoais'},{i:'ti-user-check',l:'Dados de autodeclaração'},{i:'ti-phone',l:'Contatos'},{i:'ti-user-exclamation',l:'Contatos de emergência'},{i:'ti-users',l:'Meus dependentes'},{i:'ti-home',l:'Endereço pessoal'},{i:'ti-id',l:'Documentos pessoais'},{i:'ti-school',l:'Formação acadêmica'}],
+    profissional:[{i:'ti-briefcase',l:'Dados profissionais'},{i:'ti-certificate',l:'Certificações'},{i:'ti-history',l:'Histórico de empregos'}],
+    contratual:[{i:'ti-file-text',l:'Contrato de trabalho'},{i:'ti-cash',l:'Remuneração'},{i:'ti-calendar',l:'Jornada de trabalho'},{i:'ti-beach',l:'Férias e afastamentos'}],
+  };
+  return`
+  <div class="card" style="text-align:center;padding:20px 14px">
+    <div style="position:relative;display:inline-block;margin-bottom:11px">
+      <div style="width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,#818cf8,#6d28d9);display:flex;align-items:center;justify-content:center;color:#fff;font-size:24px;font-weight:700;margin:0 auto">AP</div>
+      <button style="position:absolute;bottom:0;right:0;width:24px;height:24px;border-radius:50%;background:var(--purple);border:2px solid #fff;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:11px" onclick="toast('Selecionar foto de perfil')">✏️</button>
+    </div>
+    <p style="font-size:15px;font-weight:700;color:var(--tx)">Ana Paula Ferreira</p>
+    <p style="font-size:11px;color:var(--tx3);margin-top:2px">Instrutora de Dança · CLT</p>
+    ${canEdit()?`<button class="btn b-prim" style="margin-top:10px;font-size:11px;padding:6px 14px" onclick="toast('Editando perfil...')">✏️ Editar perfil</button>`:''}
+  </div>
+  <div class="tabs">${abas.map(a=>`<button class="tabx${S.profileTab===a?' on':''}" onclick="S.profileTab='${a}';renderScr()">${a.charAt(0).toUpperCase()+a.slice(1)}</button>`).join('')}</div>
+  <div class="card" style="padding:0 14px">
+    ${(itens[S.profileTab]||[]).map(it=>`
+    <div class="set-item" onclick="toast('Abrindo ${it.l}...')">
+      <div class="set-icon" style="background:var(--purple-l)"><i class="ti ${it.i}" style="font-size:18px;color:var(--purple)"></i></div>
+      <div style="flex:1"><p class="set-lbl">${it.l}</p></div>
+      <i class="ti ti-chevron-right" style="color:var(--tx3)"></i>
+    </div>`).join('')}
+  </div>
+  <button class="btn b-full" style="margin-top:8px;min-height:48px;border-color:#c4b5fd;color:var(--purple)" onclick="toast('Configurar perfil público...')">
+    <i class="ti ti-globe" style="margin-right:5px"></i> Configurar perfil público
+  </button>
+  <button class="btn b-full" style="margin-top:8px;min-height:48px;background:var(--blue-l);border-color:var(--blue-b);color:var(--blue)" onclick="op('m-fb')">
+    <i class="ti ti-message-circle" style="margin-right:5px"></i> Enviar / Receber Feedback
+  </button>
+  ${S.feedbacks.filter(f=>f.para==='Você').length?`<div class="card" style="margin-top:8px"><p class="ct">💬 Feedbacks recebidos</p>
+    ${S.feedbacks.filter(f=>f.para==='Você').map(f=>`<div class="row"><div class="avr" style="background:var(--green-l);color:var(--green)">🌟</div><div style="flex:1;min-width:0"><p style="font-size:12px;font-weight:600;color:var(--tx)">${f.titulo}</p><p style="font-size:10px;color:var(--tx3)">${f.de} · ${f.dt}</p></div>${!f.lido?`<span class="pill p-pur">Novo</span>`:''}</div>`).join('')}
+  </div>`:''}`;
+}
+
+function vSettings(){return`
+  <div style="text-align:center;margin-bottom:18px;padding-top:4px">
+    <div style="width:56px;height:56px;border-radius:14px;background:var(--i9);display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:800;color:#fff;margin:0 auto 8px">i9</div>
+    <p style="font-size:13px;font-weight:700;color:var(--tx)">Configurações</p>
+    <p style="font-size:11px;color:var(--tx3);margin-top:2px">${R[S.role].n}</p>
+  </div>
+  <div class="card" style="padding:0 14px">
+    ${[
+      {i:'ti-bell',bg:'#fef3c7',ic:'#d97706',l:'Habilitar som de marcação',sub:'Feedback sonoro ao registrar',tog:true,key:'somMarcacao'},
+      {i:'ti-bell-ringing',bg:'var(--blue-l)',ic:'var(--blue)',l:'Notificações por push',sub:'Alertas no celular',tog:true,key:'notifPush'},
+      {i:'ti-fingerprint',bg:'var(--green-l)',ic:'var(--green)',l:'Acesso por biometria',sub:'FaceID / TouchID',tog:true,key:'biometria'},
+      {i:'ti-file-text',bg:'#f3f4f6',ic:'var(--tx2)',l:'Política de privacidade',sub:'Termos de uso',tog:false,fn:`toast('Abrindo política...')`},
+      {i:'ti-headphones',bg:'var(--purple-l)',ic:'var(--purple)',l:'Ajuda / Suporte',sub:'Central de atendimento',tog:false,fn:`toast('Abrindo central de ajuda...')`},
+      {i:'ti-flag',bg:'var(--amber-l)',ic:'var(--amber)',l:'Visualizar tour novamente',sub:'Onboarding guiado do sistema',tog:false,fn:`toast('Iniciando tour do sistema...')`},
+    ].map(it=>`
+    <div class="set-item" onclick="${it.tog?`S.${it.key}=!S.${it.key};renderScr()`:it.fn||''}" aria-label="${it.l}">
+      <div class="set-icon" style="background:${it.bg}"><i class="ti ${it.i}" style="font-size:19px;color:${it.ic}"></i></div>
+      <div style="flex:1"><p class="set-lbl">${it.l}</p><p class="set-sub">${it.sub}</p></div>
+      ${it.tog?`<button class="sw-tog ${S[it.key]?'on':'off'}" onclick="event.stopPropagation();S.${it.key}=!S.${it.key};renderScr()"></button>`:`<i class="ti ti-chevron-right" style="color:var(--tx3)"></i>`}
+    </div>`).join('')}
+    <div class="set-item" style="border-bottom:none" onclick="doLogout()" aria-label="Sair">
+      <div class="set-icon" style="background:var(--red-l)"><i class="ti ti-logout" style="font-size:19px;color:var(--red)"></i></div>
+      <div style="flex:1"><p class="set-lbl" style="color:var(--red)">Sair</p><p class="set-sub">Encerrar sessão e limpar dados</p></div>
+      <i class="ti ti-chevron-right" style="color:var(--tx3)"></i>
+    </div>
+  </div>
+  <div style="text-align:center;margin-top:24px;padding-bottom:8px">
+    <div style="display:inline-flex;align-items:center;gap:6px;margin-bottom:5px">
+      <div style="width:18px;height:18px;border-radius:5px;background:var(--i9);display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:800;color:#fff">i9</div>
+      <span style="font-size:11px;color:var(--tx3)">powered by i9 Smart</span>
+    </div>
+    <p style="font-size:10px;color:var(--tx3)">Versão: 5.0.8 (10013073)</p>
+    <p style="font-size:10px;color:var(--tx3);margin-top:2px">© 2026 i9 Smart · Todos os direitos reservados</p>
+  </div>`}
+
+// ── RESPONSÁVEL ──────────────────────────────────────────────────────────────
+function vRFreq(){return`
+  <div class="card" style="margin-bottom:10px">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+      <div class="avr" style="width:42px;height:42px;background:#c7d2fe;color:#4338ca;font-size:13px;font-weight:700">SA</div>
+      <div><p style="font-size:14px;font-weight:700;color:var(--tx)">Sofia Almeida</p><span class="pill p-ok" style="margin-top:3px;display:inline-flex">Matrícula ativa</span></div>
+    </div>
+    <div class="g3" style="margin-bottom:10px">
+      <div class="sbox"><div class="v" style="color:var(--green)">14</div><div class="l">Presenças</div></div>
+      <div class="sbox"><div class="v" style="color:var(--red)">2</div><div class="l">Faltas</div></div>
+      <div class="sbox"><div class="v">87%</div><div class="l">Taxa</div></div>
+    </div>
+    <div class="fb"><div class="ff" style="width:87%;background:var(--green)"></div></div>
+    <p style="font-size:10px;color:var(--green);margin-top:4px">✅ Acima do mínimo exigido (75%)</p>
+  </div>
+  <div class="card" style="padding:0 14px">
+    ${[{d:'24/05',t:'Sáb',tp:'Variações de Barra',p:true},{d:'17/05',t:'Sáb',tp:'Pliés e Relevés',p:true},{d:'10/05',t:'Sáb',tp:'Alongamento',p:false},{d:'03/05',t:'Sáb',tp:'Sequência de Valsa',p:true}].map(a=>`
+    <div class="row">
+      <div style="width:32px;height:32px;border-radius:7px;background:${a.p?'var(--green-l)':'var(--red-l)'};display:flex;flex-direction:column;align-items:center;justify-content:center;flex-shrink:0;line-height:1.1">
+        <span style="font-size:8px;font-weight:700;color:${a.p?'var(--green)':'var(--red)'}">${a.t}</span>
+        <span style="font-size:12px;font-weight:700;color:var(--tx)">${a.d.split('/')[0]}</span>
+      </div>
+      <div style="flex:1"><p style="font-size:12px;font-weight:600;color:var(--tx)">${a.tp}</p><p style="font-size:10px;color:var(--tx3)">${a.d}</p></div>
+      <i class="ti ti-circle-${a.p?'check':'x'}" style="font-size:19px;color:${a.p?'var(--green)':'var(--red)'}"></i>
+    </div>`).join('')}
+  </div>`}
+
+function vRCob(){return`
+  <p style="font-size:13px;font-weight:700;color:var(--tx);margin-bottom:11px">Mensalidades — Sofia Almeida</p>
+  ${[{m:'Junho 2026',vc:'05/06/2026',v:280,s:'pendente'},{m:'Maio 2026',vc:'05/05/2026',v:280,s:'pago'},{m:'Abril 2026',vc:'05/04/2026',v:280,s:'pago'}].map(c=>`
+  <div class="card" style="background:${c.s==='pendente'?'var(--amber-l)':'var(--card)'}">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:${c.s!=='pago'?10:0}px">
+      <div><p style="font-size:14px;font-weight:700;color:var(--tx)">${c.m}</p><p style="font-size:10px;color:var(--tx3);margin-top:2px">Venc.: ${c.vc}</p></div>
+      <div style="text-align:right"><p style="font-size:16px;font-weight:700;color:var(--tx)">R$ ${c.v},00</p><span class="pill ${c.s==='pago'?'p-ok':'p-warn'}">${c.s==='pago'?'✓ Pago':'Pendente'}</span></div>
+    </div>
+    ${c.s!=='pago'?`<div style="display:flex;gap:7px">
+      <button class="btn b-ok" style="flex:1;font-size:11px" onclick="op('m-pix')">⚡ Pix</button>
+      <button class="btn b-info" style="flex:1;font-size:11px" onclick="toast('Gerando boleto...')">📄 Boleto</button>
+    </div>`:''}
+  </div>`).join('')}`}
+
+function vRDados(){return`
+  <div class="card"><p class="ct">📋 Matrícula</p>
+    ${[['Aluno(a)','Sofia Almeida'],['Turma','Ballet Infantil B'],['Horário','Sáb 09h–10h30'],['Professor(a)','Ana Paula Ferreira'],['Status','Ativa · 01/02/2026'],['Vencimento','Todo dia 5'],['Mensalidade','R$ 280,00']].map(r=>`<div class="row"><span style="font-size:11px;color:var(--tx2)">${r[0]}</span><span style="font-size:12px;font-weight:600;color:var(--tx)">${r[1]}</span></div>`).join('')}
+  </div>
+  <div style="background:var(--blue-l);border:.5px solid var(--blue-b);border-radius:12px;padding:12px">
+    <p style="font-weight:700;font-size:12px;color:#1e40af;margin-bottom:4px">📞 Contato</p>
+    <p style="font-size:12px;color:#3b82f6">Studio Arte em Movimento · (55) 3025-0000</p>
+  </div>`}
+
+// ── ALUNO ────────────────────────────────────────────────────────────────────
+function vATurma(){return`
+  <div class="card">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+      <div class="avr" style="width:42px;height:42px;background:var(--amber-l);color:var(--amber);font-size:13px;font-weight:700">SA</div>
+      <div><p style="font-size:14px;font-weight:700;color:var(--tx)">Sofia Almeida</p><p style="font-size:10px;color:var(--tx3)">Ballet Infantil B</p></div>
+    </div>
+    ${[['Turma','Ballet Infantil B'],['Professor(a)','Ana Paula Ferreira'],['Horário','Sáb, 09h00 – 10h30'],['Sala','Sala 2'],['Próxima aula','Sáb, 31/05/2026']].map(r=>`<div class="row"><span style="font-size:11px;color:var(--tx2)">${r[0]}</span><span style="font-size:12px;font-weight:600;color:var(--tx)">${r[1]}</span></div>`).join('')}
+    <div style="margin-top:12px">
+      <div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="font-size:11px;color:var(--tx2)">Frequência</span><span style="font-size:11px;font-weight:700;color:var(--green)">87%</span></div>
+      <div class="fb"><div class="ff" style="width:87%;background:var(--green)"></div></div>
+      <p style="font-size:10px;color:var(--green);margin-top:4px">✅ Acima do mínimo (75%)</p>
+    </div>
+  </div>
+  <button class="btn b-full" style="min-height:48px;background:var(--amber-l);border-color:var(--amber-b);color:var(--amber)" onclick="op('m-aval')">⭐ Avaliar minha última aula</button>
+  <div style="background:#f3f4f6;border:.5px solid var(--bdr);border-radius:11px;padding:10px 12px;display:flex;align-items:center;gap:7px;margin-top:8px">
+    <i class="ti ti-lock" style="color:var(--tx3)"></i>
+    <span style="font-size:10px;color:var(--tx3)">Pagamentos disponíveis apenas para o responsável cadastrado</span>
+  </div>`}
+
+function vAFreq(){return`
+  <div class="g3" style="margin-bottom:10px">
+    <div class="sbox"><div class="v" style="color:var(--green)">14</div><div class="l">Presenças</div></div>
+    <div class="sbox"><div class="v" style="color:var(--red)">2</div><div class="l">Faltas</div></div>
+    <div class="sbox"><div class="v">87%</div><div class="l">Taxa</div></div>
+  </div>
+  <div class="card" style="padding:0 14px">
+    ${[{d:'24/05',tp:'Variações de Barra',p:true,av:'feliz'},{d:'17/05',tp:'Pliés e Relevés',p:true,av:'mmm'},{d:'10/05',tp:'Alongamento',p:false,av:null},{d:'03/05',tp:'Sequência de Valsa',p:true,av:'feliz'}].map(a=>`
+    <div class="row">
+      <i class="ti ti-circle-${a.p?'check':'x'}" style="font-size:19px;color:${a.p?'var(--green)':'var(--red)'};flex-shrink:0"></i>
+      <div style="flex:1"><p style="font-size:12px;font-weight:600;color:var(--tx)">${a.tp}</p><p style="font-size:10px;color:var(--tx3)">${a.d}</p></div>
+      ${a.p?`<button onclick="op('m-aval')" style="background:${a.av==='feliz'?'var(--green-l)':a.av==='mmm'?'var(--amber-l)':'#f9fafb'};border:.5px solid var(--bdr);border-radius:8px;padding:4px 8px;cursor:pointer;font-size:16px">${a.av==='feliz'?'😄':a.av==='mmm'?'😐':'⭐'}</button>`:''}
+    </div>`).join('')}
+  </div>`}
+
+function vAAtiv(){return`
+  <p style="font-size:13px;font-weight:700;color:var(--tx);margin-bottom:11px">Atividades realizadas</p>
+  ${S.planos.filter(p=>p.status==='publicado').map(pl=>`
+  <div class="plano-card">
+    <p style="font-size:10px;color:var(--tx3);margin-bottom:4px">Aula ${pl.ordem} · ${pl.turma}</p>
+    <p style="font-size:13px;font-weight:700;color:var(--tx);margin-bottom:7px">${pl.titulo}</p>
+    <p style="font-size:11px;color:var(--tx2);margin-bottom:8px">⏱ ${pl.dur} minutos</p>
+    <div style="margin-bottom:9px">${pl.mats.map(m=>`<span class="pill p-info" style="font-size:9px;margin-right:4px">${m}</span>`).join('')}</div>
+    <button class="btn b-full" style="font-size:11px;background:var(--amber-l);border-color:var(--amber-b);color:var(--amber)" onclick="op('m-aval')">⭐ Avaliar esta aula</button>
+  </div>`).join('')}
+  ${S.planos.filter(p=>p.status!=='publicado').length?`<p class="sdiv">🔒 Próximas aulas (aguardando)</p>
+  ${S.planos.filter(p=>p.status!=='publicado').map(pl=>`<div class="plano-card" style="opacity:.45"><p style="font-size:13px;font-weight:600;color:var(--tx)">${pl.titulo}</p><p style="font-size:10px;color:var(--tx3)">🔒 Aguardando liberação do professor</p></div>`).join('')}`:''}`;
+}
+
+function vConvites(){
+  const rc={professor:'#0f6e56',professor_colab:'#085041',colaborador:'#4338ca',responsavel:'#0369a1',aluno:'#854f0b',gestor:'#004077'};
+  const rl={professor:'Professor',professor_colab:'Prof+Colab',colaborador:'Colaborador',responsavel:'Responsável',aluno:'Aluno',gestor:'Gestor'};
+  const can=['suporte','gestor'].includes(S.role);
+  return`
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+    <p style="font-size:14px;font-weight:700;color:var(--tx)">Convites de acesso</p>
+    ${can?`<button class="btn b-prim" style="font-size:11px;padding:7px 11px" onclick="op('m-conv')">+ Novo</button>`:''}
+  </div>
+  <div class="card" style="padding:0 14px">
+    ${S.convites.map((c,i)=>`
+    <div class="row">
+      <div style="width:8px;height:8px;border-radius:50%;background:${rc[c.role]||'#9ca3af'};flex-shrink:0"></div>
+      <div style="flex:1;min-width:0">
+        <p style="font-size:12px;font-weight:600;color:var(--tx);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${c.nome}</p>
+        <p style="font-size:10px;color:var(--tx3)">${rl[c.role]||c.role} · ${c.t} · ${c.dt}</p>
+      </div>
+      <span class="pill ${c.st==='usado'?'p-ok':c.st==='expirado'?'p-neu':'p-warn'}" style="font-size:9px">${c.st==='usado'?'Aceito':c.st==='expirado'?'Expirado':'Pendente'}</span>
+      ${c.st==='pendente'&&can?`
+        <button class="btn" style="padding:4px 6px;font-size:10px;margin-left:4px" onclick="toast('Link copiado!')"><i class="ti ti-copy"></i></button>
+        <button class="btn b-err" style="padding:4px 6px;font-size:10px;margin-left:3px" onclick="S.convites.splice(${i},1);renderScr();toast('Convite removido!')"><i class="ti ti-trash"></i></button>`:''}
+    </div>`).join('')}
+  </div>`;
+}
+
+// ════ LOGIN / LOGOUT ══════════════════════════════════════════════════════════
+function doLogin(){const e=document.getElementById('lemail').value,s=document.getElementById('lsenha').value;if(!e||!s){toast('Preencha e-mail e senha');return}S.logado=true;document.getElementById('lscr').classList.add('hidden');toast('✅ Login realizado com sucesso!');render()}
+function doBio(){S.logado=true;document.getElementById('lscr').classList.add('hidden');toast('🔐 Biometria reconhecida!');render()}
+function doLogout(){S.logado=false;S.pontos={entrada:null,intervalo:null,retorno:null,saida:null};document.getElementById('lscr').classList.remove('hidden');toast('Sessão encerrada.')}
+
+// ════ ROLE CHANGE ════════════════════════════════════════════════════════════
+function changeRole(r){
+  S.role=r;S.page=NAV[r][0]?.id||'ponto';
+  S.pontos={entrada:null,intervalo:null,retorno:null,saida:null};
+  S.alunos.forEach(a=>a.s='pend');
+  const lmap={suporte:'Portal do Suporte (i9 Smart)',gestor:'Portal do Gestor',professor_colab:'Portal do Professor',colaborador:'Portal do Colaborador',responsavel:'Portal do Responsável',aluno:'Portal do Aluno'};
+  document.getElementById('llbl').textContent=lmap[r]||'ERP Educacional';
+  document.getElementById('lscr').classList.remove('hidden');
+  S.logado=false;
+}
+
+// INIT
+changeRole('colaborador');
+document.getElementById('rsel').value='colaborador';
+</script>
+</body>
+</html>

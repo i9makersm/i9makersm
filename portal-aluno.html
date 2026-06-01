@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>Studio Arte — Portal Aluno</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{
+  --c:#854f0b;--cd:#5c360a;--cl:#fefce8;
+  --green:#16a34a;--green-l:#f0fdf4;--green-b:#bbf7d0;
+  --red:#ef4444;--red-l:#fef2f2;--red-b:#fca5a5;
+  --amber:#d97706;--amber-l:#fffbeb;--amber-b:#fde68a;
+  --bg:#fffbeb;--card:#fff;--bdr:rgba(0,0,0,0.07);
+  --tx:#0f172a;--tx2:#475569;--tx3:#94a3b8;
+  font-family:"Inter","Segoe UI",system-ui,sans-serif;
+}
+html,body{height:100%;overflow:hidden;background:#1a0f00}
+body{display:flex;align-items:center;justify-content:center}
+.phone{width:390px;height:844px;background:var(--bg);border-radius:44px;overflow:hidden;position:relative;box-shadow:0 40px 100px rgba(0,0,0,.7),0 0 0 1px rgba(255,255,255,.08);display:flex;flex-direction:column}
+.lscr{position:absolute;inset:0;z-index:200;display:flex;flex-direction:column;background:linear-gradient(160deg,#1a0f00 0%,#5c360a 50%,#854f0b 100%);border-radius:44px;align-items:center;justify-content:center;padding:32px 24px}
+.lscr.hidden{display:none}
+.l-logo{width:72px;height:72px;border-radius:20px;background:linear-gradient(135deg,#f59e0b,#d97706);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;box-shadow:0 8px 32px rgba(217,119,6,.5)}
+.l-logo i{font-size:30px;color:#fff}
+.l-card{width:100%;background:rgba(255,255,255,.08);border:.5px solid rgba(255,255,255,.14);border-radius:20px;padding:20px;margin-bottom:14px}
+.l-inp{width:100%;background:rgba(255,255,255,.1);border:.5px solid rgba(255,255,255,.18);border-radius:12px;padding:12px 14px;color:#fff;font-size:14px;outline:none;font-family:inherit;margin-bottom:10px}
+.l-inp:last-child{margin-bottom:0}
+.l-inp::placeholder{color:rgba(255,255,255,.4)}
+.l-btn{width:100%;padding:14px;border-radius:14px;border:none;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;margin-bottom:10px}
+.l-btn-main{background:linear-gradient(135deg,#f59e0b,#d97706);color:#fff;box-shadow:0 4px 20px rgba(217,119,6,.5)}
+.l-btn-bio{background:rgba(255,255,255,.1);color:#fff;border:.5px solid rgba(255,255,255,.2)}
+.hdr{flex-shrink:0;padding:52px 20px 38px;background:linear-gradient(135deg,#5c360a,#854f0b);position:relative;overflow:hidden}
+.hdr::before{content:"";position:absolute;top:-60px;right:-60px;width:200px;height:200px;border-radius:50%;background:rgba(255,255,255,.04)}
+.hdr-row{display:flex;align-items:center;gap:12px}
+.kstrip{display:flex;gap:8px;margin-top:14px}
+.kc{flex:1;background:rgba(255,255,255,.1);border:.5px solid rgba(255,255,255,.15);border-radius:12px;padding:9px 10px}
+.kc-l{color:rgba(255,255,255,.55);font-size:9px;font-weight:500;margin-bottom:3px}
+.kc-v{font-weight:700;font-size:14px}
+.scr{flex:1;overflow-y:auto;overflow-x:hidden;padding:14px 14px 6px;scrollbar-width:none}
+.scr::-webkit-scrollbar{display:none}
+.bnav{flex-shrink:0;background:rgba(255,255,255,.97);backdrop-filter:blur(20px);border-top:.5px solid var(--bdr);display:flex;padding:4px 4px 10px;height:70px;align-items:flex-start}
+.nb{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:7px 3px;border:none;background:transparent;cursor:pointer;border-radius:12px;min-width:0}
+.nb.on{background:var(--cl)}
+.nb i{font-size:22px;color:var(--tx3)}
+.nb.on i{color:var(--c)}
+.nb span{font-size:9px;font-weight:600;color:var(--tx3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.nb.on span{color:var(--c)}
+.card{background:var(--card);border:.5px solid var(--bdr);border-radius:18px;padding:16px;margin-bottom:11px;box-shadow:0 2px 12px rgba(0,0,0,.04)}
+.ct{font-size:13px;font-weight:700;color:var(--tx);margin-bottom:12px;display:flex;align-items:center;gap:7px}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.sbox{background:#f8fafc;border:.5px solid var(--bdr);border-radius:13px;padding:10px;text-align:center}
+.sbox .v{font-size:20px;font-weight:700;color:var(--tx)}
+.sbox .l{font-size:9px;color:var(--tx3);margin-top:2px}
+.pill{display:inline-flex;align-items:center;gap:3px;font-size:10px;font-weight:600;padding:3px 9px;border-radius:20px;white-space:nowrap}
+.p-ok{background:var(--green-l);color:var(--green)}
+.p-err{background:var(--red-l);color:var(--red)}
+.p-warn{background:var(--amber-l);color:var(--amber)}
+.p-info{background:#eff6ff;color:#0369a1}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:9px 14px;border-radius:12px;font-size:12px;font-weight:600;cursor:pointer;border:.5px solid var(--bdr);background:var(--card);color:var(--tx);font-family:inherit;transition:all .15s}
+.btn:active{transform:scale(.97)}
+.b-amber{background:linear-gradient(135deg,#f59e0b,#d97706);border-color:#d97706;color:#fff;box-shadow:0 4px 14px rgba(217,119,6,.3)}
+.b-full{width:100%}
+.row{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:.5px solid var(--bdr)}
+.row:last-child{border-bottom:none}
+.fb{height:5px;background:#e2e8f0;border-radius:99px;overflow:hidden}
+.ff{height:100%;border-radius:99px}
+.sw{display:flex;align-items:center;gap:10px;padding:11px 0;border-bottom:.5px solid var(--bdr)}
+.sw:last-child{border-bottom:none}
+.sw-tog{width:40px;height:22px;border-radius:20px;border:none;cursor:pointer;position:relative;flex-shrink:0}
+.sw-tog::after{content:"";position:absolute;width:16px;height:16px;border-radius:50%;background:#fff;top:3px;left:3px;transition:transform .2s;box-shadow:0 1px 4px rgba(0,0,0,.2)}
+.sw-tog.on{background:var(--c)}
+.sw-tog.on::after{transform:translateX(18px)}
+.sw-tog.off{background:#cbd5e1}
+.abtn{display:flex;flex-direction:column;align-items:center;gap:6px;padding:14px 8px;border-radius:16px;border:2px solid var(--bdr);cursor:pointer;background:#fff;font-family:inherit;transition:all .18s;flex:1}
+.abtn.sel-feliz{background:var(--green-l);border-color:#22c55e;transform:scale(1.04)}
+.abtn.sel-mmm{background:var(--amber-l);border-color:#eab308;transform:scale(1.04)}
+.abtn.sel-triste{background:var(--red-l);border-color:#ef4444;transform:scale(1.04)}
+.plano-card{background:#fff;border:.5px solid var(--bdr);border-radius:16px;padding:15px;margin-bottom:10px;box-shadow:0 2px 10px rgba(0,0,0,.04)}
+.toast{position:absolute;bottom:88px;left:50%;transform:translateX(-50%);background:#0f172a;color:#fff;padding:10px 18px;border-radius:12px;font-size:12px;font-weight:500;z-index:400;white-space:nowrap;opacity:0;transition:opacity .2s;pointer-events:none;box-shadow:0 8px 30px rgba(0,0,0,.3)}
+.toast.show{opacity:1}
+.mbg{position:absolute;inset:0;background:rgba(0,0,0,.55);z-index:150;display:none;align-items:flex-end;justify-content:center;border-radius:44px;overflow:hidden}
+.mbg.open{display:flex}
+.mbox{background:#fff;border-radius:24px 24px 0 0;padding:20px 18px 28px;width:100%;max-height:90%;overflow-y:auto}
+.mhead{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+.mhead p{font-size:15px;font-weight:700;color:var(--tx)}
+.mclose{background:#f1f5f9;border:none;font-size:18px;cursor:pointer;color:var(--tx3);width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center}
+@keyframes fu{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.card,.plano-card{animation:fu .18s ease}
+</style>
+</head>
+<body>
+<div class="phone" id="phone">
+<div class="toast" id="toast"></div>
+
+<div class="lscr" id="lscr">
+  <div class="l-logo"><i class="ti ti-school"></i></div>
+  <div style="text-align:center;margin-bottom:28px">
+    <p style="color:#fff;font-size:22px;font-weight:700;letter-spacing:-.5px">Olá, Sofia! 👋</p>
+    <p style="color:rgba(255,255,255,.5);font-size:13px;margin-top:5px">Ballet Infantil B · Studio Arte</p>
+  </div>
+  <div class="l-card">
+    <input class="l-inp" type="email" placeholder="Seu e-mail">
+    <input class="l-inp" type="password" placeholder="Senha">
+  </div>
+  <button class="l-btn l-btn-main" onclick="doLogin()">Entrar</button>
+  <button class="l-btn l-btn-bio" onclick="doBio()"><i class="ti ti-fingerprint" style="margin-right:6px"></i>Biometria</button>
+  <p style="color:rgba(255,255,255,.25);font-size:10px;margin-top:22px;text-align:center">i9 Smart ERP · v5.0.8</p>
+</div>
+
+<!-- MODAL AVALIAÇÃO -->
+<div class="mbg" id="m-aval" onclick="cm(event)"><div class="mbox">
+  <div class="mhead"><p>⭐ Avaliar aula</p><button class="mclose" onclick="cl('m-aval')">✕</button></div>
+  <p style="font-size:12px;color:var(--tx2);margin-bottom:14px;line-height:1.6">Como foi a aula? Você pode alterar esta avaliação quando quiser, mesmo dias depois! 😊</p>
+  <div style="display:flex;gap:10px;margin-bottom:16px">
+    <button class="abtn" id="av-feliz" onclick="selAv('feliz')"><span style="font-size:36px">😄</span><span style="font-size:12px;font-weight:700;color:var(--green)">Feliz</span></button>
+    <button class="abtn" id="av-mmm" onclick="selAv('mmm')"><span style="font-size:36px">😐</span><span style="font-size:12px;font-weight:700;color:var(--amber)">Mais ou menos</span></button>
+    <button class="abtn" id="av-triste" onclick="selAv('triste')"><span style="font-size:36px">😢</span><span style="font-size:12px;font-weight:700;color:var(--red)">Triste</span></button>
+  </div>
+  <div style="margin-bottom:14px"><label style="font-size:11px;font-weight:600;color:var(--tx2);display:block;margin-bottom:5px">Quer comentar algo? (opcional)</label><textarea style="width:100%;border:.5px solid #e2e8f0;border-radius:12px;padding:11px 13px;font-size:13px;color:var(--tx);resize:vertical;min-height:80px;font-family:inherit;outline:none" placeholder="O que você achou da aula?"></textarea></div>
+  <button class="btn b-amber b-full" id="aval-btn" onclick="saveAval()">💾 Salvar avaliação</button>
+</div></div>
+
+<!-- MODAL CONFIG -->
+<div class="mbg" id="m-cfg" onclick="cm(event)"><div class="mbox">
+  <div class="mhead"><p>⚙️ Configurações</p><button class="mclose" onclick="cl('m-cfg')">✕</button></div>
+  <div class="card" style="padding:0 14px;margin-bottom:0">
+    <div class="sw"><div style="flex:1"><p style="font-size:13px;font-weight:500;color:var(--tx)">Notificações push</p><p style="font-size:10px;color:var(--tx3)">Avisos de aulas e frequência</p></div><button class="sw-tog on" onclick="this.classList.toggle('on');this.classList.toggle('off')"></button></div>
+    <div class="sw"><div style="flex:1"><p style="font-size:13px;font-weight:500;color:var(--tx)">Acesso por biometria</p><p style="font-size:10px;color:var(--tx3)">FaceID / TouchID</p></div><button class="sw-tog off" onclick="this.classList.toggle('on');this.classList.toggle('off')"></button></div>
+    <div class="sw" style="border-bottom:none;cursor:pointer" onclick="document.getElementById('lscr').classList.remove('hidden');document.getElementById('hdr').style.display='none';document.getElementById('scr').style.display='none';document.getElementById('bnav').style.display='none';cl('m-cfg');toast('Até logo, Sofia!')">
+      <div style="width:36px;height:36px;border-radius:11px;background:var(--red-l);display:flex;align-items:center;justify-content:center"><i class="ti ti-logout" style="font-size:18px;color:var(--red)"></i></div>
+      <div style="flex:1"><p style="font-size:13px;font-weight:500;color:var(--red)">Sair</p><p style="font-size:10px;color:var(--tx3)">Encerrar sessão</p></div>
+    </div>
+  </div>
+  <div style="text-align:center;margin-top:16px"><p style="font-size:10px;color:var(--tx3)">powered by i9 Smart · v5.0.8</p></div>
+</div></div>
+
+<div class="hdr" id="hdr" style="display:none">
+  <div class="hdr-row">
+    <div style="width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,#f59e0b,#d97706);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:15px;font-weight:700;color:#fff;box-shadow:0 4px 16px rgba(217,119,6,.3)">SA</div>
+    <div style="flex:1"><p style="color:rgba(255,255,255,.55);font-size:10px">Ballet Infantil B</p><p style="color:#fff;font-size:16px;font-weight:700;margin-top:1px">Sofia Almeida</p><p style="color:rgba(255,255,255,.5);font-size:10px;margin-top:1px">Studio Arte em Movimento</p></div>
+  </div>
+  <div class="kstrip">
+    <div class="kc"><p class="kc-l">Frequência</p><p class="kc-v" style="color:#fde68a">87%</p></div>
+    <div class="kc"><p class="kc-l">Presenças</p><p class="kc-v" style="color:#a7f3d0">14</p></div>
+    <div class="kc"><p class="kc-l">Total aulas</p><p class="kc-v" style="color:#e9d5ff">16</p></div>
+  </div>
+</div>
+<div class="scr" id="scr" style="display:none"></div>
+<nav class="bnav" id="bnav" style="display:none"></nav>
+</div>
+
+<script>
+const NAV=[{i:"ti-users-group",l:"Minha turma",id:"turma"},{i:"ti-calendar-check",l:"Frequência",id:"freq"},{i:"ti-book",l:"Atividades",id:"ativ"},{i:"ti-settings",l:"Config",id:"cfg"}];
+let page="turma",avalSel=null;
+const avaliacoes={"Variações de Barra":"feliz","Pliés e Relevés":"mmm"};
+const planos=[
+  {titulo:"Variações de Barra — Básico",ordem:1,dur:60,mats:["PDF","Vídeo"],aval:"feliz"},
+  {titulo:"Pliés e Relevés",ordem:2,dur:60,mats:["PDF"],aval:"mmm"},
+];
+
+function toast(m,ms=3000){const t=document.getElementById("toast");t.textContent=m;t.classList.add("show");setTimeout(()=>t.classList.remove("show"),ms)}
+function cm(e){if(e.target===e.currentTarget)e.currentTarget.classList.remove("open")}
+function cl(id){document.getElementById(id).classList.remove("open")}
+function op(id){document.getElementById(id).classList.add("open")}
+function selAv(v){avalSel=v;["feliz","mmm","triste"].forEach(x=>{document.getElementById("av-"+x).className="abtn"+(x===v?" sel-"+x:"")})}
+function saveAval(){if(!avalSel){toast("Selecione uma opção 😊");return}toast("⭐ Avaliação salva! Pode alterar quando quiser.");cl("m-aval");avalSel=null}
+function doLogin(){document.getElementById("lscr").classList.add("hidden");["hdr","scr","bnav"].forEach(id=>{const el=document.getElementById(id);el.style.display=id==="bnav"?"flex":"block"});renderNav();renderScr();toast("👋 Bem-vinda, Sofia!")}
+function doBio(){doLogin();toast("🔐 Biometria reconhecida!")}
+function gp(p){page=p;if(p==="cfg"){op("m-cfg");return}renderNav();renderScr()}
+function renderNav(){document.getElementById("bnav").innerHTML=NAV.map(it=>`<button class="nb${it.id===page?" on":""}" onclick="gp('${it.id}')"><i class="ti ${it.i}"></i><span>${it.l}</span></button>`).join("")}
+function renderScr(){const views={turma:vTurma,freq:vFreq,ativ:vAtiv};document.getElementById("scr").innerHTML=(views[page]||vTurma)()}
+
+function vTurma(){return`
+  <div class="card">
+    <div style="display:flex;align-items:center;gap:13px;margin-bottom:15px">
+      <div style="width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,#f59e0b,#d97706);display:flex;align-items:center;justify-content:center;color:#fff;font-size:17px;font-weight:700;flex-shrink:0;box-shadow:0 4px 14px rgba(217,119,6,.3)">SA</div>
+      <div><p style="font-size:16px;font-weight:700;color:var(--tx)">Sofia Almeida</p><p style="font-size:11px;color:var(--tx3);margin-top:3px">Ballet Infantil B</p></div>
+    </div>
+    ${[["Turma","Ballet Infantil B"],["Professor(a)","Ana Paula Ferreira"],["Horário","Sábado, 09h00 – 10h30"],["Sala","Sala 2"],["Próxima aula","Sábado, 31/05/2026"]].map(r=>`
+    <div class="row"><span style="font-size:11px;color:var(--tx2)">${r[0]}</span><span style="font-size:13px;font-weight:600;color:var(--tx)">${r[1]}</span></div>`).join("")}
+    <div style="margin-top:14px">
+      <div style="display:flex;justify-content:space-between;margin-bottom:7px"><span style="font-size:12px;color:var(--tx2)">Minha frequência</span><span style="font-size:12px;font-weight:700;color:var(--green)">87% ✅</span></div>
+      <div class="fb"><div class="ff" style="width:87%;background:var(--green)"></div></div>
+      <p style="font-size:11px;color:var(--green);margin-top:6px">Acima do mínimo exigido (75%)</p>
+    </div>
+  </div>
+  <button class="btn b-amber b-full" style="min-height:52px;font-size:14px" onclick="op('m-aval')">⭐ Avaliar minha última aula</button>
+  <div style="background:#f1f5f9;border:.5px solid var(--bdr);border-radius:14px;padding:12px 15px;display:flex;align-items:center;gap:9px;margin-top:10px">
+    <i class="ti ti-lock" style="color:var(--tx3);font-size:20px"></i>
+    <span style="font-size:11px;color:var(--tx3)">Informações financeiras disponíveis apenas para o responsável cadastrado</span>
+  </div>`}
+
+function vFreq(){return`
+  <div class="g3" style="margin-bottom:13px">
+    <div class="sbox"><div class="v" style="color:var(--green)">14</div><div class="l">Presenças</div></div>
+    <div class="sbox"><div class="v" style="color:var(--red)">2</div><div class="l">Faltas</div></div>
+    <div class="sbox"><div class="v">87%</div><div class="l">Taxa</div></div>
+  </div>
+  <div class="card" style="padding:0 16px">
+    <p class="ct" style="padding-top:14px">📅 Histórico de aulas</p>
+    ${[{d:"24/05",tp:"Variações de Barra",p:true,av:"feliz"},{d:"17/05",tp:"Pliés e Relevés",p:true,av:"mmm"},{d:"10/05",tp:"Alongamento",p:false,av:null},{d:"03/05",tp:"Sequência de Valsa",p:true,av:"feliz"},{d:"26/04",tp:"Pas de Deux",p:true,av:null},{d:"05/04",tp:"Coreografia Recital",p:false,av:null}].map(a=>`
+    <div class="row">
+      <i class="ti ti-circle-${a.p?"check":"x"}" style="font-size:22px;color:${a.p?"var(--green)":"var(--red)"};flex-shrink:0"></i>
+      <div style="flex:1;min-width:0"><p style="font-size:12px;font-weight:600;color:var(--tx)">${a.tp}</p><p style="font-size:10px;color:var(--tx3)">${a.d}</p></div>
+      ${a.p?`<button onclick="op('m-aval')" style="background:${a.av==="feliz"?"var(--green-l)":a.av==="mmm"?"var(--amber-l)":"#f1f5f9"};border:.5px solid var(--bdr);border-radius:10px;padding:5px 10px;cursor:pointer;font-size:18px;transition:transform .15s" title="Editar avaliação">${a.av==="feliz"?"😄":a.av==="mmm"?"😐":"⭐"}</button>`:""}
+    </div>`).join("")}
+  </div>`}
+
+function vAtiv(){return`
+  <p style="font-size:16px;font-weight:700;color:var(--tx);margin-bottom:5px">Atividades realizadas</p>
+  <p style="font-size:11px;color:var(--tx3);margin-bottom:14px">Conteúdo liberado pelo professor</p>
+  ${planos.map(pl=>`
+  <div class="plano-card">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px">
+      <div style="width:34px;height:34px;border-radius:10px;background:var(--cl);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:var(--c);flex-shrink:0">${pl.ordem}</div>
+      <div style="flex:1;min-width:0"><p style="font-size:14px;font-weight:700;color:var(--tx)">${pl.titulo}</p><p style="font-size:10px;color:var(--tx3)">⏱ ${pl.dur} minutos</p></div>
+      <button onclick="op('m-aval')" style="background:${pl.aval==="feliz"?"var(--green-l)":pl.aval==="mmm"?"var(--amber-l)":"#f1f5f9"};border:.5px solid var(--bdr);border-radius:10px;padding:6px 10px;cursor:pointer;font-size:20px" title="Editar avaliação">${pl.aval==="feliz"?"😄":pl.aval==="mmm"?"😐":"⭐"}</button>
+    </div>
+    <div style="margin-bottom:10px">${pl.mats.map(m=>`<span class="pill p-info" style="font-size:9px;margin-right:4px">${m}</span>`).join("")}</div>
+    <button class="btn b-amber b-full" style="font-size:12px" onclick="toast('Abrindo materiais da aula...')">📂 Ver materiais desta aula</button>
+  </div>`).join("")}
+  <div style="background:#f1f5f9;border:.5px solid var(--bdr);border-radius:14px;padding:12px 15px;display:flex;align-items:center;gap:9px">
+    <i class="ti ti-lock" style="color:var(--tx3);font-size:20px"></i>
+    <span style="font-size:11px;color:var(--tx3)">Próximas aulas liberadas pelo professor no dia da aula</span>
+  </div>`}
+</script>
+</body>
+</html>

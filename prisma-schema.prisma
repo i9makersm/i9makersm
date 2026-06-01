@@ -1,0 +1,329 @@
+// Prisma Schema — ERP Educacional
+// Gerado para Supabase (PostgreSQL 15+)
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum RoleUsuario {
+  suporte
+  gestor
+  professor
+  colaborador
+  responsavel
+  aluno
+}
+
+enum RegimeTrabalho {
+  clt
+  pj
+  estagio
+}
+
+enum TipoMarcacao {
+  entrada
+  inicio_intervalo
+  fim_intervalo
+  saida
+}
+
+enum StatusMatricula {
+  ativa
+  cancelada
+  suspensa
+  inadimplente
+}
+
+enum StatusCobranca {
+  pendente
+  pago
+  vencido
+  cancelado
+}
+
+model users {
+  id         String      @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  email      String      @unique
+  role       RoleUsuario
+  ativo      Boolean     @default(true)
+  created_at DateTime    @default(now()) @db.Timestamptz
+  updated_at DateTime    @default(now()) @db.Timestamptz
+
+  gestores      gestores[]
+  colaboradores colaboradores[]
+  responsaveis  responsaveis[]
+  alunos        alunos[]
+  convites_criados convites[] @relation("CriadoPor")
+  convites_usados  convites[] @relation("UserCriado")
+}
+
+model empresas {
+  id         String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  nome       String
+  cnpj       String?  @unique
+  segmento   String?
+  logo_url   String?
+  telefone   String?
+  email      String?
+  endereco   Json?
+  plano      String   @default("starter")
+  ativo      Boolean  @default(true)
+  created_at DateTime @default(now()) @db.Timestamptz
+
+  gestores   gestores[]
+  turmas     turmas[]
+  convites   convites[]
+  colaboradores colaboradores[]
+}
+
+model convites {
+  id            String      @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  token         String      @unique @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  empresa_id    String      @db.Uuid
+  criado_por    String      @db.Uuid
+  role_destino  RoleUsuario
+  email_destino String?
+  nome_destino  String?
+  metadata      Json        @default("{}")
+  usado         Boolean     @default(false)
+  user_criado   String?     @db.Uuid
+  expira_em     DateTime    @db.Timestamptz
+  criado_em     DateTime    @default(now()) @db.Timestamptz
+
+  empresas      empresas    @relation(fields: [empresa_id], references: [id])
+  criador       users       @relation("CriadoPor", fields: [criado_por], references: [id])
+  usuario_criado users?     @relation("UserCriado", fields: [user_criado], references: [id])
+}
+
+model gestores {
+  id         String  @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  user_id    String  @db.Uuid
+  empresa_id String  @db.Uuid
+  nome       String
+  cpf        String?
+  telefone   String?
+
+  users    users    @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  empresas empresas @relation(fields: [empresa_id], references: [id], onDelete: Cascade)
+
+  @@unique([user_id, empresa_id])
+}
+
+model colaboradores {
+  id                String         @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  user_id           String         @db.Uuid
+  empresa_id        String         @db.Uuid
+  nome              String
+  cpf               String?        @unique
+  cargo             String
+  regime            RegimeTrabalho @default(clt)
+  salario_bruto     Decimal?       @db.Decimal(10, 2)
+  data_admissao     DateTime?      @db.Date
+  banco_horas_min   Int            @default(0)
+  carga_horaria_min Int            @default(480)
+  ativo             Boolean        @default(true)
+  created_at        DateTime       @default(now()) @db.Timestamptz
+
+  users           users             @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  empresas        empresas          @relation(fields: [empresa_id], references: [id], onDelete: Cascade)
+  registros_ponto registros_ponto[]
+  holerites       holerites[]
+  ferias          ferias[]
+  turmas_prof     professor_turmas[]
+  turmas_titular  turmas[]
+  freq_registrada registros_frequencia[]
+  atividades      atividades_aula[]
+
+  @@unique([user_id, empresa_id])
+}
+
+model registros_ponto {
+  id             String       @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  colaborador_id String       @db.Uuid
+  tipo           TipoMarcacao
+  registrado_em  DateTime     @default(now()) @db.Timestamptz
+  latitude       Decimal?     @db.Decimal(9, 6)
+  longitude      Decimal?     @db.Decimal(9, 6)
+  ip_origem      String?
+  created_at     DateTime     @default(now()) @db.Timestamptz
+
+  colaboradores colaboradores @relation(fields: [colaborador_id], references: [id])
+}
+
+model ferias {
+  id             String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  colaborador_id String    @db.Uuid
+  saldo_dias     Int       @default(0)
+  proporcionais  Int       @default(0)
+  periodo_inicio DateTime? @db.Date
+  periodo_fim    DateTime? @db.Date
+  created_at     DateTime  @default(now()) @db.Timestamptz
+
+  colaboradores colaboradores @relation(fields: [colaborador_id], references: [id])
+}
+
+model holerites {
+  id               String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  colaborador_id   String   @db.Uuid
+  mes              Int
+  ano              Int
+  salario_bruto    Decimal  @db.Decimal(10, 2)
+  inss             Decimal  @default(0) @db.Decimal(10, 2)
+  irrf             Decimal  @default(0) @db.Decimal(10, 2)
+  outros_descontos Decimal  @default(0) @db.Decimal(10, 2)
+  pdf_url          String?
+  created_at       DateTime @default(now()) @db.Timestamptz
+
+  colaboradores colaboradores @relation(fields: [colaborador_id], references: [id])
+
+  @@unique([colaborador_id, mes, ano])
+}
+
+model responsaveis {
+  id         String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  user_id    String   @db.Uuid
+  nome       String
+  cpf        String?  @unique
+  telefone   String?
+  created_at DateTime @default(now()) @db.Timestamptz
+
+  users  users    @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  alunos alunos[]
+}
+
+model alunos {
+  id              String    @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  user_id         String?   @db.Uuid
+  responsavel_id  String?   @db.Uuid
+  nome            String
+  data_nascimento DateTime? @db.Date
+  foto_url        String?
+  observacoes     String?
+  ativo           Boolean   @default(true)
+  created_at      DateTime  @default(now()) @db.Timestamptz
+
+  users        users?       @relation(fields: [user_id], references: [id])
+  responsaveis responsaveis? @relation(fields: [responsavel_id], references: [id])
+  matriculas   matriculas[]
+  frequencias  registros_frequencia[]
+}
+
+model turmas {
+  id           String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  empresa_id   String   @db.Uuid
+  professor_id String?  @db.Uuid
+  nome         String
+  modalidade   String?
+  dias_semana  Int[]
+  hora_inicio  DateTime @db.Time
+  hora_fim     DateTime @db.Time
+  sala         String?
+  vagas_total  Int      @default(20)
+  mensalidade  Decimal  @db.Decimal(10, 2)
+  ativa        Boolean  @default(true)
+  created_at   DateTime @default(now()) @db.Timestamptz
+
+  empresas      empresas          @relation(fields: [empresa_id], references: [id])
+  colaboradores colaboradores?    @relation(fields: [professor_id], references: [id])
+  matriculas    matriculas[]
+  aulas         aulas[]
+  professores   professor_turmas[]
+}
+
+model professor_turmas {
+  professor_id       String   @db.Uuid
+  turma_id           String   @db.Uuid
+  pode_fazer_chamada Boolean  @default(true)
+  concedido_por      String?  @db.Uuid
+  concedido_em       DateTime @default(now()) @db.Timestamptz
+
+  colaboradores colaboradores @relation(fields: [professor_id], references: [id], onDelete: Cascade)
+  turmas        turmas        @relation(fields: [turma_id], references: [id], onDelete: Cascade)
+
+  @@id([professor_id, turma_id])
+}
+
+model matriculas {
+  id             String          @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  aluno_id       String          @db.Uuid
+  turma_id       String          @db.Uuid
+  data_inicio    DateTime        @default(now()) @db.Date
+  status         StatusMatricula @default(ativa)
+  dia_vencimento Int             @default(10)
+  desconto_pct   Decimal         @default(0) @db.Decimal(5, 2)
+  created_at     DateTime        @default(now()) @db.Timestamptz
+
+  alunos    alunos     @relation(fields: [aluno_id], references: [id])
+  turmas    turmas     @relation(fields: [turma_id], references: [id])
+  cobrancas cobrancas[]
+
+  @@unique([aluno_id, turma_id])
+}
+
+model aulas {
+  id         String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  turma_id   String   @db.Uuid
+  data       DateTime @db.Date
+  topico     String?
+  cancelada  Boolean  @default(false)
+  created_at DateTime @default(now()) @db.Timestamptz
+
+  turmas      turmas                 @relation(fields: [turma_id], references: [id])
+  frequencias registros_frequencia[]
+  atividades  atividades_aula[]
+
+  @@unique([turma_id, data])
+}
+
+model registros_frequencia {
+  id             String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  aula_id        String   @db.Uuid
+  aluno_id       String   @db.Uuid
+  presente       Boolean
+  registrado_por String?  @db.Uuid
+  registrado_em  DateTime @default(now()) @db.Timestamptz
+
+  aulas         aulas         @relation(fields: [aula_id], references: [id], onDelete: Cascade)
+  alunos        alunos        @relation(fields: [aluno_id], references: [id])
+  colaboradores colaboradores? @relation(fields: [registrado_por], references: [id])
+
+  @@unique([aula_id, aluno_id])
+}
+
+model atividades_aula {
+  id          String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  aula_id     String   @db.Uuid
+  titulo      String
+  descricao   String?
+  criado_por  String?  @db.Uuid
+  created_at  DateTime @default(now()) @db.Timestamptz
+
+  aulas         aulas          @relation(fields: [aula_id], references: [id], onDelete: Cascade)
+  colaboradores colaboradores? @relation(fields: [criado_por], references: [id])
+}
+
+model cobrancas {
+  id              String         @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  matricula_id    String         @db.Uuid
+  referencia_mes  Int
+  referencia_ano  Int
+  valor           Decimal        @db.Decimal(10, 2)
+  desconto        Decimal        @default(0) @db.Decimal(10, 2)
+  vencimento      DateTime       @db.Date
+  status          StatusCobranca @default(pendente)
+  pix_copia_cola  String?
+  boleto_url      String?
+  pago_em         DateTime?      @db.Timestamptz
+  pago_valor      Decimal?       @db.Decimal(10, 2)
+  gateway_id      String?
+  created_at      DateTime       @default(now()) @db.Timestamptz
+
+  matriculas matriculas @relation(fields: [matricula_id], references: [id])
+
+  @@unique([matricula_id, referencia_mes, referencia_ano])
+}

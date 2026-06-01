@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>i9 Smart — Portal Suporte</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{
+  --i9:#004077;--i9d:#002a52;--i9l:#e8f0fe;
+  --green:#16a34a;--green-l:#f0fdf4;--green-b:#bbf7d0;
+  --red:#ef4444;--red-l:#fef2f2;--red-b:#fca5a5;
+  --amber:#d97706;--amber-l:#fffbeb;--amber-b:#fde68a;
+  --blue:#0369a1;--blue-l:#eff6ff;--blue-b:#bfdbfe;
+  --purple:#7c3aed;--purple-l:#f5f3ff;
+  --bg:#f0f4f8;--card:#fff;--bdr:rgba(0,0,0,0.07);
+  --tx:#0f172a;--tx2:#475569;--tx3:#94a3b8;
+  font-family:'Inter','Segoe UI',system-ui,sans-serif;
+}
+html,body{height:100%;overflow:hidden;background:#0a1628}
+body{display:flex;align-items:center;justify-content:center}
+.phone{width:390px;height:844px;background:var(--bg);border-radius:44px;overflow:hidden;position:relative;box-shadow:0 40px 100px rgba(0,0,0,.7),0 0 0 1px rgba(255,255,255,.08);display:flex;flex-direction:column}
+
+/* ── Login ── */
+.lscr{position:absolute;inset:0;z-index:200;display:flex;flex-direction:column;background:linear-gradient(160deg,#001e3c 0%,#003060 50%,#004077 100%);border-radius:44px;align-items:center;justify-content:center;padding:32px 24px}
+.lscr.hidden{display:none}
+.l-logo{width:72px;height:72px;border-radius:20px;background:#fff;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;box-shadow:0 8px 32px rgba(0,64,119,.4)}
+.l-logo span{font-size:22px;font-weight:800;color:var(--i9);letter-spacing:-1px}
+.l-card{width:100%;background:rgba(255,255,255,.07);border:.5px solid rgba(255,255,255,.12);border-radius:20px;padding:20px;margin-bottom:14px;backdrop-filter:blur(12px)}
+.l-inp{width:100%;background:rgba(255,255,255,.1);border:.5px solid rgba(255,255,255,.15);border-radius:12px;padding:12px 14px;color:#fff;font-size:14px;outline:none;font-family:inherit;margin-bottom:10px}
+.l-inp:last-child{margin-bottom:0}
+.l-inp::placeholder{color:rgba(255,255,255,.4)}
+.l-btn{width:100%;padding:14px;border-radius:14px;border:none;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;transition:all .2s}
+.l-btn-main{background:#fff;color:var(--i9);margin-bottom:10px;box-shadow:0 4px 20px rgba(255,255,255,.15)}
+.l-btn-bio{background:rgba(255,255,255,.1);color:#fff;border:.5px solid rgba(255,255,255,.2)}
+
+/* ── Header ── */
+.hdr{flex-shrink:0;padding:52px 20px 38px;background:linear-gradient(135deg,#002a52,#004077);position:relative;overflow:hidden}
+.hdr::before{content:'';position:absolute;top:-60px;right:-60px;width:200px;height:200px;border-radius:50%;background:rgba(255,255,255,.04)}
+.hdr::after{content:'';position:absolute;bottom:-30px;left:-30px;width:120px;height:120px;border-radius:50%;background:rgba(255,255,255,.03)}
+.hdr-row{display:flex;align-items:center;gap:12px}
+.hdr-logo{width:44px;height:44px;border-radius:13px;background:#fff;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:var(--i9);flex-shrink:0;box-shadow:0 4px 16px rgba(0,0,0,.2)}
+.kstrip{display:flex;gap:8px;margin-top:14px}
+.kc{flex:1;background:rgba(255,255,255,.1);border:.5px solid rgba(255,255,255,.15);border-radius:12px;padding:9px 10px;backdrop-filter:blur(8px)}
+.kc-l{color:rgba(255,255,255,.55);font-size:9px;font-weight:500;margin-bottom:3px}
+.kc-v{font-weight:700;font-size:14px;letter-spacing:-.3px}
+
+/* ── Float card ── */
+.fc{background:var(--card);border-radius:18px;padding:16px 18px;box-shadow:0 12px 40px rgba(0,0,0,.12);border:.5px solid var(--bdr);margin:-22px 14px 0;position:relative;z-index:10;flex-shrink:0}
+
+/* ── Scroll ── */
+.scr{flex:1;overflow-y:auto;overflow-x:hidden;padding:14px 14px 6px;scrollbar-width:none}
+.scr::-webkit-scrollbar{display:none}
+
+/* ── Bottom nav ── */
+.bnav{flex-shrink:0;background:rgba(255,255,255,.97);backdrop-filter:blur(20px);border-top:.5px solid var(--bdr);display:flex;padding:4px 4px 10px;height:70px;align-items:flex-start}
+.nb{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:7px 3px;border:none;background:transparent;cursor:pointer;border-radius:12px;transition:all .15s;min-width:0}
+.nb.on{background:var(--i9l)}
+.nb i{font-size:22px;color:var(--tx3)}
+.nb.on i{color:var(--i9)}
+.nb span{font-size:9px;font-weight:600;color:var(--tx3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.nb.on span{color:var(--i9)}
+
+/* ── Card ── */
+.card{background:var(--card);border:.5px solid var(--bdr);border-radius:18px;padding:16px;margin-bottom:11px;box-shadow:0 2px 12px rgba(0,0,0,.04)}
+.ct{font-size:13px;font-weight:700;color:var(--tx);margin-bottom:12px;display:flex;align-items:center;gap:7px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.sbox{background:#f8fafc;border:.5px solid var(--bdr);border-radius:13px;padding:10px;text-align:center}
+.sbox .v{font-size:20px;font-weight:700;color:var(--tx)}
+.sbox .l{font-size:9px;color:var(--tx3);margin-top:2px}
+
+/* ── Pill ── */
+.pill{display:inline-flex;align-items:center;gap:3px;font-size:10px;font-weight:600;padding:3px 9px;border-radius:20px;white-space:nowrap}
+.p-ok{background:var(--green-l);color:var(--green)}
+.p-err{background:var(--red-l);color:var(--red)}
+.p-warn{background:var(--amber-l);color:var(--amber)}
+.p-info{background:var(--blue-l);color:var(--blue)}
+.p-neu{background:#f1f5f9;color:var(--tx2)}
+
+/* ── Btn ── */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:9px 14px;border-radius:12px;font-size:12px;font-weight:600;cursor:pointer;border:.5px solid var(--bdr);background:var(--card);color:var(--tx);font-family:inherit;transition:all .15s}
+.btn:active{transform:scale(.97)}
+.b-i9{background:var(--i9);border-color:var(--i9);color:#fff;box-shadow:0 4px 14px rgba(0,64,119,.3)}
+.b-ok{background:var(--green-l);border-color:var(--green-b);color:var(--green)}
+.b-err{background:var(--red-l);border-color:var(--red-b);color:var(--red)}
+.b-warn{background:var(--amber-l);border-color:var(--amber-b);color:var(--amber)}
+.b-full{width:100%}
+
+/* ── Row ── */
+.row{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:.5px solid var(--bdr)}
+.row:last-child{border-bottom:none}
+.avr{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;flex-shrink:0}
+
+/* ── Fb bar ── */
+.fb{height:4px;background:#e2e8f0;border-radius:99px;overflow:hidden}
+.ff{height:100%;border-radius:99px}
+
+/* ── Field ── */
+.fld{margin-bottom:10px}
+.fld label{font-size:11px;font-weight:600;color:var(--tx2);display:block;margin-bottom:4px}
+.fld input,.fld select,.fld textarea{width:100%;border:.5px solid #e2e8f0;border-radius:10px;padding:10px 12px;font-size:13px;color:var(--tx);background:#fff;outline:none;font-family:inherit}
+.fld input:focus,.fld select:focus,.fld textarea:focus{border-color:var(--i9);box-shadow:0 0 0 3px rgba(0,64,119,.1)}
+.fld textarea{resize:vertical;min-height:70px}
+
+/* ── Switch ── */
+.sw{display:flex;align-items:center;gap:10px;padding:11px 0;border-bottom:.5px solid var(--bdr)}
+.sw:last-child{border-bottom:none}
+.sw-lbl{font-size:13px;color:var(--tx);flex:1}
+.sw-sub{font-size:10px;color:var(--tx3);margin-top:2px}
+.sw-tog{width:40px;height:22px;border-radius:20px;border:none;cursor:pointer;position:relative;transition:background .2s;flex-shrink:0}
+.sw-tog::after{content:'';position:absolute;width:16px;height:16px;border-radius:50%;background:#fff;top:3px;left:3px;transition:transform .2s;box-shadow:0 1px 4px rgba(0,0,0,.2)}
+.sw-tog.on{background:var(--i9)}
+.sw-tog.on::after{transform:translateX(18px)}
+.sw-tog.off{background:#cbd5e1}
+
+/* ── Geo map ── */
+.geo-map{width:100%;height:140px;background:linear-gradient(135deg,#dbeafe,#bfdbfe);border-radius:14px;position:relative;overflow:hidden;border:.5px solid var(--bdr);margin-bottom:12px}
+.geo-pin{position:absolute;top:50%;left:50%;transform:translate(-50%,-70%);font-size:28px;filter:drop-shadow(0 2px 6px rgba(0,0,0,.3))}
+.geo-circle{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:80px;height:80px;border-radius:50%;background:rgba(3,105,161,.12);border:2px solid rgba(3,105,161,.35);animation:pulse 2s infinite}
+@keyframes pulse{50%{transform:translate(-50%,-50%) scale(1.12);opacity:.7}}
+
+/* ── Logo upload ── */
+.logo-up{width:72px;height:72px;border-radius:50%;border:2px dashed #cbd5e1;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;background:#f8fafc;overflow:hidden;flex-shrink:0;transition:all .2s}
+.logo-up:hover{border-color:var(--i9);background:var(--i9l)}
+.logo-up img{width:100%;height:100%;object-fit:cover;border-radius:50%}
+
+/* ── Toast ── */
+.toast{position:absolute;bottom:88px;left:50%;transform:translateX(-50%);background:#0f172a;color:#fff;padding:10px 18px;border-radius:12px;font-size:12px;font-weight:500;z-index:400;white-space:nowrap;opacity:0;transition:opacity .2s;pointer-events:none;box-shadow:0 8px 30px rgba(0,0,0,.3)}
+.toast.show{opacity:1}
+
+/* ── Modal ── */
+.mbg{position:absolute;inset:0;background:rgba(0,0,0,.55);z-index:150;display:none;align-items:flex-end;justify-content:center;border-radius:44px;overflow:hidden}
+.mbg.open{display:flex}
+.mbox{background:#fff;border-radius:24px 24px 0 0;padding:20px 18px 28px;width:100%;max-height:90%;overflow-y:auto}
+.mhead{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+.mhead p{font-size:15px;font-weight:700;color:var(--tx)}
+.mclose{background:none;border:none;font-size:20px;cursor:pointer;color:var(--tx3);width:32px;height:32px;border-radius:50%;background:#f1f5f9;display:flex;align-items:center;justify-content:center}
+
+/* ── Back btn ── */
+.back-btn{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.12);border:.5px solid rgba(255,255,255,.2);border-radius:10px;padding:7px 13px;color:#fff;font-size:12px;font-weight:500;cursor:pointer;border-style:solid;margin-bottom:12px;font-family:inherit}
+
+/* ── Tool btn ── */
+.tool-btn{display:flex;align-items:center;gap:12px;padding:14px;border-radius:14px;background:var(--card);border:.5px solid var(--bdr);cursor:pointer;min-height:60px;transition:all .15s;margin-bottom:8px;box-shadow:0 1px 6px rgba(0,0,0,.04)}
+.tool-btn:hover{box-shadow:0 4px 16px rgba(0,0,0,.08);transform:translateY(-1px)}
+.tool-icon{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+
+/* ── Escola card ── */
+.escola-card{background:var(--card);border:.5px solid var(--bdr);border-radius:18px;padding:16px;margin-bottom:12px;box-shadow:0 2px 12px rgba(0,0,0,.05)}
+
+/* ── KPI card ── */
+.kpi-card{background:var(--card);border-radius:16px;padding:15px;box-shadow:0 2px 12px rgba(0,0,0,.05);border:.5px solid var(--bdr)}
+
+@keyframes fu{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.card,.escola-card,.kpi-card,.tool-btn{animation:fu .18s ease}
+</style>
+</head>
+<body>
+
+<div class="phone" id="phone">
+<div class="toast" id="toast"></div>
+
+<!-- LOGIN -->
+<div class="lscr" id="lscr">
+  <div class="l-logo"><span>i9</span></div>
+  <div style="text-align:center;margin-bottom:28px">
+    <p style="color:#fff;font-size:22px;font-weight:700;letter-spacing:-.5px">i9 Smart ERP</p>
+    <p style="color:rgba(255,255,255,.5);font-size:13px;margin-top:5px">Portal de Suporte — Acesso restrito</p>
+  </div>
+  <div class="l-card">
+    <input class="l-inp" id="lemail" type="email" placeholder="E-mail de suporte">
+    <input class="l-inp" id="lsenha" type="password" placeholder="Senha">
+  </div>
+  <button class="l-btn l-btn-main" onclick="doLogin()">Entrar no sistema</button>
+  <button class="l-btn l-btn-bio" onclick="doBio()">
+    <i class="ti ti-fingerprint" style="margin-right:6px"></i>Biometria
+  </button>
+  <p style="color:rgba(255,255,255,.25);font-size:10px;margin-top:24px;text-align:center">i9 Smart ERP · Versão 5.0.8 · Acesso exclusivo para suporte</p>
+</div>
+
+<!-- MODAL NOVA ESCOLA -->
+<div class="mbg" id="m-escola" onclick="cm('m-escola',event)"><div class="mbox">
+  <div class="mhead"><p>🏫 Nova escola</p><button class="mclose" onclick="cl('m-escola')">✕</button></div>
+  <div class="fld"><label>Nome da escola</label><input placeholder="Ex: Studio Arte em Movimento"></div>
+  <div class="fld"><label>Segmento</label><select><option>Escola de Dança</option><option>Escola de Robótica</option><option>Academia</option><option>Escola de Música</option><option>Outro</option></select></div>
+  <div class="fld"><label>CNPJ</label><input placeholder="00.000.000/0001-00"></div>
+  <div class="fld"><label>E-mail da escola</label><input type="email" placeholder="contato@escola.com"></div>
+  <div class="fld"><label>Telefone</label><input type="tel" placeholder="(00) 0000-0000"></div>
+  <div class="fld"><label>Cidade / Estado</label><input placeholder="Santa Maria - RS"></div>
+  <div class="fld"><label>Plano</label><select><option>Starter</option><option>Growth</option><option>Pro</option></select></div>
+  <button class="btn b-i9 b-full" onclick="toast('✅ Escola criada! Gere um convite para o gestor.');cl('m-escola')">💾 Criar escola</button>
+</div></div>
+
+<!-- MODAL CONVITE GESTOR -->
+<div class="mbg" id="m-conv" onclick="cm('m-conv',event)"><div class="mbox">
+  <div class="mhead"><p>🔗 Convidar gestor</p><button class="mclose" onclick="cl('m-conv')">✕</button></div>
+  <div style="background:var(--i9l);border:.5px solid #bfdbfe;border-radius:12px;padding:10px 13px;margin-bottom:13px;font-size:11px;color:var(--i9)">
+    📱 O link gerado inclui o instalador do app do gestor. Uso único, válido por 7 dias.
+  </div>
+  <div class="fld"><label>Escola</label><select><option>Studio Arte em Movimento</option><option>Lab Maker Marista</option></select></div>
+  <div class="fld"><label>Nome do gestor</label><input id="cnome" placeholder="Nome completo"></div>
+  <div class="fld"><label>E-mail</label><input id="cemail" type="email" placeholder="gestor@escola.com"></div>
+  <button class="btn b-i9 b-full" onclick="genConv()" style="margin-bottom:8px">🔗 Gerar link + instalador</button>
+  <div id="cresult" style="display:none">
+    <div style="background:#f8fafc;border:.5px solid var(--bdr);border-radius:11px;padding:11px 13px;margin-bottom:9px">
+      <p style="font-size:10px;font-weight:600;color:var(--tx2);margin-bottom:4px">🔗 Link gerado (7 dias · uso único)</p>
+      <p id="clink" style="font-size:10px;font-family:monospace;color:var(--tx);word-break:break-all"></p>
+    </div>
+    <button class="btn b-ok b-full" onclick="toast('📋 Link copiado!')">📋 Copiar link</button>
+  </div>
+</div></div>
+
+<!-- MODAL LOGO -->
+<div class="mbg" id="m-logo" onclick="cm('m-logo',event)"><div class="mbox">
+  <div class="mhead"><p>🖼️ Logo da escola</p><button class="mclose" onclick="cl('m-logo')">✕</button></div>
+  <p style="font-size:11px;color:var(--tx2);margin-bottom:14px">A logo aparece em todos os portais — do suporte até o aluno. Somente o suporte pode alterar.</p>
+  <div style="display:flex;align-items:center;gap:14px;margin-bottom:16px">
+    <div class="logo-up" id="logoprev" onclick="document.getElementById('logofile').click()">
+      <i class="ti ti-camera" style="font-size:22px;color:var(--tx3)"></i>
+      <span style="font-size:9px;color:var(--tx3);margin-top:3px">JPG/PNG</span>
+    </div>
+    <div>
+      <p style="font-size:13px;font-weight:600;color:var(--tx)">Selecionar imagem</p>
+      <p style="font-size:11px;color:var(--tx3);margin-top:3px">JPG ou PNG · Máx 2MB</p>
+      <input type="file" accept=".jpg,.jpeg,.png" id="logofile" style="display:none" onchange="loadLogo(this)">
+      <button class="btn" style="margin-top:7px;font-size:11px;padding:5px 11px" onclick="document.getElementById('logofile').click()">📂 Abrir pasta</button>
+    </div>
+  </div>
+  <div class="fld"><label>Escola</label><select><option>Studio Arte em Movimento</option><option>Lab Maker Marista</option></select></div>
+  <button class="btn b-i9 b-full" onclick="toast('✅ Logo aplicada em todos os portais desta escola!');cl('m-logo')">💾 Aplicar em todos os portais</button>
+</div></div>
+
+<!-- MODAL GEOFENCE -->
+<div class="mbg" id="m-geo" onclick="cm('m-geo',event)"><div class="mbox">
+  <div class="mhead"><p>📍 Geofence de ponto</p><button class="mclose" onclick="cl('m-geo')">✕</button></div>
+  <div class="geo-map">
+    <div class="geo-pin">📍</div><div class="geo-circle"></div>
+    <div style="position:absolute;bottom:8px;right:10px;background:rgba(255,255,255,.92);border-radius:8px;padding:4px 10px;font-size:10px;font-weight:600;color:var(--blue)">Santa Maria-RS</div>
+  </div>
+  <div class="fld"><label>Escola</label><select><option>Studio Arte em Movimento</option><option>Lab Maker Marista</option></select></div>
+  <div class="fld"><label>Endereço / Local</label><input value="Rua XV de Novembro, 450 — Santa Maria-RS"></div>
+  <div class="fld"><label>Raio permitido</label><select><option>50 metros</option><option selected>100 metros</option><option>200 metros</option><option>500 metros</option></select></div>
+  <div class="card" style="padding:0 14px;margin-bottom:0">
+    <div class="sw"><div style="flex:1"><div class="sw-lbl">Geofence ativo</div><div class="sw-sub">Bloquear ponto fora da área</div></div><button class="sw-tog on" onclick="this.classList.toggle('on');this.classList.toggle('off')"></button></div>
+    <div class="sw"><div style="flex:1"><div class="sw-lbl">Notificar gestor</div><div class="sw-sub">Alerta de tentativa fora da área</div></div><button class="sw-tog on" onclick="this.classList.toggle('on');this.classList.toggle('off')"></button></div>
+  </div>
+  <button class="btn b-i9 b-full" style="margin-top:12px" onclick="toast('✅ Geofence salvo!');cl('m-geo')">💾 Salvar configuração</button>
+</div></div>
+
+<!-- MODAL REMOVER ESCOLA -->
+<div class="mbg" id="m-rm-escola" onclick="cm('m-rm-escola',event)"><div class="mbox">
+  <div class="mhead"><p>🗑️ Remover escola</p><button class="mclose" onclick="cl('m-rm-escola')">✕</button></div>
+  <div style="background:var(--red-l);border:.5px solid var(--red-b);border-radius:13px;padding:14px;margin-bottom:14px">
+    <p style="font-size:13px;font-weight:700;color:var(--red);margin-bottom:6px">⚠️ Ação crítica e irreversível</p>
+    <p style="font-size:11px;color:var(--red);line-height:1.6">A escola terá <strong>30 dias</strong> para exportar todos os dados. Após esse prazo, todos os acessos serão bloqueados permanentemente e os dados deletados do servidor.</p>
+  </div>
+  <div class="fld"><label>Escola a remover</label><select><option>Studio Arte em Movimento</option><option>Lab Maker Marista</option></select></div>
+  <div class="fld"><label>Motivo</label><select><option>Encerramento do contrato</option><option>Inadimplência</option><option>Solicitação da escola</option><option>Outro</option></select></div>
+  <div class="fld"><label>Digite CONFIRMAR para prosseguir</label><input placeholder="CONFIRMAR"></div>
+  <button class="btn b-err b-full" onclick="toast('⏳ Processo de remoção iniciado. Escola notificada. Prazo: 30 dias.',5000);cl('m-rm-escola')">🗑️ Iniciar processo de remoção</button>
+</div></div>
+
+<!-- HEADER -->
+<div class="hdr" id="hdr" style="display:none">
+  <div class="hdr-row">
+    <div class="hdr-logo"><span>i9</span></div>
+    <div style="flex:1">
+      <p style="color:rgba(255,255,255,.55);font-size:10px">i9 Smart ERP — Suporte</p>
+      <p style="color:#fff;font-size:16px;font-weight:700;margin-top:1px">Painel de Controle</p>
+      <p style="color:rgba(255,255,255,.5);font-size:10px;margin-top:1px">Acesso total ao sistema</p>
+    </div>
+    <button style="background:rgba(255,255,255,.1);border:.5px solid rgba(255,255,255,.2);border-radius:10px;padding:8px 10px;color:#fff;font-size:13px;cursor:pointer;border-style:solid" onclick="toast('Sem novas notificações')">🔔</button>
+  </div>
+  <div class="kstrip">
+    <div class="kc"><p class="kc-l">Escolas ativas</p><p class="kc-v" style="color:#93c5fd">2</p></div>
+    <div class="kc"><p class="kc-l">Total de alunos</p><p class="kc-v" style="color:#a7f3d0">160</p></div>
+    <div class="kc"><p class="kc-l">Turmas</p><p class="kc-v" style="color:#fde68a">14</p></div>
+    <div class="kc"><p class="kc-l">MRR</p><p class="kc-v" style="color:#f9a8d4">R$278</p></div>
+  </div>
+</div>
+
+<!-- CONTENT -->
+<div class="scr" id="scr" style="display:none"></div>
+
+<!-- NAV -->
+<nav class="bnav" id="bnav" style="display:none"></nav>
+</div>
+
+<script>
+const PAGES=['escolas','convites','ferramentas','config'];
+const NAV_ITEMS=[
+  {i:'ti-building-community',l:'Escolas',id:'escolas'},
+  {i:'ti-link',l:'Convites',id:'convites'},
+  {i:'ti-tools',l:'Ferramentas',id:'ferramentas'},
+  {i:'ti-settings',l:'Config',id:'config'},
+];
+let page='escolas';
+const hist=[];
+
+function toast(m,ms=3000){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),ms)}
+function cm(id,e){if(e.target.id===id)document.getElementById(id).classList.remove('open')}
+function cl(id){document.getElementById(id).classList.remove('open')}
+function op(id){document.getElementById(id).classList.add('open')}
+function gp(p){hist.push(page);page=p;renderNav();renderScr()}
+function goBack(){if(hist.length){page=hist.pop();renderNav();renderScr()}}
+function loadLogo(inp){if(inp.files&&inp.files[0]){const r=new FileReader();r.onload=e=>{const p=document.getElementById('logoprev');p.innerHTML=`<img src="${e.target.result}" alt="Logo">`;toast('Logo carregada! Clique Salvar.')};r.readAsDataURL(inp.files[0])}}
+function genConv(){const n=document.getElementById('cnome').value.trim(),e=document.getElementById('cemail').value.trim();if(!n||!e.includes('@')){toast('Preencha nome e e-mail');return}const tok=[...Array(32)].map(()=>Math.floor(Math.random()*16).toString(16)).join('');document.getElementById('clink').textContent=`https://app.i9smart.com.br/instalar/gestor?token=${tok}`;document.getElementById('cresult').style.display='block';toast('✅ Convite de gestor gerado!')}
+
+function doLogin(){document.getElementById('lscr').classList.add('hidden');document.getElementById('hdr').style.display='block';document.getElementById('scr').style.display='block';document.getElementById('bnav').style.display='flex';renderNav();renderScr();toast('✅ Bem-vindo, Suporte!')}
+function doBio(){document.getElementById('lscr').classList.add('hidden');document.getElementById('hdr').style.display='block';document.getElementById('scr').style.display='block';document.getElementById('bnav').style.display='flex';renderNav();renderScr();toast('🔐 Biometria reconhecida!')}
+
+function renderNav(){
+  document.getElementById('bnav').innerHTML=NAV_ITEMS.map(it=>`<button class="nb${it.id===page?' on':''}" onclick="gp('${it.id}')"><i class="ti ${it.i}"></i><span>${it.l}</span></button>`).join('')
+}
+
+function renderScr(){
+  const views={escolas:vEscolas,convites:vConvites,ferramentas:vFerramentas,config:vConfig};
+  const fn=views[page];
+  document.getElementById('scr').innerHTML=fn?fn():'';
+}
+
+function vEscolas(){return`
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+    <div><p style="font-size:16px;font-weight:700;color:var(--tx)">Escolas cadastradas</p><p style="font-size:11px;color:var(--tx3);margin-top:2px">Gerencie todas as instâncias</p></div>
+    <button class="btn b-i9" style="font-size:12px" onclick="op('m-escola')">+ Nova escola</button>
+  </div>
+  ${[{n:'Studio Arte em Movimento',s:'Escola de Dança',c:'Santa Maria-RS',a:48,t:5,g:'Maria Fernanda',ok:true,plano:'Growth'},
+     {n:'Lab Maker Marista',s:'Escola de Robótica',c:'Santa Maria-RS',a:112,t:9,g:'Carlos Lima',ok:true,plano:'Pro'}].map(e=>`
+  <div class="escola-card">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px">
+      <div style="flex:1;min-width:0">
+        <p style="font-size:14px;font-weight:700;color:var(--tx)">${e.n}</p>
+        <p style="font-size:11px;color:var(--tx3);margin-top:3px">${e.s} · ${e.c}</p>
+        <div style="display:flex;gap:6px;margin-top:7px">
+          <span class="pill p-ok">✅ Ativa</span>
+          <span class="pill p-info">${e.plano}</span>
+        </div>
+      </div>
+    </div>
+    <div class="g3" style="margin-bottom:12px">
+      <div class="sbox"><div class="v">${e.a}</div><div class="l">Alunos</div></div>
+      <div class="sbox"><div class="v">${e.t}</div><div class="l">Turmas</div></div>
+      <div class="sbox"><div class="v" style="font-size:11px;font-weight:600">${e.g.split(' ')[0]}</div><div class="l">Gestor</div></div>
+    </div>
+    <div style="display:flex;gap:7px;margin-bottom:8px">
+      <button class="btn b-i9" style="flex:1;font-size:11px" onclick="toast('Acessando portal de ${e.n}...')">Acessar portal</button>
+      <button class="btn" style="flex:1;font-size:11px" onclick="toast('Editar ${e.n}')">✏️ Editar dados</button>
+    </div>
+    <button class="btn b-err b-full" style="font-size:11px" onclick="op('m-rm-escola')">🗑️ Iniciar processo de remoção (30 dias BKP)</button>
+  </div>`).join('')}`}
+
+function vConvites(){return`
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+    <div><p style="font-size:16px;font-weight:700;color:var(--tx)">Convites enviados</p><p style="font-size:11px;color:var(--tx3);margin-top:2px">Links únicos com instalador do app</p></div>
+    <button class="btn b-i9" style="font-size:12px" onclick="op('m-conv')">+ Novo</button>
+  </div>
+  <div class="card" style="padding:0 16px">
+    ${[{n:'Maria Fernanda',escola:'Studio Arte',role:'Gestor',st:'aceito',dt:'22/05'},
+       {n:'Carlos Lima',escola:'Lab Maker',role:'Gestor',st:'aceito',dt:'18/05'},
+       {n:'Novo Gestor',escola:'Academia Ritmo',role:'Gestor',st:'pendente',dt:'24/05'}].map((c,i)=>`
+    <div class="row">
+      <div style="width:36px;height:36px;border-radius:11px;background:${c.st==='aceito'?'var(--green-l)':'var(--amber-l)'};display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0">${c.st==='aceito'?'✅':'⏳'}</div>
+      <div style="flex:1;min-width:0">
+        <p style="font-size:12px;font-weight:600;color:var(--tx);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${c.n}</p>
+        <p style="font-size:10px;color:var(--tx3)">${c.role} · ${c.escola} · ${c.dt}</p>
+      </div>
+      <span class="pill ${c.st==='aceito'?'p-ok':'p-warn'}">${c.st==='aceito'?'Aceito':'Pendente'}</span>
+      ${c.st==='pendente'?`<button class="btn" style="padding:4px 8px;font-size:10px;margin-left:5px" onclick="toast('Link copiado!')"><i class="ti ti-copy"></i></button>`:''}
+    </div>`).join('')}
+  </div>`}
+
+function vFerramentas(){return`
+  <p style="font-size:16px;font-weight:700;color:var(--tx);margin-bottom:4px">Ferramentas de suporte</p>
+  <p style="font-size:11px;color:var(--tx3);margin-bottom:16px">Controle global de todas as escolas</p>
+  ${[
+    {i:'ti-photo',bg:'#f5f3ff',ic:'#7c3aed',l:'Logo das escolas',s:'Upload JPG/PNG para cada escola',fn:`op('m-logo')`},
+    {i:'ti-map-pin',bg:'#eff6ff',ic:'#0369a1',l:'Geofence de ponto',s:'Área GPS de registro por escola',fn:`op('m-geo')`},
+    {i:'ti-cash',bg:'#f0fdf4',ic:'#16a34a',l:'Editar salários',s:'Remuneração dos colaboradores',fn:`toast('Selecione a escola e o colaborador.')`},
+    {i:'ti-edit',bg:'#fffbeb',ic:'#d97706',l:'Corrigir chamada',s:'Auditado com log de alteração',fn:`toast('Selecione escola, turma e data.')`},
+    {i:'ti-user-minus',bg:'#fef2f2',ic:'#ef4444',l:'Remover usuário',s:'Bloqueia acesso imediatamente',fn:`toast('Selecione o usuário a remover.')`},
+    {i:'ti-building-off',bg:'#fef2f2',ic:'#dc2626',l:'Remover escola',s:'30 dias de prazo para backup',fn:`op('m-rm-escola')`},
+    {i:'ti-chart-bar',bg:'#f0fdf4',ic:'#16a34a',l:'Dashboard PGR global',s:'Saúde emocional de todas as equipes',fn:`toast('Abrindo dashboard PGR...')`},
+    {i:'ti-receipt',bg:'#f8fafc',ic:'#475569',l:'Financeiro global',s:'MRR, churn, inadimplência',fn:`toast('Abrindo financeiro global...')`},
+  ].map(a=>`
+  <div class="tool-btn" onclick="${a.fn}">
+    <div class="tool-icon" style="background:${a.bg}"><i class="ti ${a.i}" style="font-size:20px;color:${a.ic}"></i></div>
+    <div style="flex:1;min-width:0">
+      <p style="font-size:13px;font-weight:600;color:${a.ic}">${a.l}</p>
+      <p style="font-size:11px;color:var(--tx3);margin-top:2px">${a.s}</p>
+    </div>
+    <i class="ti ti-chevron-right" style="color:var(--tx3);font-size:16px"></i>
+  </div>`).join('')}`}
+
+function vConfig(){return`
+  <div style="display:flex;align-items:center;gap:14px;margin-bottom:18px;padding:16px;background:linear-gradient(135deg,#002a52,#004077);border-radius:18px">
+    <div style="width:48px;height:48px;border-radius:14px;background:#fff;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:800;color:var(--i9);flex-shrink:0">i9</div>
+    <div><p style="color:#fff;font-size:14px;font-weight:700">i9 Smart ERP</p><p style="color:rgba(255,255,255,.55);font-size:11px;margin-top:2px">Versão 5.0.8 · build 10013073</p></div>
+  </div>
+  <div class="card" style="padding:0 16px">
+    ${[
+      {i:'ti-bell',bg:'#fef3c7',ic:'#d97706',l:'Notificações push',sub:'Alertas do sistema'},
+      {i:'ti-mail',bg:'var(--blue-l)',ic:'var(--blue)',l:'Alertas por e-mail',sub:'Inadimplência e PGR'},
+      {i:'ti-shield-check',bg:'var(--green-l)',ic:'var(--green)',l:'Aprovação de ponto manual',sub:'Gestor aprova registros'},
+      {i:'ti-mood-smile',bg:'#f0fdf4',ic:'#16a34a',l:'Dashboard PGR ativo',sub:'NR-1 — registros imutáveis'},
+    ].map(it=>`
+    <div style="display:flex;align-items:center;gap:11px;padding:13px 0;border-bottom:.5px solid var(--bdr);cursor:pointer" onclick="toast('Configuração atualizada!')">
+      <div style="width:36px;height:36px;border-radius:11px;background:${it.bg};display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="ti ${it.i}" style="font-size:18px;color:${it.ic}"></i></div>
+      <div style="flex:1"><p style="font-size:13px;font-weight:500;color:var(--tx)">${it.l}</p><p style="font-size:10px;color:var(--tx3);margin-top:2px">${it.sub}</p></div>
+      <button class="sw-tog on" onclick="event.stopPropagation();this.classList.toggle('on');this.classList.toggle('off')"></button>
+    </div>`).join('')}
+    <div style="display:flex;align-items:center;gap:11px;padding:13px 0;cursor:pointer;border-bottom:none" onclick="document.getElementById('lscr').classList.remove('hidden');document.getElementById('hdr').style.display='none';document.getElementById('scr').style.display='none';document.getElementById('bnav').style.display='none';toast('Sessão encerrada.')">
+      <div style="width:36px;height:36px;border-radius:11px;background:var(--red-l);display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="ti ti-logout" style="font-size:18px;color:var(--red)"></i></div>
+      <div style="flex:1"><p style="font-size:13px;font-weight:500;color:var(--red)">Sair</p><p style="font-size:10px;color:var(--tx3);margin-top:2px">Encerrar sessão de suporte</p></div>
+      <i class="ti ti-chevron-right" style="color:var(--tx3)"></i>
+    </div>
+  </div>
+  <div style="text-align:center;margin-top:20px">
+    <p style="font-size:10px;color:var(--tx3)">powered by i9 Smart</p>
+    <p style="font-size:10px;color:var(--tx3)">Versão: 5.0.8 (10013073)</p>
+    <p style="font-size:10px;color:var(--tx3);margin-top:2px">© 2026 i9 Smart · Todos os direitos reservados</p>
+  </div>`}
+</script>
+</body>
+</html>

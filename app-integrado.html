@@ -1,0 +1,832 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>ERP Educacional</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{
+  --purple:#7c3aed;--purple-d:#4c1d95;--purple-l:#f5f3ff;
+  --green:#16a34a;--green-l:#f0fdf4;--green-b:#bbf7d0;
+  --red:#ef4444;--red-l:#fef2f2;--red-b:#fca5a5;
+  --amber:#d97706;--amber-l:#fffbeb;--amber-b:#fde68a;
+  --blue:#0369a1;--blue-l:#eff6ff;--blue-b:#bfdbfe;
+  --teal:#0f6e56;
+  --bg:#f0efff;--card:#fff;--border:rgba(0,0,0,0.08);
+  --text:#111827;--text2:#6b7280;--text3:#9ca3af;
+  --r:16px;--rsm:10px;
+  font-family:'Inter','Segoe UI',system-ui,sans-serif;
+}
+html,body{height:100%;overflow:hidden}
+body{background:#1a1a2e;display:flex;align-items:center;justify-content:center}
+
+/* Phone frame */
+.phone{width:390px;height:844px;background:var(--bg);border-radius:40px;overflow:hidden;position:relative;box-shadow:0 30px 80px rgba(0,0,0,0.6),0 0 0 1px rgba(255,255,255,0.1);display:flex;flex-direction:column}
+
+/* Header */
+.hdr{flex-shrink:0;padding:52px 20px 38px;position:relative;overflow:hidden}
+.hdr::before{content:'';position:absolute;top:-50px;right:-50px;width:180px;height:180px;border-radius:50%;background:rgba(255,255,255,0.06);pointer-events:none}
+.hdr::after{content:'';position:absolute;bottom:-20px;left:20%;width:100px;height:100px;border-radius:50%;background:rgba(255,255,255,0.04);pointer-events:none}
+.hdr-row{display:flex;align-items:center;gap:12px;margin-bottom:0}
+.avatar{width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:600;color:#fff;flex-shrink:0;letter-spacing:-.5px}
+.kpi-strip{display:flex;gap:8px;margin-top:14px}
+.kpi-c{flex:1;background:rgba(255,255,255,0.12);border:0.5px solid rgba(255,255,255,0.18);border-radius:11px;padding:9px 10px}
+.kpi-c p:first-child{color:rgba(255,255,255,0.6);font-size:9px;font-weight:500;margin-bottom:3px}
+.kpi-c p:last-child{font-weight:700;font-size:14px;letter-spacing:-.3px}
+
+/* Float card */
+.float-card{background:var(--card);border-radius:var(--r);padding:16px 18px;box-shadow:0 8px 32px rgba(0,0,0,0.14);border:0.5px solid var(--border);margin:-22px 14px 0;position:relative;z-index:10;flex-shrink:0}
+
+/* Scroll area */
+.scroll{flex:1;overflow-y:auto;overflow-x:hidden;padding:14px 14px 0}
+.scroll::-webkit-scrollbar{width:2px}
+.scroll::-webkit-scrollbar-thumb{background:rgba(0,0,0,0.12);border-radius:99px}
+
+/* Bottom nav */
+.bnav{flex-shrink:0;background:rgba(255,255,255,0.97);backdrop-filter:blur(16px);border-top:0.5px solid var(--border);display:flex;padding:0 6px 8px;height:72px;align-items:flex-start;padding-top:6px}
+.nb{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 4px;border:none;background:transparent;cursor:pointer;border-radius:10px;transition:background .12s}
+.nb.on{background:var(--purple-l)}
+.nb i{font-size:22px;color:var(--text3);transition:color .12s}
+.nb.on i{color:var(--purple)}
+.nb span{font-size:9px;font-weight:600;color:var(--text3);transition:color .12s;line-height:1}
+.nb.on span{color:var(--purple)}
+
+/* Cards */
+.card{background:var(--card);border:0.5px solid var(--border);border-radius:var(--r);padding:15px;margin-bottom:11px}
+.ct{font-size:13px;font-weight:700;color:var(--text);margin-bottom:11px;display:flex;align-items:center;gap:6px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px}
+.sbox{background:#f9fafb;border:0.5px solid var(--border);border-radius:var(--rsm);padding:9px;text-align:center}
+.sbox .v{font-size:19px;font-weight:700;color:var(--text)}
+.sbox .l{font-size:9px;color:var(--text3);margin-top:1px}
+
+/* Pill */
+.pill{display:inline-flex;align-items:center;gap:3px;font-size:10px;font-weight:600;padding:3px 9px;border-radius:20px;white-space:nowrap}
+.p-ok{background:var(--green-l);color:var(--green)}
+.p-err{background:var(--red-l);color:var(--red)}
+.p-warn{background:var(--amber-l);color:var(--amber)}
+.p-info{background:var(--blue-l);color:var(--blue)}
+.p-neu{background:#f3f4f6;color:var(--text2)}
+
+/* Btn */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:5px;padding:9px 14px;border-radius:var(--rsm);font-size:12px;font-weight:600;cursor:pointer;border:0.5px solid var(--border);background:var(--card);color:var(--text);font-family:inherit;transition:all .12s;letter-spacing:-.1px}
+.btn:active{transform:scale(.97)}
+.b-prim{background:var(--purple);border-color:var(--purple);color:#fff;box-shadow:0 4px 14px rgba(124,58,237,.28)}
+.b-ok{background:var(--green-l);border-color:var(--green-b);color:var(--green)}
+.b-err{background:var(--red-l);border-color:var(--red-b);color:var(--red)}
+.b-full{width:100%}
+.b-disabled{opacity:.38;pointer-events:none}
+
+/* Hold btn */
+.hold{position:relative;overflow:hidden;border-radius:13px;border:1.5px solid var(--hb,var(--purple));height:76px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer;user-select:none;-webkit-user-select:none;flex:1;transition:box-shadow .2s}
+.hold .hf{position:absolute;left:0;top:0;bottom:0;width:0;transition:none;border-radius:11px}
+.hold .hi{font-size:22px;position:relative;z-index:1;line-height:1}
+.hold .hl{font-size:11px;font-weight:700;position:relative;z-index:1}
+.hold .hh{font-size:8px;position:relative;z-index:1;opacity:.65}
+
+/* Freq bar */
+.fb{height:4px;background:#f3f4f6;border-radius:99px;overflow:hidden}
+.ff{height:100%;border-radius:99px;transition:width .4s}
+
+/* Row */
+.row{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:.5px solid var(--border)}
+.row:last-child{border-bottom:none}
+.av{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;flex-shrink:0}
+
+/* Field */
+.fld{margin-bottom:10px}
+.fld label{font-size:11px;font-weight:500;color:var(--text2);display:block;margin-bottom:3px}
+.fld input,.fld select{width:100%;border:.5px solid rgba(0,0,0,0.12);border-radius:9px;padding:9px 11px;font-size:13px;color:var(--text);background:#fff;outline:none;font-family:inherit;transition:border-color .15s}
+.fld input:focus,.fld select:focus{border-color:var(--purple);box-shadow:0 0 0 3px rgba(124,58,237,.1)}
+
+/* Ponto grid */
+.pg{display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-top:11px}
+.pc{border-radius:9px;padding:7px 8px;text-align:center;border:.5px solid var(--border);background:#f9fafb;transition:all .2s}
+.pc.m{background:var(--green-l);border-color:var(--green-b)}
+
+/* Role switcher overlay */
+.role-sw{position:absolute;top:12px;right:12px;z-index:100;background:rgba(255,255,255,0.95);border:.5px solid var(--border);border-radius:10px;padding:6px 8px;box-shadow:0 4px 16px rgba(0,0,0,0.15)}
+.role-sw select{border:none;background:transparent;font-size:11px;font-weight:600;color:var(--purple);cursor:pointer;outline:none;font-family:inherit}
+
+/* Toast */
+.toast{position:absolute;top:14px;left:50%;transform:translateX(-50%);background:#111827;color:#fff;padding:9px 16px;border-radius:10px;font-size:12px;font-weight:500;z-index:200;white-space:nowrap;opacity:0;transition:opacity .2s;pointer-events:none;box-shadow:0 4px 20px rgba(0,0,0,0.25)}
+.toast.show{opacity:1}
+
+/* Modal */
+.modal-bg{position:absolute;inset:0;background:rgba(0,0,0,0.5);z-index:150;display:none;align-items:flex-end;justify-content:center;border-radius:40px;overflow:hidden}
+.modal-bg.open{display:flex}
+.mbox{background:#fff;border-radius:20px 20px 0 0;padding:20px 18px 28px;width:100%;max-height:85%;overflow-y:auto}
+
+@keyframes fu{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.card,.hold{animation:fu .16s ease}
+</style>
+</head>
+<body>
+
+<div class="phone" id="phone">
+
+  <!-- Role switcher (demo) -->
+  <div class="role-sw">
+    <select id="rsel" onchange="changeRole(this.value)">
+      <option value="suporte">👑 Suporte</option>
+      <option value="gestor">👔 Gestor</option>
+      <option value="professor">📚 Professor</option>
+      <option value="colaborador" selected>⏱ Colaborador</option>
+      <option value="responsavel">👨‍👩‍👧 Responsável</option>
+      <option value="aluno">🎓 Aluno</option>
+    </select>
+  </div>
+
+  <!-- Toast -->
+  <div class="toast" id="toast"></div>
+
+  <!-- Modal Pix -->
+  <div class="modal-bg" id="m-pix" onclick="cm('m-pix',event)">
+    <div class="mbox">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">
+        <p style="font-size:15px;font-weight:700;color:var(--text)">⚡ Pagar com Pix</p>
+        <button onclick="document.getElementById('m-pix').classList.remove('open')" style="background:none;border:none;font-size:20px;cursor:pointer;color:var(--text3)">✕</button>
+      </div>
+      <div style="width:130px;height:130px;background:#f3f4f6;border-radius:12px;display:flex;flex-direction:column;align-items:center;justify-content:center;margin:0 auto 14px;border:.5px solid var(--border)">
+        <span style="font-size:38px">📱</span><span style="font-size:10px;color:var(--text3);margin-top:4px">QR Code Pix</span><span style="font-size:10px;color:var(--text3)">R$ 280,00</span>
+      </div>
+      <p style="font-size:11px;color:var(--text2);margin-bottom:6px;font-weight:500">Código Pix Copia e Cola:</p>
+      <div style="background:#f8fafc;border:.5px solid var(--border);border-radius:8px;padding:9px 11px;font-size:10px;color:var(--text);font-family:monospace;word-break:break-all;margin-bottom:11px">00020126580014br.gov.bcb.pix0136a1b2c3d4-e5f6-7890-abcd-ef1234567890520400005303986304ABCD</div>
+      <button class="btn b-prim b-full" id="pix-btn" onclick="cpix()">📋 Copiar código Pix</button>
+    </div>
+  </div>
+
+  <!-- Modal Convite -->
+  <div class="modal-bg" id="m-conv" onclick="cm('m-conv',event)">
+    <div class="mbox">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+        <p style="font-size:15px;font-weight:700;color:var(--text)">Novo convite de acesso</p>
+        <button onclick="document.getElementById('m-conv').classList.remove('open')" style="background:none;border:none;font-size:20px;cursor:pointer;color:var(--text3)">✕</button>
+      </div>
+      <div class="fld"><label>Perfil de acesso</label>
+        <select id="c-role" onchange="updConvTurma()">
+          <option value="professor">Professor</option>
+          <option value="responsavel">Pais / Responsável</option>
+          <option value="aluno">Aluno</option>
+        </select>
+      </div>
+      <div class="fld"><label>Nome completo</label><input id="c-nome" placeholder="Nome do convidado"></div>
+      <div class="fld"><label>E-mail</label><input id="c-email" type="email" placeholder="email@exemplo.com"></div>
+      <div class="fld" id="c-tw"><label>Turma vinculada</label>
+        <select id="c-turma">
+          <option>Ballet Infantil A</option><option>Ballet Infantil B</option>
+          <option>Robótica Avançada</option><option>Violão Iniciante</option>
+        </select>
+      </div>
+      <button class="btn b-prim b-full" onclick="genConv()">🔗 Gerar link de acesso</button>
+      <div id="c-result" style="display:none;margin-top:11px">
+        <div style="background:#f9fafb;border:.5px solid var(--border);border-radius:9px;padding:10px 12px;margin-bottom:8px">
+          <p style="font-size:10px;font-weight:600;color:var(--text2);margin-bottom:3px">🔗 Link gerado (7 dias · uso único)</p>
+          <p id="c-link" style="font-size:10px;font-family:monospace;color:var(--text);word-break:break-all"></p>
+        </div>
+        <button class="btn b-ok b-full" onclick="ccopy()">📋 Copiar link</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Header -->
+  <div class="hdr" id="hdr"></div>
+
+  <!-- Float card -->
+  <div id="fc" style="display:none"></div>
+
+  <!-- Scroll content -->
+  <div class="scroll" id="scr"></div>
+
+  <!-- Bottom nav -->
+  <nav class="bnav" id="bnav"></nav>
+
+</div>
+
+<script>
+// ═══════════════════════════════════════════════════════
+// ESTADO
+// ═══════════════════════════════════════════════════════
+const S={
+  role:'colaborador', page:'ponto',
+  pontos:{entrada:null,intervalo:null,retorno:null,saida:null},
+  alunos:[
+    {ini:'SA',nome:'Sofia Almeida',    freq:87, s:'pend'},
+    {ini:'IC',nome:'Isabella Costa',   freq:100,s:'pend'},
+    {ini:'LM',nome:'Laura Mendes',     freq:68, s:'pend'},
+    {ini:'VR',nome:'Valentina Rocha',  freq:93, s:'pend'},
+    {ini:'BL',nome:'Beatriz Lima',     freq:75, s:'pend'},
+    {ini:'CF',nome:'Clara Ferreira',   freq:100,s:'pend'},
+  ],
+  convites:[
+    {nome:'Ana Paula Ferreira',role:'professor',  st:'usado',   dt:'22/05',t:'Ballet B'},
+    {nome:'Carla Almeida',     role:'responsavel',st:'pendente',dt:'24/05',t:'—'},
+    {nome:'Sofia Almeida',     role:'aluno',      st:'pendente',dt:'24/05',t:'Ballet B'},
+    {nome:'Carlos Lima',       role:'professor',  st:'usado',   dt:'18/05',t:'Robótica'},
+    {nome:'Sônia Ramos',       role:'professor',  st:'expirado',dt:'10/05',t:'Violão'},
+  ],
+};
+
+const R={
+  suporte:    {l:'Suporte',     av:'SP',cor:'#4c1d95',g:'linear-gradient(135deg,#4c1d95,#7c3aed)',n:'Suporte Admin',    s:'Acesso total'},
+  gestor:     {l:'Gestor',      av:'MF',cor:'#1e1b4b',g:'linear-gradient(135deg,#1e1b4b,#312e81)',n:'Maria Fernanda',  s:'Studio Arte em Movimento'},
+  professor:  {l:'Professor',   av:'AP',cor:'#085041',g:'linear-gradient(135deg,#085041,#0f6e56)',n:'Ana Paula F.',    s:'Ballet Infantil B'},
+  colaborador:{l:'Colaborador', av:'AP',cor:'#4338ca',g:'linear-gradient(135deg,#4338ca,#6d28d9)',n:'Ana Paula Ferreira',s:'Instrutora · CLT'},
+  responsavel:{l:'Responsável', av:'CA',cor:'#0369a1',g:'linear-gradient(135deg,#0369a1,#0c4a6e)',n:'Carla Almeida',  s:'Mãe da Sofia Almeida'},
+  aluno:      {l:'Aluno',       av:'SA',cor:'#854f0b',g:'linear-gradient(135deg,#854f0b,#92400e)',n:'Sofia Almeida',  s:'Ballet Infantil B'},
+};
+
+const NAV={
+  suporte:    [{i:'ti-building-community',l:'Escolas',id:'escolas'},{i:'ti-link',l:'Convites',id:'convites'},{i:'ti-settings',l:'Config',id:'config'}],
+  gestor:     [{i:'ti-layout-dashboard',l:'Dashboard',id:'dashboard'},{i:'ti-users-group',l:'Turmas',id:'turmas'},{i:'ti-chart-bar',l:'Financeiro',id:'financeiro'},{i:'ti-link',l:'Acessos',id:'convites'}],
+  professor:  [{i:'ti-users-group',l:'Turmas',id:'turmas'},{i:'ti-clipboard-check',l:'Chamada',id:'chamada'},{i:'ti-clock',l:'Ponto',id:'ponto'}],
+  colaborador:[{i:'ti-clock',l:'Ponto',id:'ponto'},{i:'ti-calendar',l:'Histórico',id:'historico'},{i:'ti-cash',l:'Financeiro',id:'financeiro'},{i:'ti-beach',l:'Férias',id:'ferias'}],
+  responsavel:[{i:'ti-calendar-check',l:'Frequência',id:'frequencia'},{i:'ti-receipt',l:'Mensalidades',id:'cobrancas'},{i:'ti-id-badge',l:'Dados',id:'dados'}],
+  aluno:      [{i:'ti-users-group',l:'Minha turma',id:'turma'},{i:'ti-calendar-check',l:'Frequência',id:'frequencia'},{i:'ti-book',l:'Atividades',id:'atividades'}],
+};
+
+// ═══════════════════════════════════════════════════════
+// HELPERS
+// ═══════════════════════════════════════════════════════
+function fc(f){return f>=80?'#16a34a':f>=60?'#d97706':'#ef4444'}
+function fb(f){return f>=80?'#f0fdf4':f>=60?'#fffbeb':'#fef2f2'}
+function tn(){return new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})}
+let toastT;
+function toast(msg,ms=2800){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.classList.add('show');
+  clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('show'),ms);
+}
+function cm(id,e){if(e.target.id===id)document.getElementById(id).classList.remove('open')}
+function cpix(){const b=document.getElementById('pix-btn');b.textContent='✅ Copiado!';setTimeout(()=>b.textContent='📋 Copiar código Pix',2200);toast('Código Pix copiado!')}
+function updConvTurma(){const v=document.getElementById('c-role').value;document.getElementById('c-tw').style.display=v==='responsavel'?'none':'block';}
+
+// ═══════════════════════════════════════════════════════
+// HOLD BUTTON
+// ═══════════════════════════════════════════════════════
+const holds={};
+function mkHold(el,cb){
+  if(!el||el._hset)return;el._hset=1;
+  function start(e){
+    e.preventDefault();if(el.dataset.done==='1')return;
+    holds[el.id]={t:performance.now()};
+    const f=el.querySelector('.hf'),lbl=el.querySelector('.hl');
+    const cor=el.dataset.cor||'#7c3aed';
+    el.style.boxShadow=`0 0 0 5px ${cor}22`;
+    const tick=()=>{
+      if(!holds[el.id])return;
+      const p=Math.min((performance.now()-holds[el.id].t)/3000*100,100);
+      if(f)f.style.width=p+'%';
+      if(lbl)lbl.textContent=Math.round(p/100*3)+'s...';
+      if(p<100){holds[el.id].r=requestAnimationFrame(tick);}
+      else done();
+    };
+    holds[el.id].r=requestAnimationFrame(tick);
+  }
+  function stop(){
+    if(!holds[el.id])return;
+    cancelAnimationFrame(holds[el.id].r);delete holds[el.id];
+    const f=el.querySelector('.hf'),lbl=el.querySelector('.hl');
+    if(f)f.style.width='0%';
+    if(lbl&&el.dataset.done!=='1')lbl.textContent=el.dataset.lbl||'Segurar 3s';
+    el.style.boxShadow='none';
+  }
+  function done(){
+    delete holds[el.id];el.dataset.done='1';el.style.pointerEvents='none';
+    const cor=el.dataset.cor||'#7c3aed';
+    el.style.background=cor;el.style.borderColor=cor;
+    el.style.boxShadow=`0 4px 16px ${cor}40`;
+    const ic=el.querySelector('.hi'),lbl=el.querySelector('.hl'),hh=el.querySelector('.hh'),f=el.querySelector('.hf');
+    if(ic)ic.textContent='✅';
+    if(lbl){lbl.textContent='Registrado!';lbl.style.color='#fff';}
+    if(hh)hh.style.display='none';
+    if(f){f.style.width='100%';f.style.background='rgba(255,255,255,0.18)';}
+    cb();
+  }
+  el.addEventListener('mousedown',start);
+  el.addEventListener('mouseup',stop);
+  el.addEventListener('mouseleave',stop);
+  el.addEventListener('touchstart',start,{passive:false});
+  el.addEventListener('touchend',stop);
+}
+
+// ═══════════════════════════════════════════════════════
+// RENDER
+// ═══════════════════════════════════════════════════════
+function render(){
+  renderHdr();renderFC();renderNav();renderScr();
+}
+
+function renderHdr(){
+  const Ri=R[S.role];
+  const h=document.getElementById('hdr');
+  h.style.background=Ri.g;
+  const kpiMap={
+    colaborador:`<div class="kpi-strip"><div class="kpi-c"><p>Banco de Horas</p><p style="color:#a3e635">+3h 20min</p></div><div class="kpi-c"><p>Férias</p><p style="color:#fde68a">15 dias</p></div><div class="kpi-c"><p>Salário Líq.</p><p style="color:#93c5fd">R$ 3.239</p></div></div>`,
+    suporte:`<div class="kpi-strip"><div class="kpi-c"><p>Escolas Ativas</p><p style="color:#e9d5ff">2</p></div><div class="kpi-c"><p>Total Alunos</p><p style="color:#e9d5ff">160</p></div><div class="kpi-c"><p>Turmas</p><p style="color:#e9d5ff">14</p></div></div>`,
+    gestor:`<div class="kpi-strip"><div class="kpi-c"><p>Alunos</p><p style="color:#c7d2fe">48</p></div><div class="kpi-c"><p>Faturamento</p><p style="color:#a3e635">R$ 14.280</p></div><div class="kpi-c"><p>Inadimp.</p><p style="color:#fca5a5">R$ 2.520</p></div></div>`,
+    professor:`<div class="kpi-strip"><div class="kpi-c"><p>Minhas turmas</p><p style="color:#a7f3d0">2</p></div><div class="kpi-c"><p>Alunos</p><p style="color:#a7f3d0">21</p></div></div>`,
+    responsavel:`<div class="kpi-strip"><div class="kpi-c"><p>Frequência</p><p style="color:#93c5fd">87%</p></div><div class="kpi-c"><p>Pendente</p><p style="color:#fde68a">R$ 280</p></div></div>`,
+    aluno:`<div class="kpi-strip"><div class="kpi-c"><p>Frequência</p><p style="color:#fde68a">87%</p></div><div class="kpi-c"><p>Aulas</p><p style="color:#fde68a">16</p></div></div>`,
+  };
+  h.innerHTML=`
+    <div class="hdr-row">
+      <div class="avatar" style="background:${Ri.cor}66;box-shadow:0 0 0 2px rgba(255,255,255,0.2)">${Ri.av}</div>
+      <div style="flex:1">
+        <p style="color:rgba(255,255,255,0.6);font-size:10px">Bem-vindo(a)</p>
+        <p style="color:#fff;font-size:15px;font-weight:700;margin-top:2px">${Ri.n}</p>
+        <p style="color:rgba(255,255,255,0.55);font-size:10px;margin-top:1px">${Ri.s}</p>
+      </div>
+      ${S.role!=='aluno'?`<button style="background:rgba(255,255,255,0.1);border:.5px solid rgba(255,255,255,0.2);border-radius:10px;padding:8px 10px;color:#fff;font-size:14px;cursor:pointer" onclick="toast('🔔 Sem novas notificações')">🔔</button>`:''}
+    </div>
+    ${kpiMap[S.role]||''}`;
+}
+
+let clkI=null;
+function renderFC(){
+  const el=document.getElementById('fc');
+  if(S.role==='colaborador'&&S.page==='ponto'){
+    el.style.display='block';
+    el.className='float-card';
+    const pts=['entrada','intervalo','retorno','saida'];
+    const lb={entrada:'Entrada',intervalo:'Intervalo',retorno:'Retorno',saida:'Saída'};
+    const bg={entrada:'#ecfdf5',intervalo:'#fffbeb',retorno:'#eff6ff',saida:'#fdf4ff'};
+    const cl={entrada:'#065f46',intervalo:'#713f12',retorno:'#1e40af',saida:'#6b21a8'};
+    const any=pts.some(t=>S.pontos[t]);
+    el.innerHTML=`
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:${any?10:0}px">
+        <div>
+          <p style="font-size:10px;color:var(--text2);font-weight:500">Horário atual</p>
+          <p id="clk" style="font-size:28px;font-weight:800;color:var(--text);letter-spacing:-1px;font-variant-numeric:tabular-nums">--:--:--</p>
+          <p style="font-size:10px;color:var(--text3);margin-top:1px">Domingo, 24 de maio de 2026</p>
+        </div>
+        <div style="background:${S.pontos.entrada?'var(--green-l)':'#f9fafb'};border:.5px solid ${S.pontos.entrada?'var(--green-b)':'var(--border)'};border-radius:10px;padding:5px 11px;text-align:right">
+          <p style="font-size:9px;font-weight:600;color:${S.pontos.saida?'var(--text2)':S.pontos.entrada?'var(--green)':'var(--text3)'}">${S.pontos.saida?'Encerrada':S.pontos.entrada?'🟢 Em jornada':'⚪ Sem registro'}</p>
+          <p style="font-size:11px;font-weight:700;color:var(--text)">${S.pontos.saida?'Completo':S.pontos.entrada?'Em curso':'—'}</p>
+        </div>
+      </div>
+      ${any?`<div class="pg">${pts.map(t=>`<div class="pc${S.pontos[t]?' m':''}" ${S.pontos[t]?`style="background:${bg[t]};border-color:${cl[t]}40"`:''}>
+        <p style="font-size:8px;font-weight:600;color:${S.pontos[t]?cl[t]:'var(--text3)'}">${lb[t]}</p>
+        <p style="font-size:13px;font-weight:700;color:${S.pontos[t]?'var(--text)':'#d1d5db'}">${S.pontos[t]||'--:--'}</p>
+      </div>`).join('')}</div>`:''}`;
+    clearInterval(clkI);
+    const tick=()=>{const e=document.getElementById('clk');if(e)e.textContent=new Date().toLocaleTimeString('pt-BR');};
+    tick();clkI=setInterval(tick,1000);
+  } else {
+    el.style.display='none';el.innerHTML='';
+  }
+}
+
+function renderNav(){
+  const nav=document.getElementById('bnav');
+  nav.innerHTML=(NAV[S.role]||[]).map(it=>`
+    <button class="nb${it.id===S.page?' on':''}" onclick="gp('${it.id}')">
+      <i class="ti ${it.i}"></i><span>${it.l}</span>
+    </button>`).join('');
+}
+
+function renderScr(){
+  const area=document.getElementById('scr');
+  const fn={
+    suporte:{escolas:vEscolas,convites:vConvites,config:vConfig},
+    gestor:{dashboard:vGDash,turmas:vGTurmas,financeiro:vGFin,convites:vConvites},
+    professor:{turmas:vPTurmas,chamada:vChamada,ponto:vPonto},
+    colaborador:{ponto:vPonto,historico:vHist,financeiro:vCFin,ferias:vFerias},
+    responsavel:{frequencia:vRFreq,cobrancas:vRCob,dados:vRDados},
+    aluno:{turma:vATurma,frequencia:vAFreq,atividades:vAAtiv},
+  };
+  const view=((fn[S.role]||{})[S.page]);
+  area.innerHTML=view?view():`<div class="card"><p style="color:var(--text3);text-align:center;padding:20px">Em desenvolvimento</p></div>`;
+  // bind holds
+  document.querySelectorAll('.hold:not([data-done="1"])').forEach(el=>{
+    const tipo=el.dataset.tipo,idx=el.dataset.idx;
+    if(tipo){
+      mkHold(el,()=>{
+        S.pontos[tipo]=tn();
+        toast(`⏱ ${tipo==='entrada'?'Entrada':tipo==='intervalo'?'Intervalo':tipo==='retorno'?'Retorno':'Saída'} registrada às ${S.pontos[tipo]}`);
+        renderFC();renderScr();
+      });
+    } else if(idx!==undefined){
+      mkHold(el,()=>{
+        S.alunos[idx].s='p';
+        toast('✅ Presença — '+S.alunos[idx].nome);
+        renderScr();
+      });
+    }
+  });
+}
+
+function gp(p){S.page=p;renderFC();renderNav();renderScr();}
+
+// ═══════════════════════════════════════════════════════
+// VIEWS
+// ═══════════════════════════════════════════════════════
+
+function vEscolas(){return`
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:13px">
+    <p style="font-size:14px;font-weight:700;color:var(--text)">Escolas cadastradas</p>
+    <button class="btn b-prim" style="padding:8px 13px;font-size:11px">+ Nova escola</button>
+  </div>
+  ${[
+    {n:'Studio Arte em Movimento',s:'Escola de Dança · Santa Maria-RS',a:48,t:5,g:'Maria F.'},
+    {n:'Lab Maker Marista',s:'Escola de Robótica · Santa Maria-RS',a:112,t:9,g:'Carlos L.'},
+  ].map(e=>`
+  <div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:11px">
+      <div><p style="font-size:14px;font-weight:700;color:var(--text)">${e.n}</p><p style="font-size:10px;color:var(--text3);margin-top:2px">${e.s}</p></div>
+      <span class="pill p-ok">✅ Ativa</span>
+    </div>
+    <div class="g3" style="margin-bottom:11px">
+      <div class="sbox"><div class="v">${e.a}</div><div class="l">Alunos</div></div>
+      <div class="sbox"><div class="v">${e.t}</div><div class="l">Turmas</div></div>
+      <div class="sbox"><div class="v" style="font-size:12px">${e.g}</div><div class="l">Gestor</div></div>
+    </div>
+    <div style="display:flex;gap:8px">
+      <button class="btn b-prim" style="flex:1;font-size:11px" onclick="toast('Acessando ${e.n}...')">Acessar portal</button>
+      <button class="btn" style="flex:1;font-size:11px" onclick="toast('Editar ${e.n}')">Editar dados</button>
+    </div>
+  </div>`).join('')}`;
+}
+
+function vConvites(){
+  const rc={professor:'#0f6e56',responsavel:'#0369a1',aluno:'#854f0b',gestor:'#1e1b4b'};
+  const canGen=['suporte','gestor'].includes(S.role);
+  return`
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:13px">
+    <p style="font-size:14px;font-weight:700;color:var(--text)">Convites enviados</p>
+    ${canGen?`<button class="btn b-prim" style="padding:8px 13px;font-size:11px" onclick="document.getElementById('m-conv').classList.add('open')">+ Novo</button>`:''}
+  </div>
+  <div class="card" style="padding:0 15px">
+    ${S.convites.map(c=>`
+    <div class="row">
+      <div style="width:8px;height:8px;border-radius:50%;background:${rc[c.role]||'#9ca3af'};flex-shrink:0"></div>
+      <div style="flex:1;min-width:0">
+        <p style="font-size:12px;font-weight:600;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${c.nome}</p>
+        <p style="font-size:10px;color:var(--text3)">${c.role} · ${c.t} · ${c.dt}</p>
+      </div>
+      <span class="pill ${c.st==='usado'?'p-ok':c.st==='expirado'?'p-neu':'p-warn'}">${c.st==='usado'?'Aceito':c.st==='expirado'?'Expirado':'Pendente'}</span>
+      ${c.st==='pendente'&&canGen?`<button class="btn" style="padding:4px 7px;font-size:10px" onclick="toast('Link copiado!')"><i class="ti ti-copy"></i></button>`:''}
+    </div>`).join('')}
+  </div>`;
+}
+
+function vConfig(){return`
+  <div class="card">
+    <p class="ct">⚙️ Sistema</p>
+    ${[['Versão','1.0.0'],['Banco','PostgreSQL + Supabase'],['Auth','Supabase JWT'],['Storage','Supabase Storage'],['Pix','Woovi / OpenPix'],['Deploy','Vercel + Railway']].map(r=>`<div class="row"><span style="font-size:12px;color:var(--text2)">${r[0]}</span><span style="font-size:12px;font-weight:600;color:var(--text)">${r[1]}</span></div>`).join('')}
+  </div>`;}
+
+function vGDash(){return`
+  <div class="g2">
+    ${[['Alunos ativos','48','5 turmas','#4338ca'],['Faturamento','R$14.280','Maio 2026','#16a34a'],['Inadimplência','R$2.520','9 alunos','#ef4444'],['Freq. média','87%','últimas 4s','#0369a1']].map(k=>`
+    <div class="card" style="padding:14px"><p style="font-size:10px;color:var(--text3)">${k[0]}</p><p style="font-size:20px;font-weight:700;color:${k[3]};margin:4px 0;letter-spacing:-.5px">${k[1]}</p><p style="font-size:10px;color:var(--text3)">${k[2]}</p></div>`).join('')}
+  </div>
+  <div class="card">
+    <p class="ct">📅 Aulas de hoje</p>
+    ${[['08:00','Ballet Infantil A','Sala 1',11,true],['09:00','Ballet Infantil B','Sala 2',10,true],['10:00','Violão Iniciante','Sala 3',12,false],['14:00','Robótica Avançada','Lab',8,false]].map(a=>`
+    <div class="row">
+      <span style="font-size:11px;font-weight:700;color:#4338ca;min-width:38px">${a[0]}</span>
+      <div style="flex:1"><p style="font-size:12px;font-weight:600;color:var(--text)">${a[1]}</p><p style="font-size:10px;color:var(--text3)">${a[2]} · ${a[3]} alunos</p></div>
+      <span class="pill ${a[4]?'p-ok':'p-neu'}">${a[4]?'🟢 Em andamento':'⏳ Aguardando'}</span>
+    </div>`).join('')}
+  </div>
+  <div class="card">
+    <p class="ct">⚡ Ações rápidas</p>
+    <div class="g2">
+      ${[['👤','Novo Aluno','#4338ca','#f0efff'],['🎓','Nova Turma','#0369a1','#eff6ff'],['📋','Chamada',  '#16a34a','#f0fdf4'],['🔗','Convite',  '#7c3aed','#f5f3ff']].map(a=>`
+      <button style="background:${a[3]};border:.5px solid ${a[2]}30;border-radius:12px;padding:13px 0;display:flex;flex-direction:column;align-items:center;gap:5px;cursor:pointer;border-style:solid" onclick="${a[1]==='Chamada'?`S.role='professor';S.page='chamada';render();document.getElementById('rsel').value='professor'`:a[1]==='Convite'?`document.getElementById('m-conv').classList.add('open')`:`toast('${a[1]}...')`}">
+        <span style="font-size:22px">${a[0]}</span>
+        <span style="font-size:11px;font-weight:600;color:${a[2]}">${a[1]}</span>
+      </button>`).join('')}
+    </div>
+  </div>`;}
+
+function vGTurmas(){return`
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:13px">
+    <p style="font-size:14px;font-weight:700;color:var(--text)">Turmas</p>
+    <button class="btn b-prim" style="padding:8px 13px;font-size:11px" onclick="toast('Formulário de nova turma')">+ Nova turma</button>
+  </div>
+  ${[
+    {n:'Ballet Infantil A',  p:'Ana Paula F.', h:'Qua/Sex 08h',v:12,m:11,pc:91},
+    {n:'Ballet Infantil B',  p:'Ana Paula F.', h:'Sáb 09h',    v:12,m:10,pc:83},
+    {n:'Robótica Avançada',  p:'Carlos Lima',  h:'Ter/Qui 14h',v:10,m:8, pc:80},
+    {n:'Violão Iniciante',   p:'Sônia Ramos',  h:'Seg/Qua 10h',v:15,m:12,pc:80},
+    {n:'Dança Contemporânea',p:'Beatriz Nery', h:'Ter 19h',    v:12,m:7, pc:58},
+  ].map(t=>`
+  <div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px">
+      <div><p style="font-size:13px;font-weight:700;color:var(--text)">${t.n}</p><p style="font-size:10px;color:var(--text3);margin-top:2px">👤 ${t.p} · 🕐 ${t.h}</p></div>
+      <span class="pill ${t.pc>=80?'p-ok':t.pc>=60?'p-warn':'p-err'}">${t.m}/${t.v}</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:7px;margin-bottom:10px">
+      <div class="fb" style="flex:1"><div class="ff" style="width:${t.pc}%;background:${fc(t.pc)}"></div></div>
+      <span style="font-size:10px;font-weight:700;color:${fc(t.pc)}">${t.pc}%</span>
+    </div>
+    <div style="display:flex;gap:7px">
+      <button class="btn b-ok" style="flex:1;font-size:11px" onclick="S.role='professor';S.page='chamada';render();document.getElementById('rsel').value='professor'">📋 Chamada</button>
+      <button class="btn" style="flex:1;font-size:11px" onclick="toast('Alunos de ${t.n}')">👁 Alunos</button>
+    </div>
+  </div>`).join('')}`;}
+
+function vGFin(){return`
+  <div class="card">
+    <p class="ct">💰 Maio 2026</p>
+    <div style="display:flex;align-items:center;gap:14px;margin-bottom:13px">
+      <div style="position:relative;width:78px;height:78px;flex-shrink:0">
+        <svg viewBox="0 0 78 78" style="transform:rotate(-90deg);width:78px;height:78px">
+          <circle cx="39" cy="39" r="28" fill="none" stroke="#f3f4f6" stroke-width="10"/>
+          <circle cx="39" cy="39" r="28" fill="none" stroke="#4338ca" stroke-width="10" stroke-dasharray="143 176" stroke-linecap="round"/>
+        </svg>
+        <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:#4338ca">82%</div>
+      </div>
+      <div style="flex:1">
+        <div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="font-size:10px;color:var(--text2)">Recebido</span><span style="font-size:11px;font-weight:700;color:var(--green)">R$ 11.760</span></div>
+        <div class="fb" style="margin-bottom:7px"><div class="ff" style="width:82%;background:var(--green)"></div></div>
+        <div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="font-size:10px;color:var(--text2)">Inadimplência</span><span style="font-size:11px;font-weight:700;color:var(--red)">R$ 2.520</span></div>
+        <div class="fb"><div class="ff" style="width:18%;background:var(--red)"></div></div>
+      </div>
+    </div>
+  </div>
+  <div class="card" style="padding:0 15px">
+    <p class="ct" style="padding-top:14px">⚠️ Inadimplentes</p>
+    ${[{n:'Gabriela Oliveira',d:19,v:280},{n:'Pedro Henrique',d:34,v:350},{n:'Mariana Souza',d:8,v:220},{n:'Lucas Mendes',d:52,v:280}].map(a=>`
+    <div class="row">
+      <div class="av" style="background:${a.d>30?'var(--red-l)':'var(--amber-l)'};color:${a.d>30?'var(--red)':'var(--amber)'};">${a.n.split(' ').map(x=>x[0]).slice(0,2).join('')}</div>
+      <div style="flex:1;min-width:0"><p style="font-size:12px;font-weight:600;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${a.n}</p><p style="font-size:10px;color:${a.d>30?'var(--red)':'var(--amber)'}">⏰ ${a.d} dias em atraso</p></div>
+      <p style="font-size:12px;font-weight:700;color:var(--red)">R$ ${a.v}</p>
+      <button class="btn b-ok" style="padding:5px 9px;font-size:10px;margin-left:6px" onclick="toast('Cobrança enviada!')">Cobrar</button>
+    </div>`).join('')}
+  </div>`;}
+
+function vPTurmas(){return`
+  ${[{n:'Ballet Infantil B',h:'Sáb 09h–10h30',sala:'Sala 2',a:10,f:87,prx:'31/05'},{n:'Ballet Infantil A',h:'Qua/Sex 08h',sala:'Sala 1',a:11,f:91,prx:'28/05'}].map(t=>`
+  <div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:11px">
+      <div><p style="font-size:14px;font-weight:700;color:var(--text)">${t.n}</p><p style="font-size:10px;color:var(--text3);margin-top:2px">🕐 ${t.h} · ${t.sala}</p></div>
+      <span class="pill p-ok">${t.a} alunos</span>
+    </div>
+    <div class="g3" style="margin-bottom:11px">
+      <div class="sbox"><div class="v" style="color:var(--green)">${t.f}%</div><div class="l">Frequência</div></div>
+      <div class="sbox"><div class="v">16</div><div class="l">Aulas</div></div>
+      <div class="sbox"><div class="v" style="font-size:12px">${t.prx}</div><div class="l">Próxima aula</div></div>
+    </div>
+    <div style="display:flex;gap:7px">
+      <button class="btn b-ok" style="flex:1;font-size:11px" onclick="gp('chamada')">📋 Chamada</button>
+      <button class="btn" style="flex:1;font-size:11px" onclick="toast('Histórico dos alunos')">👁 Histórico</button>
+    </div>
+  </div>`).join('')}
+  <div style="background:#f3f4f6;border:.5px solid var(--border);border-radius:11px;padding:10px 13px;display:flex;align-items:center;gap:8px">
+    <i class="ti ti-lock" style="color:var(--text3)"></i>
+    <span style="font-size:10px;color:var(--text3)">Financeiro e outras turmas não disponíveis para este perfil</span>
+  </div>`;}
+
+function vChamada(){
+  const p=S.alunos.filter(a=>a.s==='p').length;
+  const f=S.alunos.filter(a=>a.s==='f').length;
+  const nd=S.alunos.filter(a=>a.s==='pend').length;
+  return`
+  <div class="g3" style="margin-bottom:11px">
+    <div class="sbox"><div class="v" style="color:var(--green)">${p}</div><div class="l">Presentes</div></div>
+    <div class="sbox"><div class="v" style="color:var(--red)">${f}</div><div class="l">Faltas</div></div>
+    <div class="sbox"><div class="v" style="color:var(--text3)">${nd}</div><div class="l">Pendentes</div></div>
+  </div>
+  <div class="card" style="padding:0 15px;margin-bottom:11px">
+    ${S.alunos.map((a,i)=>`
+    <div class="row" id="ar${i}" style="transition:background .2s;background:${a.s==='p'?'var(--green-l)':a.s==='f'?'var(--red-l)':'transparent'};margin:0 -15px;padding:10px 15px;border-radius:0">
+      <div class="av" style="background:${fb(a.freq)};color:${fc(a.freq)}">${a.ini}</div>
+      <div style="flex:1;min-width:0">
+        <p style="font-size:12px;font-weight:600;color:var(--text)">${a.nome}</p>
+        <div style="display:flex;align-items:center;gap:5px;margin-top:3px">
+          <div class="fb" style="max-width:70px"><div class="ff" style="width:${a.freq}%;background:${fc(a.freq)}"></div></div>
+          <span style="font-size:10px;color:${fc(a.freq)}">${a.freq}%</span>
+        </div>
+      </div>
+      ${a.s==='pend'?`
+        <div id="hch${i}" class="hold" data-idx="${i}" data-cor="#16a34a" data-lbl="Segurar 3s" style="--hb:#16a34a;width:100px;height:50px;border-radius:9px;flex:none">
+          <div class="hf" style="background:#16a34a22"></div>
+          <span class="hi" style="font-size:15px">✋</span>
+          <span class="hl" style="font-size:10px;color:#16a34a">Segurar 3s</span>
+        </div>
+        <button class="btn b-err" style="padding:5px 9px;font-size:13px;flex-shrink:0;height:50px;border-radius:9px" onclick="mF(${i})">✕</button>`
+      :`<div style="width:34px;height:34px;border-radius:50%;background:${a.s==='p'?'var(--green-l)':'var(--red-l)'};display:flex;align-items:center;justify-content:center;font-size:17px">${a.s==='p'?'✅':'❌'}</div>`}
+    </div>`).join('')}
+  </div>
+  <button class="btn ${nd>0?'b-disabled':'b-prim'} b-full" ${nd>0?'disabled':''} onclick="finC()">
+    ${nd>0?`⚠️ ${nd} aluno(s) pendente(s)`:'✅ Finalizar e salvar chamada'}
+  </button>`;}
+
+function mF(i){S.alunos[i].s='f';renderScr();toast('❌ Falta — '+S.alunos[i].nome);}
+function finC(){const p=S.alunos.filter(a=>a.s==='p').length;toast(`✅ Chamada salva! ${p} presentes`);S.alunos.forEach(a=>a.s='pend');setTimeout(()=>renderScr(),600);}
+
+function vPonto(){
+  const tipos=[{id:'entrada',ic:'🏁',l:'Entrada',cor:'#4F46E5'},{id:'intervalo',ic:'☕',l:'Intervalo',cor:'#f59e0b'},{id:'retorno',ic:'🔄',l:'Retorno',cor:'#0ea5e9'},{id:'saida',ic:'🚪',l:'Saída',cor:'#7c3aed'}];
+  const deps={entrada:[],intervalo:['entrada'],retorno:['entrada','intervalo'],saida:['entrada','intervalo','retorno']};
+  return`
+  <div class="card">
+    <p class="ct">Registrar Ponto — Segure 3 segundos</p>
+    <p style="font-size:11px;color:var(--text3);margin-bottom:13px">Pressione e <strong>segure 3 segundos</strong> para confirmar.</p>
+    <div class="g2" style="gap:9px">
+      ${tipos.map(t=>{
+        const done=!!S.pontos[t.id];
+        const ok=deps[t.id].every(d=>S.pontos[d]);
+        const dis=done||!ok;
+        return`<div id="hpt${t.id}" class="hold${done?' done':''}" data-tipo="${t.id}" data-cor="${t.cor}" data-lbl="${t.l}"
+          style="--hb:${dis&&!done?'#e5e7eb':t.cor};background:${done?t.cor:'transparent'};opacity:${dis&&!done?.38:1};pointer-events:${dis?'none':'auto'}">
+          <div class="hf" style="background:${t.cor}22"></div>
+          <span class="hi">${done?'✅':t.ic}</span>
+          <span class="hl" style="color:${done?'#fff':t.cor}">${done?'Registrado!':t.l}</span>
+          ${!done?`<span class="hh" style="color:${t.cor}">Segure 3s</span>`:''}
+        </div>`;}).join('')}
+    </div>
+    <p style="font-size:10px;color:var(--text3);text-align:center;margin-top:11px">📍 GPS + timestamp automáticos · Imutável</p>
+  </div>
+  <div class="card">
+    <p class="ct">Banco de Horas</p>
+    <div style="display:flex;align-items:center;gap:14px">
+      <div style="text-align:center"><p style="font-size:30px;font-weight:800;color:#4338ca;letter-spacing:-1px">+3h20</p><p style="font-size:10px;color:var(--text3)">saldo atual</p></div>
+      <div style="flex:1">
+        <div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="font-size:11px;color:var(--text3)">Esta semana</span><span style="font-size:11px;font-weight:700;color:var(--green)">+0h 45min</span></div>
+        <div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="font-size:11px;color:var(--text3)">Este mês</span><span style="font-size:11px;font-weight:700;color:#4338ca">+3h 20min</span></div>
+        <div style="display:flex;justify-content:space-between"><span style="font-size:11px;color:var(--text3)">Carga diária</span><span style="font-size:11px;font-weight:600;color:var(--text2)">8h 00min</span></div>
+      </div>
+    </div>
+  </div>`;}
+
+function vHist(){return`
+  <p style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:12px">Histórico — Maio 2026</p>
+  ${[{d:'Sex 23/05',ok:true,h:'8h 02min',m:{e:'08:02',i:'12:00',r:'13:01',s:'17:05'}},{d:'Qui 22/05',ok:true,h:'8h 00min',m:{e:'07:58',i:'12:00',r:'13:00',s:'17:00'}},{d:'Qua 21/05',ok:true,h:'7h 55min',m:{e:'08:10',i:'12:05',r:'13:00',s:'17:10'}},{d:'Ter 20/05',ok:false,h:'—',m:{e:'08:05',i:'12:00',r:'—',s:'—'}}].map(dia=>`
+  <div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+      <div style="display:flex;align-items:center;gap:9px">
+        <div style="width:36px;height:36px;border-radius:8px;background:${dia.ok?'#f5f3ff':'var(--red-l)'};display:flex;flex-direction:column;align-items:center;justify-content:center;line-height:1.1">
+          <span style="font-size:8px;color:${dia.ok?'#7c3aed':'var(--red)'};font-weight:700">${dia.d.split(' ')[0].toUpperCase()}</span>
+          <span style="font-size:14px;font-weight:800;color:var(--text)">${dia.d.split(' ')[1].split('/')[0]}</span>
+        </div>
+        <div><p style="font-size:12px;font-weight:600;color:var(--text)">${dia.d.split(' ')[1]}</p><p style="font-size:10px;color:var(--text3)">${dia.h}</p></div>
+      </div>
+      <span class="pill ${dia.ok?'p-ok':'p-err'}">${dia.ok?'✓ Completo':'⚠ Incompleto'}</span>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:5px">
+      ${[['Entrada',dia.m.e,'#ecfdf5','#065f46'],['Intervalo',dia.m.i,'#fefce8','#713f12'],['Retorno',dia.m.r,'#eff6ff','#1e40af'],['Saída',dia.m.s,'#fdf4ff','#6b21a8']].map(([l,v,bg,cl])=>`
+      <div style="display:flex;align-items:center;gap:5px;background:${v!=='—'?bg:'#f9fafb'};border:.5px solid ${v!=='—'?cl+'30':'var(--border)'};border-radius:8px;padding:6px 9px">
+        <span style="font-size:8px;font-weight:600;padding:1px 5px;border-radius:20px;background:${v!=='—'?bg:'#f3f4f6'};color:${v!=='—'?cl:'var(--text3)'}">${l}</span>
+        <span style="font-size:12px;font-weight:700;color:${v!=='—'?'var(--text)':'#d1d5db'};margin-left:auto">${v}</span>
+      </div>`).join('')}
+    </div>
+  </div>`).join('')}`;}
+
+function vCFin(){return`
+  <div class="card"><p class="ct">💰 Resumo — Maio 2026</p>
+    <div class="g2" style="margin-bottom:11px">
+      <div class="sbox"><div class="l">Salário Bruto</div><div class="v" style="font-size:16px">R$ 3.800</div></div>
+      <div class="sbox" style="background:var(--red-l);border:.5px solid var(--red-b)"><div class="l">Descontos</div><div class="v" style="font-size:16px;color:var(--red)">-R$ 560</div></div>
+    </div>
+    <div style="background:#f5f3ff;border:.5px solid #c4b5fd;border-radius:11px;padding:13px;text-align:center;margin-bottom:11px">
+      <p style="font-size:10px;color:var(--text3)">Salário Líquido</p>
+      <p style="font-size:24px;font-weight:800;color:#4338ca;letter-spacing:-.5px">R$ 3.239,60</p>
+    </div>
+    <div style="background:var(--green-l);border:.5px solid var(--green-b);border-radius:10px;padding:9px 12px;display:flex;justify-content:space-between">
+      <span style="font-size:12px;color:var(--green);font-weight:600">📅 Próx. pagamento</span>
+      <span style="font-size:12px;font-weight:700;color:var(--text)">05/06/2026</span>
+    </div>
+  </div>
+  <div class="card" style="padding:0 15px"><p class="ct" style="padding-top:14px">📄 Holerites</p>
+    ${[['Maio 2026',false],['Abril 2026',true],['Março 2026',true]].map(([m,pg])=>`
+    <div class="row">
+      <div style="flex:1"><p style="font-size:12px;font-weight:600;color:var(--text)">${m}</p></div>
+      <span class="pill ${pg?'p-ok':'p-warn'}">${pg?'✓ Pago':'A receber'}</span>
+      <button class="btn" style="padding:5px 9px;font-size:11px;margin-left:6px" onclick="toast('Baixando PDF de ${m}...')"><i class="ti ti-download"></i></button>
+    </div>`).join('')}
+  </div>`;}
+
+function vFerias(){return`
+  <div class="card" style="text-align:center;padding:22px">
+    <p class="ct" style="text-align:left">🌴 Saldo de Férias</p>
+    <p style="font-size:50px;font-weight:800;color:#4338ca;letter-spacing:-2px;margin:12px 0 3px">15</p>
+    <p style="font-size:13px;color:var(--text2)">dias disponíveis</p>
+    <p style="font-size:11px;color:var(--text3);margin-top:5px">+ 8 dias proporcionais adquiridos</p>
+    <div class="fb" style="margin:13px 0"><div class="ff" style="width:50%;background:#4338ca"></div></div>
+    <div class="g2" style="text-align:left">
+      ${[['Período aquisitivo','01/02/2025'],['Vencimento','01/02/2026'],['Proporcionais','8 dias'],['Total disponível','23 dias']].map(r=>`<div class="sbox"><div class="l">${r[0]}</div><div class="v" style="font-size:13px">${r[1]}</div></div>`).join('')}
+    </div>
+  </div>
+  <div style="background:#eff6ff;border:.5px solid #bfdbfe;border-radius:13px;padding:13px">
+    <p style="font-weight:700;font-size:13px;color:#1e40af;margin-bottom:5px">📋 Solicitar Férias</p>
+    <button class="btn" style="background:#3b82f6;color:#fff;border:none;margin-top:4px" onclick="toast('Redirecionando ao RH...')">Falar com RH</button>
+  </div>`;}
+
+function vRFreq(){return`
+  <div class="card" style="margin-bottom:11px">
+    <div style="display:flex;align-items:center;gap:11px;margin-bottom:13px">
+      <div class="av" style="width:44px;height:44px;background:#c7d2fe;color:#4338ca;font-size:14px;font-weight:700">SA</div>
+      <div><p style="font-size:14px;font-weight:700;color:var(--text)">Sofia Almeida</p><span class="pill p-ok" style="margin-top:3px;display:inline-flex">Matrícula ativa</span></div>
+    </div>
+    <div class="g3" style="margin-bottom:11px">
+      <div class="sbox"><div class="v" style="color:var(--green)">14</div><div class="l">Presenças</div></div>
+      <div class="sbox"><div class="v" style="color:var(--red)">2</div><div class="l">Faltas</div></div>
+      <div class="sbox"><div class="v">87%</div><div class="l">Taxa</div></div>
+    </div>
+    <div style="display:flex;justify-content:space-between;margin-bottom:5px"><span style="font-size:11px;color:var(--text2)">Frequência acumulada</span><span style="font-size:11px;font-weight:700;color:var(--green)">✅ OK</span></div>
+    <div class="fb"><div class="ff" style="width:87%;background:var(--green)"></div></div>
+  </div>
+  <div class="card" style="padding:0 15px">
+    ${[{d:'24/05',t:'Sáb',tp:'Variações de Barra',p:true},{d:'17/05',t:'Sáb',tp:'Pliés e Relevés',p:true},{d:'10/05',t:'Sáb',tp:'Alongamento',p:false},{d:'03/05',t:'Sáb',tp:'Sequência de Valsa',p:true},{d:'26/04',t:'Sáb',tp:'Pas de Deux',p:true},{d:'05/04',t:'Sáb',tp:'Coreografia Recital',p:false}].map(a=>`
+    <div class="row">
+      <div style="width:34px;height:34px;border-radius:8px;background:${a.p?'var(--green-l)':'var(--red-l)'};display:flex;flex-direction:column;align-items:center;justify-content:center;flex-shrink:0;line-height:1.1">
+        <span style="font-size:8px;font-weight:700;color:${a.p?'var(--green)':'var(--red)'}">${a.t}</span>
+        <span style="font-size:12px;font-weight:700;color:var(--text)">${a.d.split('/')[0]}</span>
+      </div>
+      <div style="flex:1"><p style="font-size:12px;font-weight:600;color:var(--text)">${a.tp}</p><p style="font-size:10px;color:var(--text3)">${a.d}</p></div>
+      <i class="ti ti-circle-${a.p?'check':'x'}" style="font-size:20px;color:${a.p?'var(--green)':'var(--red)'}"></i>
+    </div>`).join('')}
+  </div>`;}
+
+function vRCob(){return`
+  <p style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:12px">Mensalidades — Sofia Almeida</p>
+  ${[{m:'Junho 2026',vc:'05/06/2026',v:280,s:'pendente'},{m:'Maio 2026',vc:'05/05/2026',v:280,s:'pago'},{m:'Abril 2026',vc:'05/04/2026',v:280,s:'pago'}].map(c=>`
+  <div class="card" style="background:${c.s==='pendente'?'var(--amber-l)':'var(--card)'}">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:${c.s!=='pago'?11:0}px">
+      <div><p style="font-size:14px;font-weight:700;color:var(--text)">${c.m}</p><p style="font-size:10px;color:var(--text3);margin-top:2px">Venc.: ${c.vc}</p></div>
+      <div style="text-align:right"><p style="font-size:17px;font-weight:700;color:var(--text)">R$ ${c.v},00</p><span class="pill ${c.s==='pago'?'p-ok':'p-warn'}">${c.s==='pago'?'✓ Pago':'Pendente'}</span></div>
+    </div>
+    ${c.s!=='pago'?`<div style="display:flex;gap:7px">
+      <button class="btn b-ok" style="flex:1;font-size:11px" onclick="document.getElementById('m-pix').classList.add('open')">⚡ Pix</button>
+      <button class="btn" style="flex:1;font-size:11px;background:var(--blue-l);border-color:var(--blue-b);color:var(--blue)" onclick="toast('Gerando boleto...')">📄 Boleto</button>
+    </div>`:''}
+  </div>`).join('')}`;}
+
+function vRDados(){return`
+  <div class="card"><p class="ct">📋 Matrícula</p>
+    ${[['Aluno(a)','Sofia Almeida'],['Turma','Ballet Infantil B'],['Horário','Sáb 09h–10h30'],['Professor(a)','Ana Paula Ferreira'],['Status','Ativa · 01/02/2026'],['Vencimento','Todo dia 5'],['Mensalidade','R$ 280,00']].map(r=>`<div class="row"><span style="font-size:11px;color:var(--text2)">${r[0]}</span><span style="font-size:12px;font-weight:600;color:var(--text)">${r[1]}</span></div>`).join('')}
+  </div>
+  <div style="background:var(--blue-l);border:.5px solid var(--blue-b);border-radius:13px;padding:13px">
+    <p style="font-weight:700;font-size:13px;color:#1e40af;margin-bottom:4px">📞 Contato</p>
+    <p style="font-size:12px;color:#3b82f6">Studio Arte em Movimento</p>
+    <p style="font-size:12px;color:#3b82f6;margin-top:2px">(55) 3025-0000</p>
+  </div>`;}
+
+function vATurma(){return`
+  <div class="card">
+    <div style="display:flex;align-items:center;gap:11px;margin-bottom:13px">
+      <div class="av" style="width:44px;height:44px;background:var(--amber-l);color:var(--amber);font-size:14px;font-weight:700">SA</div>
+      <div><p style="font-size:14px;font-weight:700;color:var(--text)">Sofia Almeida</p><p style="font-size:10px;color:var(--text3)">Ballet Infantil B</p></div>
+    </div>
+    ${[['Turma','Ballet Infantil B'],['Professor(a)','Ana Paula Ferreira'],['Horário','Sáb, 09h00 – 10h30'],['Sala','Sala 2'],['Próxima aula','Sáb, 31/05/2026']].map(r=>`<div class="row"><span style="font-size:11px;color:var(--text2)">${r[0]}</span><span style="font-size:12px;font-weight:600;color:var(--text)">${r[1]}</span></div>`).join('')}
+    <div style="margin-top:13px"><div style="display:flex;justify-content:space-between;margin-bottom:5px"><span style="font-size:11px;color:var(--text2)">Frequência</span><span style="font-size:11px;font-weight:700;color:var(--green)">87%</span></div><div class="fb"><div class="ff" style="width:87%;background:var(--green)"></div></div><p style="font-size:10px;color:var(--green);margin-top:4px">✅ Acima do mínimo (75%)</p></div>
+  </div>
+  <div style="background:#f3f4f6;border:.5px solid var(--border);border-radius:11px;padding:10px 13px;display:flex;align-items:center;gap:8px">
+    <i class="ti ti-lock" style="color:var(--text3)"></i>
+    <span style="font-size:10px;color:var(--text3)">Pagamentos disponíveis apenas para o responsável</span>
+  </div>`;}
+
+function vAFreq(){return`
+  <div class="g3" style="margin-bottom:11px">
+    <div class="sbox"><div class="v" style="color:var(--green)">14</div><div class="l">Presenças</div></div>
+    <div class="sbox"><div class="v" style="color:var(--red)">2</div><div class="l">Faltas</div></div>
+    <div class="sbox"><div class="v">87%</div><div class="l">Taxa</div></div>
+  </div>
+  <div class="card" style="padding:0 15px">
+    ${[{d:'24/05',tp:'Variações de Barra',p:true},{d:'17/05',tp:'Pliés e Relevés',p:true},{d:'10/05',tp:'Alongamento',p:false},{d:'03/05',tp:'Sequência de Valsa',p:true},{d:'26/04',tp:'Pas de Deux',p:true},{d:'05/04',tp:'Coreografia Recital',p:false}].map(a=>`
+    <div class="row">
+      <i class="ti ti-circle-${a.p?'check':'x'}" style="font-size:19px;color:${a.p?'var(--green)':'var(--red)'};flex-shrink:0"></i>
+      <div style="flex:1"><p style="font-size:12px;font-weight:600;color:var(--text)">${a.tp}</p><p style="font-size:10px;color:var(--text3)">${a.d}</p></div>
+      <span class="pill ${a.p?'p-ok':'p-err'}">${a.p?'Presente':'Falta'}</span>
+    </div>`).join('')}
+  </div>`;}
+
+function vAAtiv(){return`
+  <p style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:12px">Atividades realizadas</p>
+  ${[{d:'24/05',t:'Variações de Barra',desc:'Exercícios de barra clássica com pliés, tendus e dégagés. Foco no alinhamento postural e posição dos braços.'},{d:'17/05',t:'Pliés e Relevés',desc:'Sequência de demi-plié e grand-plié nas cinco posições. Introdução ao relevé na barra e no centro.'},{d:'03/05',t:'Sequência de Valsa',desc:'Coreografia em 3/4 com pas de bourrée e chassés. Ensaio do recital de junho.'},{d:'26/04',t:'Pas de Deux Iniciante',desc:'Introdução ao trabalho em dupla: sincronização e consciência espacial.'}].map(a=>`
+  <div class="card"><p style="font-size:10px;color:var(--text3);margin-bottom:4px">${a.d}</p><p style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:7px">${a.t}</p><p style="font-size:12px;color:var(--text2);line-height:1.6">${a.desc}</p></div>`).join('')}`;}
+
+// Convite
+function genConv(){
+  const n=document.getElementById('c-nome').value.trim();
+  const e=document.getElementById('c-email').value.trim();
+  if(!n||!e.includes('@')){toast('Preencha nome e e-mail');return;}
+  const t=[...Array(32)].map(()=>Math.floor(Math.random()*16).toString(16)).join('');
+  const link=`https://portal.erp-educacional.com.br/entrar?token=${t}`;
+  const role=document.getElementById('c-role').value;
+  document.getElementById('c-link').textContent=link;
+  document.getElementById('c-result').style.display='block';
+  S.convites.unshift({nome:n,role,st:'pendente',dt:new Date().toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'}),t:document.getElementById('c-turma')?.value||'—'});
+  toast('✅ Convite gerado!');
+}
+function ccopy(){toast('📋 Link copiado!');}
+
+// Role change
+function changeRole(r){
+  S.role=r;S.page=NAV[r][0]?.id||'dashboard';
+  S.pontos={entrada:null,intervalo:null,retorno:null,saida:null};
+  S.alunos.forEach(a=>a.s='pend');
+  render();
+}
+
+// Init
+changeRole('colaborador');
+document.getElementById('rsel').value='colaborador';
+</script>
+</body>
+</html>

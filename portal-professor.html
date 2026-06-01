@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1">
+<title>Studio Arte — Portal Professor</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{
+  --c:#085041;--cd:#053328;--cl:#ecfdf5;
+  --green:#16a34a;--green-l:#f0fdf4;--green-b:#bbf7d0;
+  --red:#ef4444;--red-l:#fef2f2;--red-b:#fca5a5;
+  --amber:#d97706;--amber-l:#fffbeb;--amber-b:#fde68a;
+  --blue:#0369a1;--blue-l:#eff6ff;--blue-b:#bfdbfe;
+  --purple:#7c3aed;--purple-l:#f5f3ff;
+  --bg:#f0fdf4;--card:#fff;--bdr:rgba(0,0,0,0.07);
+  --tx:#0f172a;--tx2:#475569;--tx3:#94a3b8;
+  font-family:'Inter','Segoe UI',system-ui,sans-serif;
+}
+html,body{height:100%;overflow:hidden;background:#061a11}
+body{display:flex;align-items:center;justify-content:center}
+.phone{width:390px;height:844px;background:var(--bg);border-radius:44px;overflow:hidden;position:relative;box-shadow:0 40px 100px rgba(0,0,0,.7),0 0 0 1px rgba(255,255,255,.08);display:flex;flex-direction:column}
+.lscr{position:absolute;inset:0;z-index:200;display:flex;flex-direction:column;background:linear-gradient(160deg,#021a0e 0%,#053328 50%,#085041 100%);border-radius:44px;align-items:center;justify-content:center;padding:32px 24px}
+.lscr.hidden{display:none}
+.l-logo{width:72px;height:72px;border-radius:20px;background:linear-gradient(135deg,#059669,#0f6e56);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;box-shadow:0 8px 32px rgba(5,150,105,.4)}
+.l-logo i{font-size:30px;color:#fff}
+.l-card{width:100%;background:rgba(255,255,255,.07);border:.5px solid rgba(255,255,255,.12);border-radius:20px;padding:20px;margin-bottom:14px}
+.l-inp{width:100%;background:rgba(255,255,255,.1);border:.5px solid rgba(255,255,255,.15);border-radius:12px;padding:12px 14px;color:#fff;font-size:14px;outline:none;font-family:inherit;margin-bottom:10px}
+.l-inp:last-child{margin-bottom:0}
+.l-inp::placeholder{color:rgba(255,255,255,.4)}
+.l-btn{width:100%;padding:14px;border-radius:14px;border:none;font-size:14px;font-weight:700;cursor:pointer;font-family:inherit;margin-bottom:10px}
+.l-btn-main{background:linear-gradient(135deg,#059669,#0f6e56);color:#fff;box-shadow:0 4px 20px rgba(5,150,105,.4)}
+.l-btn-bio{background:rgba(255,255,255,.1);color:#fff;border:.5px solid rgba(255,255,255,.2)}
+.hdr{flex-shrink:0;padding:52px 20px 38px;background:linear-gradient(135deg,#053328,#085041);position:relative;overflow:hidden}
+.hdr::before{content:'';position:absolute;top:-60px;right:-60px;width:200px;height:200px;border-radius:50%;background:rgba(255,255,255,.04)}
+.hdr-row{display:flex;align-items:center;gap:12px}
+.kstrip{display:flex;gap:8px;margin-top:14px}
+.kc{flex:1;background:rgba(255,255,255,.1);border:.5px solid rgba(255,255,255,.15);border-radius:12px;padding:9px 10px}
+.kc-l{color:rgba(255,255,255,.55);font-size:9px;font-weight:500;margin-bottom:3px}
+.kc-v{font-weight:700;font-size:14px}
+.fc{background:var(--card);border-radius:18px;padding:16px 18px;box-shadow:0 12px 40px rgba(0,0,0,.12);border:.5px solid var(--bdr);margin:-22px 14px 0;position:relative;z-index:10;flex-shrink:0}
+.scr{flex:1;overflow-y:auto;overflow-x:hidden;padding:14px 14px 6px;scrollbar-width:none}
+.scr::-webkit-scrollbar{display:none}
+.bnav{flex-shrink:0;background:rgba(255,255,255,.97);backdrop-filter:blur(20px);border-top:.5px solid var(--bdr);display:flex;padding:4px 4px 10px;height:70px;align-items:flex-start}
+.nb{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:7px 3px;border:none;background:transparent;cursor:pointer;border-radius:12px;min-width:0}
+.nb.on{background:var(--cl)}
+.nb i{font-size:22px;color:var(--tx3)}
+.nb.on i{color:var(--c)}
+.nb span{font-size:9px;font-weight:600;color:var(--tx3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.nb.on span{color:var(--c)}
+.card{background:var(--card);border:.5px solid var(--bdr);border-radius:18px;padding:16px;margin-bottom:11px;box-shadow:0 2px 12px rgba(0,0,0,.04)}
+.ct{font-size:13px;font-weight:700;color:var(--tx);margin-bottom:12px;display:flex;align-items:center;gap:7px}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px}
+.sbox{background:#f8fafc;border:.5px solid var(--bdr);border-radius:13px;padding:10px;text-align:center}
+.sbox .v{font-size:20px;font-weight:700;color:var(--tx)}
+.sbox .l{font-size:9px;color:var(--tx3);margin-top:2px}
+.pill{display:inline-flex;align-items:center;gap:3px;font-size:10px;font-weight:600;padding:3px 9px;border-radius:20px;white-space:nowrap}
+.p-ok{background:var(--green-l);color:var(--green)}
+.p-err{background:var(--red-l);color:var(--red)}
+.p-warn{background:var(--amber-l);color:var(--amber)}
+.p-info{background:var(--blue-l);color:var(--blue)}
+.p-neu{background:#f1f5f9;color:var(--tx2)}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:9px 14px;border-radius:12px;font-size:12px;font-weight:600;cursor:pointer;border:.5px solid var(--bdr);background:var(--card);color:var(--tx);font-family:inherit;transition:all .15s}
+.btn:active{transform:scale(.97)}
+.b-prim{background:linear-gradient(135deg,#059669,#0f6e56);border-color:#059669;color:#fff;box-shadow:0 4px 14px rgba(5,150,105,.3)}
+.b-ok{background:var(--green-l);border-color:var(--green-b);color:var(--green)}
+.b-err{background:var(--red-l);border-color:var(--red-b);color:var(--red)}
+.b-warn{background:var(--amber-l);border-color:var(--amber-b);color:var(--amber)}
+.b-full{width:100%}
+.hold{position:relative;overflow:hidden;border-radius:14px;border:2px solid var(--hb,#059669);height:76px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer;user-select:none;-webkit-user-select:none;flex:1}
+.hold .hf{position:absolute;left:0;top:0;bottom:0;width:0;border-radius:12px}
+.hold .hi{font-size:22px;position:relative;z-index:1}
+.hold .hl{font-size:11px;font-weight:700;position:relative;z-index:1}
+.hold .hh{font-size:9px;position:relative;z-index:1;opacity:.65}
+.row{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:.5px solid var(--bdr)}
+.row:last-child{border-bottom:none}
+.avr{width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;flex-shrink:0}
+.fb{height:4px;background:#e2e8f0;border-radius:99px;overflow:hidden}
+.ff{height:100%;border-radius:99px}
+.fld{margin-bottom:10px}
+.fld label{font-size:11px;font-weight:600;color:var(--tx2);display:block;margin-bottom:4px}
+.fld input,.fld select,.fld textarea{width:100%;border:.5px solid #e2e8f0;border-radius:10px;padding:10px 12px;font-size:13px;color:var(--tx);background:#fff;outline:none;font-family:inherit}
+.fld textarea{resize:vertical;min-height:70px}
+.sw{display:flex;align-items:center;gap:10px;padding:11px 0;border-bottom:.5px solid var(--bdr)}
+.sw:last-child{border-bottom:none}
+.sw-tog{width:40px;height:22px;border-radius:20px;border:none;cursor:pointer;position:relative;flex-shrink:0}
+.sw-tog::after{content:'';position:absolute;width:16px;height:16px;border-radius:50%;background:#fff;top:3px;left:3px;transition:transform .2s;box-shadow:0 1px 4px rgba(0,0,0,.2)}
+.sw-tog.on{background:var(--c)}
+.sw-tog.on::after{transform:translateX(18px)}
+.sw-tog.off{background:#cbd5e1}
+.hbtn{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px;padding:10px 4px;border-radius:12px;border:1.5px solid var(--bdr);cursor:pointer;background:#fff;font-family:inherit}
+.hbtn.sel-ex{background:#f0fdf4;border-color:#22c55e}
+.hbtn.sel-bm{background:#eff6ff;border-color:#3b82f6}
+.hbtn.sel-nt{background:#fefce8;border-color:#eab308}
+.hbtn.sel-st{background:#fff7ed;border-color:#f97316}
+.hbtn.sel-ml{background:#fef2f2;border-color:#ef4444}
+.pc{border-radius:10px;padding:8px;text-align:center;border:.5px solid var(--bdr);background:#f8fafc}
+.pc.m{background:var(--green-l);border-color:var(--green-b)}
+.toast{position:absolute;bottom:88px;left:50%;transform:translateX(-50%);background:#0f172a;color:#fff;padding:10px 18px;border-radius:12px;font-size:12px;font-weight:500;z-index:400;white-space:nowrap;opacity:0;transition:opacity .2s;pointer-events:none;box-shadow:0 8px 30px rgba(0,0,0,.3)}
+.toast.show{opacity:1}
+.mbg{position:absolute;inset:0;background:rgba(0,0,0,.55);z-index:150;display:none;align-items:flex-end;justify-content:center;border-radius:44px;overflow:hidden}
+.mbg.open{display:flex}
+.mbox{background:#fff;border-radius:24px 24px 0 0;padding:20px 18px 28px;width:100%;max-height:90%;overflow-y:auto}
+.mhead{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+.mhead p{font-size:15px;font-weight:700;color:var(--tx)}
+.mclose{background:#f1f5f9;border:none;font-size:18px;cursor:pointer;color:var(--tx3);width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center}
+.back-btn{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.12);border:.5px solid rgba(255,255,255,.2);border-radius:10px;padding:7px 13px;color:#fff;font-size:12px;font-weight:500;cursor:pointer;margin-bottom:12px;font-family:inherit;border-style:solid}
+.tabs{display:flex;gap:4px;background:rgba(0,0,0,.05);border-radius:12px;padding:3px;margin-bottom:14px}
+.tabx{flex:1;padding:9px 0;border:none;border-radius:10px;font-size:11px;font-weight:600;color:var(--tx3);cursor:pointer;background:transparent;font-family:inherit}
+.tabx.on{background:#fff;color:var(--c);box-shadow:0 1px 5px rgba(0,0,0,.08)}
+.plano-card{background:#fff;border:.5px solid var(--bdr);border-radius:14px;padding:13px;margin-bottom:9px;box-shadow:0 2px 8px rgba(0,0,0,.04)}
+@keyframes fu{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.card,.plano-card,.hold{animation:fu .18s ease}
+</style>
+</head>
+<body>
+<div class="phone" id="phone">
+<div class="toast" id="toast"></div>
+
+<div class="lscr" id="lscr">
+  <div class="l-logo"><i class="ti ti-chalkboard"></i></div>
+  <div style="text-align:center;margin-bottom:28px">
+    <p style="color:#fff;font-size:22px;font-weight:700;letter-spacing:-.5px">Portal do Professor</p>
+    <p style="color:rgba(255,255,255,.5);font-size:13px;margin-top:5px">Ballet Infantil B · Studio Arte</p>
+  </div>
+  <div class="l-card">
+    <input class="l-inp" type="email" placeholder="Seu e-mail">
+    <input class="l-inp" type="password" placeholder="Senha">
+  </div>
+  <button class="l-btn l-btn-main" onclick="doLogin()">Entrar</button>
+  <button class="l-btn l-btn-bio" onclick="doBio()"><i class="ti ti-fingerprint" style="margin-right:6px"></i>Biometria</button>
+  <p style="color:rgba(255,255,255,.25);font-size:10px;margin-top:22px;text-align:center">i9 Smart ERP · v5.0.8</p>
+</div>
+
+<!-- MODAL HUMOR PGR -->
+<div class="mbg" id="m-humor" onclick="cm('m-humor',event)"><div class="mbox">
+  <div class="mhead"><p>😊 Como você está hoje?</p><button class="mclose" onclick="cl('m-humor')">✕</button></div>
+  <p style="font-size:11px;color:var(--tx2);margin-bottom:13px">Termômetro emocional — NR-1 PGR. Confidencial e imutável.</p>
+  <div style="display:flex;gap:7px;margin:12px 0">
+    <button class="hbtn" id="h-ex" onclick="selH('ex')"><span style="font-size:24px">😄</span><span style="font-size:9px;font-weight:600;color:var(--tx2)">Excelente</span></button>
+    <button class="hbtn" id="h-bm" onclick="selH('bm')"><span style="font-size:24px">🙂</span><span style="font-size:9px;font-weight:600;color:var(--tx2)">Bem</span></button>
+    <button class="hbtn" id="h-nt" onclick="selH('nt')"><span style="font-size:24px">😐</span><span style="font-size:9px;font-weight:600;color:var(--tx2)">Neutro</span></button>
+    <button class="hbtn" id="h-st" onclick="selH('st')"><span style="font-size:24px">😟</span><span style="font-size:9px;font-weight:600;color:var(--tx2)">Estressado</span></button>
+    <button class="hbtn" id="h-ml" onclick="selH('ml')"><span style="font-size:24px">😡</span><span style="font-size:9px;font-weight:600;color:var(--tx2)">Mal</span></button>
+  </div>
+  <div id="hextra" style="display:none">
+    <div class="fld"><label>Quer nos contar mais? (opcional)</label><textarea placeholder="O que está acontecendo..."></textarea></div>
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:11px">
+      <input type="checkbox" style="width:16px;height:16px;accent-color:var(--c)">
+      <label style="font-size:12px;color:var(--tx)">Quero que o RH entre em contato</label>
+    </div>
+  </div>
+  <button class="btn b-prim b-full" onclick="toast('✅ Estado emocional registrado. Confidencial.');cl('m-humor')">📤 Registrar</button>
+  <button class="btn b-err b-full" style="margin-top:8px" onclick="cl('m-humor');op('m-pgr')">🚨 Fazer relato de ocorrência PGR</button>
+</div></div>
+
+<!-- MODAL PGR RELATO -->
+<div class="mbg" id="m-pgr" onclick="cm('m-pgr',event)"><div class="mbox">
+  <div class="mhead"><p>🔒 Relato confidencial PGR</p><button class="mclose" onclick="cl('m-pgr')">✕</button></div>
+  <div style="background:#fef2f2;border:.5px solid #fca5a5;border-radius:12px;padding:11px;margin-bottom:13px;font-size:11px;color:#7f1d1d">🔐 Dados protegidos por lei (NR-1 PGR). Registro imutável — ninguém pode alterar ou apagar.</div>
+  <div class="fld"><label>Categoria</label><select><option>Assédio moral</option><option>Assédio sexual</option><option>Discriminação</option><option>Condições inadequadas</option><option>Relacionamento</option><option>Outro</option></select></div>
+  <div class="fld"><label>Descrição</label><textarea placeholder="Descreva com detalhes..."></textarea></div>
+  <div style="display:flex;align-items:center;gap:8px;margin-bottom:13px">
+    <input type="checkbox" checked style="width:16px;height:16px;accent-color:var(--c)">
+    <label style="font-size:12px;color:var(--tx)">Manter relato anônimo</label>
+  </div>
+  <button class="btn b-err b-full" onclick="toast('🔒 Relato PGR registrado. Imutável por lei.');cl('m-pgr')">📤 Registrar relato (imutável)</button>
+</div></div>
+
+<!-- MODAL FEEDBACK -->
+<div class="mbg" id="m-fb" onclick="cm('m-fb',event)"><div class="mbox">
+  <div class="mhead"><p>💬 Feedback</p><button class="mclose" onclick="cl('m-fb')">✕</button></div>
+  <div class="fld"><label>Para</label><select><option>Gestora — Maria Fernanda</option></select></div>
+  <div class="fld"><label>Tipo</label><select><option>🌟 Elogio</option><option>💡 Sugestão</option><option>⚠️ Alerta</option><option>💬 Geral</option></select></div>
+  <div class="fld"><label>Mensagem</label><textarea placeholder="Escreva seu feedback..."></textarea></div>
+  <button class="btn b-prim b-full" onclick="toast('💬 Feedback enviado!');cl('m-fb')">📤 Enviar</button>
+</div></div>
+
+<!-- MODAL FINANCEIRO -->
+<div class="mbg" id="m-fin" onclick="cm('m-fin',event)"><div class="mbox">
+  <div class="mhead"><p>💰 Dados Financeiros</p><button class="mclose" onclick="cl('m-fin')">✕</button></div>
+  <div style="background:#f5f3ff;border:.5px solid #c4b5fd;border-radius:14px;padding:16px;text-align:center;margin-bottom:14px">
+    <p style="font-size:10px;color:var(--tx3)">Salário Líquido — Maio 2026</p>
+    <p style="font-size:28px;font-weight:800;color:#4338ca;letter-spacing:-.5px">R$ 3.239,60</p>
+    <p style="font-size:11px;color:var(--tx3);margin-top:3px">Próx. pagamento: 05/06/2026</p>
+  </div>
+  <div style="background:#f8fafc;border:.5px solid var(--bdr);border-radius:12px;padding:13px;margin-bottom:12px">
+    ${["Salário Bruto:::R$ 3.800,00:::false","(-) INSS 9%:::R$ 342,00:::true","(-) IRRF:::R$ 218,40:::true","Salário Líquido:::R$ 3.239,60:::bold"].map(r=>{const[l,v,t]=r.split(':::');return f'<div style="display:flex;justify-content:space-between;padding:7px 0;border-top:.5px solid var(--bdr)"><span style="font-size:12px;color:var(--tx2)">{l}</span><span style="font-size:12px;font-weight:{t==="bold"?700:500};color:{t==="true"?"var(--red)":t==="bold"?"#4338ca":"var(--tx)"}">{v}</span></div>'})}
+  </div>
+  <p style="font-size:12px;font-weight:600;color:var(--tx);margin-bottom:9px">📄 Holerites</p>
+  ${[["Maio 2026","false"],["Abril 2026","true"],["Março 2026","true"]].map(([m,pg])=>f'<div style="display:flex;align-items:center;gap:9px;padding:8px 0;border-bottom:.5px solid var(--bdr)"><div style="flex:1"><p style="font-size:12px;font-weight:600;color:var(--tx)">{m}</p></div><span class="pill {("p-ok" if pg=="true" else "p-warn")}">{("✓ Pago" if pg=="true" else "A receber")}</span><button class="btn" style="padding:4px 8px;font-size:11px;margin-left:6px" onclick="toast(&apos;Baixando...&apos;)"><i class="ti ti-download"></i></button></div>').join('')}
+</div></div>
+
+<!-- HEADER -->
+<div class="hdr" id="hdr" style="display:none">
+  <div id="bwrap"></div>
+  <div class="hdr-row">
+    <div style="width:44px;height:44px;border-radius:13px;background:linear-gradient(135deg,#059669,#0f6e56);display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 4px 16px rgba(5,150,105,.3)"><i class="ti ti-chalkboard" style="font-size:22px;color:#fff"></i></div>
+    <div style="flex:1"><p style="color:rgba(255,255,255,.55);font-size:10px">Studio Arte em Movimento</p><p style="color:#fff;font-size:16px;font-weight:700;margin-top:1px">Ana Paula Ferreira</p><p style="color:rgba(255,255,255,.5);font-size:10px;margin-top:1px">Professora · CLT</p></div>
+    <button style="background:rgba(255,255,255,.1);border:.5px solid rgba(255,255,255,.2);border-radius:10px;padding:8px 10px;color:#fff;font-size:13px;cursor:pointer;border-style:solid" onclick="toast('Sem novas notificações')">🔔</button>
+  </div>
+  <div class="kstrip">
+    <div class="kc"><p class="kc-l">Turmas</p><p class="kc-v" style="color:#a7f3d0">2</p></div>
+    <div class="kc"><p class="kc-l">Alunos</p><p class="kc-v" style="color:#a7f3d0">21</p></div>
+    <div class="kc"><p class="kc-l">Banco Hrs</p><p class="kc-v" style="color:#86efac">+3h20</p></div>
+  </div>
+</div>
+<div class="fc" id="fc" style="display:none"></div>
+<div class="scr" id="scr" style="display:none"></div>
+<nav class="bnav" id="bnav" style="display:none"></nav>
+</div>
+
+<script>
+const NAV=[
+  {i:'ti-users-group',l:'Turmas',id:'turmas'},
+  {i:'ti-clipboard-check',l:'Chamada',id:'chamada'},
+  {i:'ti-book',l:'Planos',id:'planos'},
+  {i:'ti-clock',l:'Ponto',id:'ponto'},
+  {i:'ti-user',l:'Perfil',id:'perfil'},
+];
+let page='turmas',hist=[],profileTab='pessoal',humorSel=null;
+const pontos={entrada:null,intervalo:null,retorno:null,saida:null};
+const holds={};
+const planos=[
+  {titulo:'Variações de Barra — Básico',turma:'Ballet Infantil B',ordem:1,dur:60,status:'publicado',mats:['PDF','Vídeo']},
+  {titulo:'Pliés e Relevés',turma:'Ballet Infantil B',ordem:2,dur:60,status:'publicado',mats:['PDF']},
+  {titulo:'Sequência de Valsa',turma:'Ballet Infantil B',ordem:3,dur:90,status:'bloqueado',mats:['MP3','PDF']},
+];
+const alunos=[
+  {ini:'SA',nome:'Sofia Almeida',freq:87,s:'pend'},
+  {ini:'IC',nome:'Isabella Costa',freq:100,s:'pend'},
+  {ini:'LM',nome:'Laura Mendes',freq:68,s:'pend'},
+  {ini:'VR',nome:'Valentina Rocha',freq:93,s:'pend'},
+  {ini:'BL',nome:'Beatriz Lima',freq:75,s:'pend'},
+  {ini:'CF',nome:'Clara Ferreira',freq:100,s:'pend'},
+];
+function toast(m,ms=3000){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),ms)}
+function cm(id,e){if(e.target.id===id)document.getElementById(id).classList.remove('open')}
+function cl(id){document.getElementById(id).classList.remove('open')}
+function op(id){document.getElementById(id).classList.add('open')}
+function fc2(f){return f>=80?'#16a34a':f>=60?'#d97706':'#ef4444'}
+function fb2(f){return f>=80?'#f0fdf4':f>=60?'#fffbeb':'#fef2f2'}
+function nt(){return new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})}
+function selH(h){humorSel=h;['ex','bm','nt','st','ml'].forEach(id=>{const el=document.getElementById('h-'+id);el.className='hbtn'+(id===h?' sel-'+id:'')});document.getElementById('hextra').style.display=['st','ml'].includes(h)?'block':'none'}
+function gp(p){hist.push(page);page=p;renderNav();renderScr();renderFC();updateBack()}
+function goBack(){if(hist.length){page=hist.pop();renderNav();renderScr();renderFC();updateBack()}}
+function updateBack(){const bw=document.getElementById('bwrap');const root=['turmas','chamada','planos','ponto','perfil'];bw.innerHTML=!root.includes(page)&&hist.length?'<button class="back-btn" onclick="goBack()"><i class="ti ti-arrow-left" style="font-size:16px"></i> Voltar</button>':'';}
+function doLogin(){document.getElementById('lscr').classList.add('hidden');['hdr','scr','bnav'].forEach(id=>{const el=document.getElementById(id);el.style.display=id==='bnav'?'flex':'block'});renderNav();renderScr();renderFC();toast('✅ Bem-vinda, Ana Paula!')}
+function doBio(){doLogin();toast('🔐 Biometria reconhecida!')}
+function renderNav(){document.getElementById('bnav').innerHTML=NAV.map(it=>`<button class="nb${it.id===page?' on':''}" onclick="gp('${it.id}')"><i class="ti ${it.i}"></i><span>${it.l}</span></button>`).join('')}
+
+let clkI=null;
+function renderFC(){
+  const el=document.getElementById('fc');
+  if(page==='ponto'){
+    el.style.display='block';
+    const pts=['entrada','intervalo','retorno','saida'],lb={entrada:'Entrada',intervalo:'Intervalo',retorno:'Retorno',saida:'Saída'},bg={entrada:'#ecfdf5',intervalo:'#fffbeb',retorno:'#eff6ff',saida:'#fdf4ff'},cl2={entrada:'#065f46',intervalo:'#713f12',retorno:'#1e40af',saida:'#6b21a8'},any=pts.some(t=>pontos[t]);
+    el.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:${any?9:0}px"><div><p style="font-size:10px;color:var(--tx2);font-weight:500">Horário atual</p><p id="clk" style="font-size:26px;font-weight:800;color:var(--tx);letter-spacing:-1px">--:--:--</p><p style="font-size:10px;color:var(--tx3)">Domingo, 24 de maio de 2026</p></div><div style="background:${pontos.entrada?'var(--green-l)':'#f9fafb'};border:.5px solid ${pontos.entrada?'var(--green-b)':'var(--bdr)'};border-radius:9px;padding:5px 11px;text-align:right"><p style="font-size:9px;font-weight:600;color:${pontos.saida?'var(--tx2)':pontos.entrada?'var(--green)':'var(--tx3)'}">${pontos.saida?'Encerrada':pontos.entrada?'🟢 Em jornada':'⚪ Sem registro'}</p></div></div>${any?`<div style="display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-top:10px">${pts.map(t=>`<div class="pc${pontos[t]?' m':''}" ${pontos[t]?`style="background:${bg[t]};border-color:${cl2[t]}40"`:''}>  <p style="font-size:8px;font-weight:600;color:${pontos[t]?cl2[t]:'var(--tx3)'}">${lb[t]}</p><p style="font-size:12px;font-weight:700;color:${pontos[t]?'var(--tx)':'#d1d5db'}">${pontos[t]||'--:--'}</p></div>`).join('')}</div>`:''}`;
+    clearInterval(clkI);const tick=()=>{const e=document.getElementById('clk');if(e)e.textContent=new Date().toLocaleTimeString('pt-BR')};tick();clkI=setInterval(tick,1000);
+  }else{el.style.display='none';el.innerHTML=''}
+}
+
+function renderScr(){
+  const views={turmas:vTurmas,chamada:vChamada,planos:vPlanos,ponto:vPonto,perfil:vPerfil};
+  document.getElementById('scr').innerHTML=(views[page]||vTurmas)();
+  bindHolds();bindChamada();
+}
+
+function mkHold(el,cb){
+  if(!el||el._hs)return;el._hs=1;
+  function start(e){e.preventDefault();if(el.dataset.done==='1')return;holds[el.id]={t:performance.now()};const f=el.querySelector('.hf'),lbl=el.querySelector('.hl'),cor=el.dataset.cor||'#059669';el.style.boxShadow=`0 0 0 5px ${cor}22`;const tick=()=>{if(!holds[el.id])return;const p=Math.min((performance.now()-holds[el.id].t)/3000*100,100);if(f)f.style.width=p+'%';if(lbl)lbl.textContent=Math.round(p/100*3)+'s...';if(p<100)holds[el.id].r=requestAnimationFrame(tick);else done()};holds[el.id].r=requestAnimationFrame(tick)}
+  function stop(){if(!holds[el.id])return;cancelAnimationFrame(holds[el.id].r);delete holds[el.id];const f=el.querySelector('.hf'),lbl=el.querySelector('.hl');if(f)f.style.width='0%';if(lbl&&el.dataset.done!=='1')lbl.textContent=el.dataset.lbl||'Segurar 3s';el.style.boxShadow='none'}
+  function done(){delete holds[el.id];el.dataset.done='1';el.style.pointerEvents='none';const cor=el.dataset.cor||'#059669';el.style.background=cor;el.style.borderColor=cor;el.style.boxShadow=`0 4px 16px ${cor}40`;const ic=el.querySelector('.hi'),lbl=el.querySelector('.hl'),hh=el.querySelector('.hh'),f=el.querySelector('.hf');if(ic)ic.textContent='✅';if(lbl){lbl.textContent='Registrado!';lbl.style.color='#fff'}if(hh)hh.style.display='none';if(f){f.style.width='100%';f.style.background='rgba(255,255,255,.2)'}cb()}
+  el.addEventListener('mousedown',start);el.addEventListener('mouseup',stop);el.addEventListener('mouseleave',stop);el.addEventListener('touchstart',start,{passive:false});el.addEventListener('touchend',stop)
+}
+
+function bindHolds(){
+  const tipos=['entrada','intervalo','retorno','saida'],deps={entrada:[],intervalo:['entrada'],retorno:['entrada','intervalo'],saida:['entrada','intervalo','retorno']};
+  tipos.forEach(t=>{const el=document.getElementById('hpt'+t);if(!el||pontos[t])return;mkHold(el,()=>{pontos[t]=nt();toast(`⏱ ${t==='entrada'?'Entrada':t==='intervalo'?'Intervalo':t==='retorno'?'Retorno':'Saída'} às ${pontos[t]}`);renderFC();renderScr();if(t==='entrada')setTimeout(()=>op('m-humor'),1200)})})
+}
+
+function bindChamada(){
+  alunos.forEach((a,i)=>{const el=document.getElementById('hch'+i);if(!el||a.s!=='pend')return;mkHold(el,()=>{a.s='p';toast('✅ Presença — '+a.nome);renderScr()})})
+}
+
+function vTurmas(){return`
+  ${[{n:'Ballet Infantil B',h:'Sáb 09h–10h30',sala:'Sala 2',a:10,f:87,prx:'31/05',prox:true},
+     {n:'Ballet Infantil A',h:'Qua/Sex 08h',sala:'Sala 1',a:11,f:91,prx:'28/05',prox:false}].map(t=>`
+  <div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:12px">
+      <div><p style="font-size:15px;font-weight:700;color:var(--tx)">${t.n}</p><p style="font-size:11px;color:var(--tx3);margin-top:3px">🕐 ${t.h} · ${t.sala}</p></div>
+      <span class="pill p-ok">${t.a} alunos</span>
+    </div>
+    <div class="g3" style="margin-bottom:12px">
+      <div class="sbox"><div class="v" style="color:var(--green)">${t.f}%</div><div class="l">Frequência</div></div>
+      <div class="sbox"><div class="v">16</div><div class="l">Aulas</div></div>
+      <div class="sbox"><div class="v" style="font-size:12px">${t.prx}</div><div class="l">Próxima</div></div>
+    </div>
+    <div style="display:flex;gap:8px">
+      <button class="btn b-prim" style="flex:1;font-size:12px" onclick="gp('chamada')">📋 Fazer chamada</button>
+      <button class="btn b-ok" style="flex:1;font-size:12px" onclick="gp('planos')">📋 Planos de aula</button>
+    </div>
+  </div>`).join('')}
+  <div style="background:#f1f5f9;border:.5px solid var(--bdr);border-radius:13px;padding:11px 14px;display:flex;align-items:center;gap:8px">
+    <i class="ti ti-lock" style="color:var(--tx3)"></i>
+    <span style="font-size:11px;color:var(--tx3)">Dados financeiros da escola não disponíveis para este perfil</span>
+  </div>`}
+
+function vChamada(){
+  const p=alunos.filter(a=>a.s==='p').length,f=alunos.filter(a=>a.s==='f').length,nd=alunos.filter(a=>a.s==='pend').length;
+  return`
+  <div class="g3" style="margin-bottom:12px">
+    <div class="sbox"><div class="v" style="color:var(--green)">${p}</div><div class="l">Presentes</div></div>
+    <div class="sbox"><div class="v" style="color:var(--red)">${f}</div><div class="l">Faltas</div></div>
+    <div class="sbox"><div class="v" style="color:var(--tx3)">${nd}</div><div class="l">Pendentes</div></div>
+  </div>
+  <div class="card" style="padding:0 16px;margin-bottom:12px">
+    ${alunos.map((a,i)=>`
+    <div class="row" style="background:${a.s==='p'?'var(--green-l)':a.s==='f'?'var(--red-l)':'transparent'};margin:0 -16px;padding:10px 16px;border-radius:0">
+      <div class="avr" style="background:${fb2(a.freq)};color:${fc2(a.freq)}">${a.ini}</div>
+      <div style="flex:1;min-width:0">
+        <p style="font-size:12px;font-weight:600;color:var(--tx)">${a.nome}</p>
+        <div style="display:flex;align-items:center;gap:5px;margin-top:3px">
+          <div class="fb" style="max-width:60px"><div class="ff" style="width:${a.freq}%;background:${fc2(a.freq)}"></div></div>
+          <span style="font-size:10px;color:${fc2(a.freq)}">${a.freq}%</span>
+        </div>
+      </div>
+      ${a.s==='pend'?`
+      <div id="hch${i}" class="hold" data-cor="#059669" data-lbl="Segurar 3s" style="--hb:#059669;width:94px;height:46px;border-radius:10px;flex:none">
+        <div class="hf" style="background:#05966922"></div>
+        <span class="hi" style="font-size:14px">✋</span>
+        <span class="hl" style="font-size:9px;color:#059669">Segurar 3s</span>
+      </div>
+      <button class="btn b-err" style="padding:5px 8px;font-size:13px;flex-shrink:0;height:46px;border-radius:10px" onclick="alunos[${i}].s='f';renderScr();toast('❌ Falta — ${a.nome}')">✕</button>`
+      :`<div style="width:32px;height:32px;border-radius:50%;background:${a.s==='p'?'var(--green-l)':'var(--red-l)'};display:flex;align-items:center;justify-content:center;font-size:17px">${a.s==='p'?'✅':'❌'}</div>`}
+    </div>`).join('')}
+  </div>
+  <button class="btn ${nd>0?'':'b-prim'} b-full" ${nd>0?'style="opacity:.4" disabled':''} onclick="alunos.forEach(a=>a.s='pend');renderScr();toast('✅ Chamada salva! Hora registrada automaticamente.',4000)">
+    ${nd>0?`⚠️ ${nd} pendente(s)`:'✅ Finalizar chamada'}
+  </button>`}
+
+function vPlanos(){
+  const pub=planos.filter(p=>p.status==='publicado'),blk=planos.filter(p=>p.status!=='publicado');
+  return`
+  <p style="font-size:16px;font-weight:700;color:var(--tx);margin-bottom:5px">Planos de Aula</p>
+  <p style="font-size:11px;color:var(--tx3);margin-bottom:14px">Materiais liberados pelo gestor</p>
+  ${pub.length?pub.map(pl=>`
+  <div class="plano-card">
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:9px">
+      <div style="width:32px;height:32px;border-radius:9px;background:var(--cl);display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:var(--c);flex-shrink:0">${pl.ordem}</div>
+      <div style="flex:1"><p style="font-size:13px;font-weight:700;color:var(--tx)">${pl.titulo}</p><p style="font-size:10px;color:var(--tx3)">⏱ ${pl.dur}min</p></div>
+    </div>
+    <div style="margin-bottom:9px">${pl.mats.map(m=>`<span class="pill p-info" style="font-size:9px;margin-right:4px">${m}</span>`).join('')}</div>
+    <button class="btn b-prim b-full" style="font-size:12px" onclick="toast('📂 Abrindo pasta: ${pl.titulo}')">📂 Abrir pasta / executar aula</button>
+  </div>`).join(''):''}
+  ${blk.length?`<p style="font-size:11px;font-weight:700;color:var(--tx3);margin:14px 0 9px;text-transform:uppercase;letter-spacing:.06em">🔒 Próximas aulas (aguardando gestor)</p>
+  ${blk.map(pl=>`<div class="plano-card" style="opacity:.4"><div style="display:flex;align-items:center;gap:10px"><div style="width:32px;height:32px;border-radius:9px;background:#f1f5f9;display:flex;align-items:center;justify-content:center;font-size:13px;color:var(--tx3);flex-shrink:0">${pl.ordem}</div><div><p style="font-size:13px;font-weight:600;color:var(--tx)">${pl.titulo}</p><p style="font-size:10px;color:var(--tx3)">🔒 Aguardando liberação</p></div></div></div>`).join('')}`:''}`;
+}
+
+function vPonto(){
+  const tipos=[{id:'entrada',ic:'🏁',l:'Entrada',cor:'#059669'},{id:'intervalo',ic:'☕',l:'Intervalo',cor:'#f59e0b'},{id:'retorno',ic:'🔄',l:'Retorno',cor:'#0ea5e9'},{id:'saida',ic:'🚪',l:'Saída',cor:'#7c3aed'}];
+  const deps={entrada:[],intervalo:['entrada'],retorno:['entrada','intervalo'],saida:['entrada','intervalo','retorno']};
+  return`
+  <div class="card">
+    <p class="ct">Registrar Ponto — Segure 3s</p>
+    <p style="font-size:11px;color:var(--tx3);margin-bottom:13px">Pressione e <strong>segure 3 segundos</strong>. GPS e horário capturados automaticamente.</p>
+    <div class="g2" style="gap:9px">
+      ${tipos.map(t=>{const done=!!pontos[t.id],ok=deps[t.id].every(d=>pontos[d]),dis=done||!ok;return`<div id="hpt${t.id}" class="hold${done?' done':''}" data-cor="${t.cor}" data-lbl="${t.l}" style="--hb:${dis&&!done?'#e2e8f0':t.cor};background:${done?t.cor:'transparent'};opacity:${dis&&!done?.35:1};pointer-events:${dis?'none':'auto'}"><div class="hf" style="background:${t.cor}22"></div><span class="hi">${done?'✅':t.ic}</span><span class="hl" style="color:${done?'#fff':t.cor}">${done?'Registrado!':t.l}</span>${!done?`<span class="hh" style="color:${t.cor}">Segure 3s</span>`:''}</div>`}).join('')}
+    </div>
+    <p style="font-size:10px;color:var(--tx3);text-align:center;margin-top:11px">📍 GPS + timestamp server-side · Imutável</p>
+  </div>
+  <div class="g2" style="gap:9px;margin-bottom:11px">
+    <button class="btn b-full" style="min-height:48px;background:var(--amber-l);border-color:var(--amber-b);color:var(--amber)" onclick="toast('📝 Registro manual: preencha horário e justificativa.')">📝 Ponto manual</button>
+    <button class="btn b-full" onclick="op('m-fin')" style="min-height:48px;background:#f5f3ff;border-color:#c4b5fd;color:#7c3aed">💰 Financeiro</button>
+  </div>
+  <div class="g2" style="gap:9px;margin-bottom:11px">
+    <button class="btn b-full" onclick="op('m-humor')" style="min-height:48px;background:var(--green-l);border-color:var(--green-b);color:var(--green)">😊 Termômetro emocional</button>
+    <button class="btn b-full" onclick="op('m-fb')" style="min-height:48px;background:var(--blue-l);border-color:var(--blue-b);color:var(--blue)">💬 Feedback</button>
+  </div>
+  <div class="card">
+    <p class="ct">⏱ Banco de Horas</p>
+    <div style="display:flex;align-items:center;gap:14px">
+      <div style="text-align:center"><p style="font-size:28px;font-weight:800;color:#059669;letter-spacing:-1px">+3h20</p><p style="font-size:10px;color:var(--tx3)">saldo</p></div>
+      <div style="flex:1">
+        <div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="font-size:11px;color:var(--tx3)">Esta semana</span><span style="font-size:11px;font-weight:700;color:var(--green)">+0h 45min</span></div>
+        <div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="font-size:11px;color:var(--tx3)">Este mês</span><span style="font-size:11px;font-weight:700;color:#059669">+3h 20min</span></div>
+        <div style="display:flex;justify-content:space-between"><span style="font-size:11px;color:var(--tx3)">Carga diária</span><span style="font-size:11px;font-weight:600;color:var(--tx2)">8h 00min</span></div>
+      </div>
+    </div>
+  </div>`}
+
+function vPerfil(){
+  const abas=['pessoal','profissional','contratual'];
+  const itens={
+    pessoal:[{i:'ti-user',l:'Dados pessoais'},{i:'ti-user-check',l:'Autodeclaração'},{i:'ti-phone',l:'Contatos'},{i:'ti-user-exclamation',l:'Emergência'},{i:'ti-users',l:'Dependentes'},{i:'ti-home',l:'Endereço'},{i:'ti-id',l:'Documentos'},{i:'ti-school',l:'Formação acadêmica'}],
+    profissional:[{i:'ti-briefcase',l:'Dados profissionais'},{i:'ti-certificate',l:'Certificações'},{i:'ti-history',l:'Histórico'}],
+    contratual:[{i:'ti-file-text',l:'Contrato de trabalho'},{i:'ti-cash',l:'Remuneração'},{i:'ti-calendar',l:'Jornada'},{i:'ti-beach',l:'Férias'}],
+  };
+  return`
+  <div class="card" style="text-align:center;padding:22px 16px">
+    <div style="position:relative;display:inline-block;margin-bottom:12px">
+      <div style="width:76px;height:76px;border-radius:50%;background:linear-gradient(135deg,#059669,#0f6e56);display:flex;align-items:center;justify-content:center;color:#fff;font-size:26px;font-weight:700;margin:0 auto">AP</div>
+      <button style="position:absolute;bottom:0;right:0;width:26px;height:26px;border-radius:50%;background:#059669;border:2px solid #fff;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:12px" onclick="toast('Selecionar foto...')">✏️</button>
+    </div>
+    <p style="font-size:15px;font-weight:700;color:var(--tx)">Ana Paula Ferreira</p>
+    <p style="font-size:11px;color:var(--tx3);margin-top:3px">Instrutora de Dança · CLT</p>
+  </div>
+  <div class="tabs">${abas.map(a=>`<button class="tabx${profileTab===a?' on':''}" onclick="profileTab='${a}';renderScr()">${a.charAt(0).toUpperCase()+a.slice(1)}</button>`).join('')}</div>
+  <div class="card" style="padding:0 16px">
+    ${(itens[profileTab]||[]).map(it=>`
+    <div style="display:flex;align-items:center;gap:11px;padding:13px 0;border-bottom:.5px solid var(--bdr);cursor:pointer" onclick="toast('Abrindo ${it.l}...')">
+      <div style="width:36px;height:36px;border-radius:11px;background:var(--cl);display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="ti ${it.i}" style="font-size:18px;color:var(--c)"></i></div>
+      <p style="flex:1;font-size:13px;font-weight:500;color:var(--tx)">${it.l}</p>
+      <i class="ti ti-chevron-right" style="color:var(--tx3)"></i>
+    </div>`).join('')}
+  </div>
+  <button class="btn b-full" style="margin-top:9px;min-height:48px;border-color:#a7f3d0;color:var(--c)" onclick="toast('Configurar perfil público...')">
+    <i class="ti ti-globe" style="margin-right:6px"></i>Configurar perfil público
+  </button>
+  <button class="btn b-full" style="margin-top:9px;min-height:48px;background:var(--blue-l);border-color:var(--blue-b);color:var(--blue)" onclick="op('m-fb')">
+    <i class="ti ti-message-circle" style="margin-right:6px"></i>Enviar / Receber Feedback
+  </button>
+  <div style="text-align:center;margin-top:18px;padding:12px 0;border-top:.5px solid var(--bdr)">
+    <p style="font-size:10px;color:var(--tx3)">powered by i9 Smart · Versão 5.0.8</p>
+  </div>`}
+</script>
+</body>
+</html>
