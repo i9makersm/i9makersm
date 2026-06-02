@@ -4,20 +4,14 @@
 
 1. Acesse https://supabase.com e crie um projeto
 2. Copie: **Project URL** e **service_role key**
-3. Abra o **SQL Editor** e execute na ordem:
+3. Preencha o `.env`
+4. Rode:
 
-```sql
--- 1º: estrutura principal
-\i schema.sql
-
--- 2º: adições v2 (PGR, Avaliação, Planos, Notificações)
-\i schema-v2-additions.sql
-
--- 3º: dados de teste
-\i seed-test-data.sql
+```bash
+npm run setup
 ```
 
-4. Verifique no painel: **Table Editor** deve mostrar 15+ tabelas
+5. Verifique no painel: **Table Editor** deve mostrar as tabelas principais e os dados de teste provisionados
 
 ---
 
@@ -32,6 +26,7 @@ Edite `.env`:
 SUPABASE_URL=https://SEU-PROJETO.supabase.co
 SUPABASE_ANON_KEY=eyJ...
 SUPABASE_SERVICE_ROLE_KEY=eyJ...
+SERVICE_ROLE_KEY=eyJ... # alias opcional para compatibilidade
 DATABASE_URL=postgresql://postgres:SENHA@db.SEU-PROJETO.supabase.co:5432/postgres
 PORT=4000
 NODE_ENV=production
@@ -44,10 +39,11 @@ NODE_ENV=production
 ```bash
 npm install
 npx prisma generate
-npx prisma db push        # sincroniza modelos
+npm run db:bootstrap      # sincroniza modelos e provisiona o ambiente de teste
+npm run build              # compila TS para dist/
 
 # Desenvolvimento
-npm run dev               # inicia api-backend.ts e api-routes-v2.ts
+npm run dev               # inicia os dois servidores da API
 
 # Verificar saúde
 curl http://localhost:4000/health
@@ -62,7 +58,7 @@ curl http://localhost:4000/health
 ```bash
 curl -X POST http://localhost:4000/auth/login \
   -H "Content-Type: application/json" \
-  -d '{"email":"gestor@arteemmovimento.com","password":"senha123"}'
+  -d '{"email":"gestor@arteemmovimento.com","password":"Gestor@2026"}'
 # Guarde o access_token retornado como $TOKEN
 ```
 
@@ -141,6 +137,8 @@ npx vercel --prod
 **Seletor de portais (demo):** canto superior esquerdo da tela.
 Em produção, cada perfil recebe seu próprio link de convite com o app instalador.
 
+**Painel de diagnóstico:** abra `backend-test.html` para validar login, health e rotas por perfil sem depender dos portais.
+
 ---
 
 ## ─── PASSO 6: Criar senhas no Supabase Auth ─────────────────────────────────
@@ -152,10 +150,10 @@ Em produção, cada perfil recebe seu próprio link de convite com o app instala
 ```bash
 # Criar senha para o gestor de teste
 curl -X PUT "https://SEU-PROJETO.supabase.co/auth/v1/admin/users/USER_UUID" \
-  -H "apikey: $SERVICE_ROLE_KEY" \
-  -H "Authorization: Bearer $SERVICE_ROLE_KEY" \
+  -H "apikey: $SUPABASE_SERVICE_ROLE_KEY" \
+  -H "Authorization: Bearer $SUPABASE_SERVICE_ROLE_KEY" \
   -H "Content-Type: application/json" \
-  -d '{"password": "senha123"}'
+  -d '{"password": "Gestor@2026"}'
 ```
 
 ---

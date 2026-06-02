@@ -284,13 +284,13 @@ body{display:flex;align-items:center;justify-content:center}
 <div class="mbg" id="m-plano" onclick="cm('m-plano',event)"><div class="mbox">
   <div class="mhead"><p>📋 Plano de aula</p><button class="mclose" onclick="cl('m-plano')">✕</button></div>
   <div class="fld"><label>Título</label><input id="plt" placeholder="Ex: Variações de Barra — Básico"></div>
-  <div class="fld"><label>Turma</label><select><option>Ballet Infantil A</option><option>Ballet Infantil B</option><option>Robótica Avançada</option><option>Violão Iniciante</option></select></div>
+  <div class="fld"><label>Turma</label><select id="plturma"><option>Ballet Infantil A</option><option selected>Ballet Infantil B</option><option>Robótica Avançada</option><option>Violão Iniciante</option></select></div>
   <div class="g2" style="margin-bottom:9px">
-    <div class="fld" style="margin-bottom:0"><label>Ordem</label><input type="number" value="1" min="1"></div>
-    <div class="fld" style="margin-bottom:0"><label>Duração (min)</label><input type="number" value="60"></div>
+    <div class="fld" style="margin-bottom:0"><label>Ordem</label><input id="plordem" type="number" value="1" min="1"></div>
+    <div class="fld" style="margin-bottom:0"><label>Duração (min)</label><input id="pldur" type="number" value="60"></div>
   </div>
-  <div class="fld"><label>Acesso ao professor</label><select><option>🔒 Bloqueado</option><option>✅ Liberado</option></select></div>
-  <div class="fld"><label>Descrição</label><textarea placeholder="Objetivos da aula..."></textarea></div>
+  <div class="fld"><label>Acesso ao professor</label><select id="plstatus"><option>🔒 Bloqueado</option><option>✅ Liberado</option></select></div>
+  <div class="fld"><label>Descrição</label><textarea id="pldesc" placeholder="Objetivos da aula..."></textarea></div>
   <p style="font-size:11px;font-weight:600;color:var(--tx2);margin-bottom:7px">Materiais</p>
   <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:11px">
     <button class="btn" style="font-size:11px;padding:6px 10px" onclick="toast('Selecionar MP4')">🎬 Vídeo</button>
@@ -340,10 +340,10 @@ body{display:flex;align-items:center;justify-content:center}
     🔐 Dados protegidos por lei (NR-1 PGR). Imutáveis — nem o suporte técnico pode alterar.
   </div>
   <div class="fld"><label>Categoria</label>
-    <select><option>Assédio moral</option><option>Assédio sexual</option><option>Discriminação</option><option>Condições inadequadas</option><option>Relacionamento</option><option>Outro</option></select>
+    <select id="pgrcat"><option>Assédio moral</option><option>Assédio sexual</option><option>Discriminação</option><option>Condições inadequadas</option><option>Relacionamento</option><option>Outro</option></select>
   </div>
-  <div class="fld"><label>Descrição</label><textarea placeholder="Descreva com detalhes..."></textarea></div>
-  <div class="fld"><label>Pessoas envolvidas (opcional)</label><input placeholder="Nomes ou cargos..."></div>
+  <div class="fld"><label>Descrição</label><textarea id="pgrdesc" placeholder="Descreva com detalhes..."></textarea></div>
+  <div class="fld"><label>Pessoas envolvidas (opcional)</label><input id="pgrenv" placeholder="Nomes ou cargos..."></div>
   <div style="display:flex;align-items:center;gap:8px;margin-bottom:10px">
     <input type="checkbox" checked id="pgranon" style="width:16px;height:16px;accent-color:var(--purple)">
     <label for="pgranon" style="font-size:12px;color:var(--tx)">Manter relato anônimo</label>
@@ -366,6 +366,31 @@ body{display:flex;align-items:center;justify-content:center}
   <div class="fld"><label>Título</label><input placeholder="Assunto do feedback..."></div>
   <div class="fld"><label>Mensagem</label><textarea placeholder="Escreva seu feedback..."></textarea></div>
   <button class="btn b-prim b-full" onclick="toast('💬 Feedback enviado!');cl('m-fb')">📤 Enviar</button>
+</div></div>
+
+<div class="mbg" id="m-notif" onclick="cm('m-notif',event)"><div class="mbox">
+  <div class="mhead"><p>🔔 Notificações</p><button class="mclose" onclick="cl('m-notif')">✕</button></div>
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+    <div>
+      <p style="font-size:12px;font-weight:700;color:var(--tx)">Caixa de entrada</p>
+      <p style="font-size:10px;color:var(--tx3)">${S.notificacoesNaoLidas} não lidas</p>
+    </div>
+    <button class="btn" style="font-size:11px;padding:6px 10px" onclick="loadRemoteData()">↻ Atualizar</button>
+  </div>
+  <div style="display:flex;flex-direction:column;gap:8px">
+    ${S.notificacoes.length ? S.notificacoes.map(n=>`
+      <div class="card" style="margin:0;padding:12px;border-color:${n.lida?'var(--bdr)':'var(--blue-b)'};background:${n.lida?'#fff':'var(--blue-l)'}">
+        <div style="display:flex;justify-content:space-between;gap:10px">
+          <div style="flex:1;min-width:0">
+            <p style="font-size:12px;font-weight:700;color:var(--tx)">${n.titulo}</p>
+            <p style="font-size:10px;color:var(--tx2);margin-top:3px">${n.mensagem}</p>
+            <p style="font-size:9px;color:var(--tx3);margin-top:6px">${new Date(n.created_at).toLocaleString('pt-BR')}</p>
+          </div>
+          <button class="btn ${n.lida?'b-dis':'b-prim'}" style="padding:5px 8px;font-size:10px" ${n.lida?'disabled':''} onclick="marcarNotifLida('${n.id}')">${n.lida?'Lida':'Marcar'}</button>
+        </div>
+      </div>
+    `).join('') : `<div class="card"><p style="color:var(--tx3);font-size:11px;text-align:center">Sem notificações no momento.</p></div>`}
+  </div>
 </div></div>
 
 <div class="mbg" id="m-fin" onclick="cm('m-fin',event)"><div class="mbox">
@@ -431,11 +456,20 @@ body{display:flex;align-items:center;justify-content:center}
 // ════ ESTADO ════════════════════════════════════════════════════════════════
 const S={
   role:'colaborador',page:'ponto',logado:false,
+  token:null,refreshToken:null,user:null,
+  apiOnline:false,
   biometria:false,somMarcacao:true,notifPush:true,
   empresa:{nome:'Studio Arte em Movimento',logo:null},
   pontos:{entrada:null,intervalo:null,retorno:null,saida:null},
   geoAtivo:true,geoRaio:100,
   humorSel:null,avalSel:null,profileTab:'pessoal',
+  turmasApi:[],
+  cobrancasApi:[],
+  notificacoes:[],
+  notificacoesNaoLidas:0,
+  settingsApi:null,
+  convitesApi:[],
+  planosApi:[],
   planos:[
     {titulo:'Variações de Barra — Básico',turma:'Ballet Infantil B',ordem:1,dur:60,status:'publicado',mats:['PDF','Vídeo']},
     {titulo:'Pliés e Relevés',turma:'Ballet Infantil B',ordem:2,dur:60,status:'publicado',mats:['PDF']},
@@ -475,11 +509,124 @@ const NAV={
   aluno:[{i:'ti-users-group',l:'Turma',id:'turma'},{i:'ti-calendar-check',l:'Frequência',id:'frequencia'},{i:'ti-book',l:'Atividades',id:'atividades'},{i:'ti-settings',l:'Config',id:'settings'}],
 };
 // ════ HELPERS ════════════════════════════════════════════════════════════════
+const API_BASE = localStorage.getItem('i9_api_base') || 'http://127.0.0.1:4000';
+const API_V2_BASE = localStorage.getItem('i9_api_v2_base') || 'http://127.0.0.1:4001';
 function fc2(f){return f>=80?'#16a34a':f>=60?'#d97706':'#ef4444'}
 function fb2(f){return f>=80?'#f0fdf4':f>=60?'#fffbeb':'#fef2f2'}
 function nt(){return new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})}
 let toastT;
 function toast(m,ms=3000){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('show'),ms)}
+function setApiOnline(online){
+  if(S.apiOnline === online) return;
+  S.apiOnline = online;
+  const badge = document.getElementById('api-badge');
+  if (badge) {
+    badge.textContent = online ? 'API online' : 'Modo demo';
+    badge.style.background = online ? 'rgba(34,197,94,.18)' : 'rgba(245,158,11,.18)';
+    badge.style.color = online ? '#16a34a' : '#d97706';
+  }
+}
+async function api(path, { method='GET', body, auth=true, v2=false, headers={} } = {}){
+  const token = S.token || localStorage.getItem('i9_access_token');
+  try{
+    const res = await fetch(`${v2?API_V2_BASE:API_BASE}${path}`, {
+      method,
+      headers: {
+        'Content-Type': 'application/json',
+        ...(auth && token ? { Authorization: `Bearer ${token}` } : {}),
+        ...headers,
+      },
+      body: body === undefined ? undefined : JSON.stringify(body),
+    });
+    const text = await res.text();
+    let data = null;
+    if (text) {
+      try { data = JSON.parse(text); } catch { data = { raw: text }; }
+    }
+    if (!res.ok) {
+      const msg = data?.error || data?.message || `Erro HTTP ${res.status}`;
+      throw new Error(msg);
+    }
+    setApiOnline(true);
+    return data;
+  }catch(err){
+    setApiOnline(false);
+    throw err;
+  }
+}
+function setSession(session, user){
+  S.logado = true;
+  S.token = session?.access_token || null;
+  S.refreshToken = session?.refresh_token || null;
+  S.user = user || null;
+  localStorage.setItem('i9_access_token', S.token || '');
+  localStorage.setItem('i9_refresh_token', S.refreshToken || '');
+  localStorage.setItem('i9_user', JSON.stringify(S.user || {}));
+  document.getElementById('lscr').classList.add('hidden');
+  loadRemoteData();
+}
+function clearSession(){
+  S.logado = false;
+  S.token = null;
+  S.refreshToken = null;
+  S.user = null;
+  localStorage.removeItem('i9_access_token');
+  localStorage.removeItem('i9_refresh_token');
+  localStorage.removeItem('i9_user');
+  document.getElementById('lscr').classList.remove('hidden');
+}
+async function loadRemoteData(){
+  if(!S.logado || !S.token) return;
+  try{
+    const tasks = [];
+    if(['gestor','professor_colab','suporte'].includes(S.role)) tasks.push(api('/turmas').then(r=>{S.turmasApi=r.data||[]} ).catch(()=>{S.turmasApi=[]}));
+    if(['gestor','responsavel','aluno'].includes(S.role)) tasks.push(api('/cobrancas/minhas').then(r=>{S.cobrancasApi=r.data||[]} ).catch(()=>{S.cobrancasApi=[]}));
+    if(['gestor','suporte','professor_colab','colaborador','responsavel','aluno'].includes(S.role)) tasks.push(api('/notificacoes').then(r=>{S.notificacoes=r.data||[];S.notificacoesNaoLidas=r.nao_lidas||0}).catch(()=>{S.notificacoes=[];S.notificacoesNaoLidas=0}));
+    if(['gestor','suporte'].includes(S.role)) tasks.push(api('/convites').then(r=>{
+      S.convitesApi = r.data || [];
+      S.convites = S.convitesApi.map(c => ({
+        nome: c.nome_destino || c.nome || 'Convite',
+        role: c.role_destino || c.role || 'responsavel',
+        st: c.status || c.st || 'pendente',
+        dt: c.criado_em ? new Date(c.criado_em).toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'}) : (c.dt || '--/--'),
+        t: c.turma_nome || c.turma || '—',
+      }));
+    }).catch(()=>{S.convitesApi=[];S.convites=[]}));
+    if(['gestor','professor_colab'].includes(S.role)) tasks.push(api('/planos',{v2:true}).then(r=>{
+      S.planosApi = r.data || [];
+      S.planos = S.planosApi.map(p=>({
+        titulo:p.titulo,
+        turma:p.turmas?.nome || p.turma?.nome || p.turma_id || 'Turma',
+        ordem:p.ordem || 1,
+        dur:Number(p.duracao_min || 60),
+        status:p.status || 'rascunho',
+        mats:(p.plano_materiais || []).map(m=>m.tipo?.toUpperCase() === 'LINK' ? 'Link' : m.tipo?.toUpperCase() === 'PDF' ? 'PDF' : m.tipo?.toUpperCase() === 'VIDEO' ? 'Vídeo' : m.tipo?.toUpperCase() === 'AUDIO' ? 'MP3' : 'Imagem')
+      }));
+    }).catch(()=>{S.planosApi=[]}));
+    if(['colaborador','professor_colab'].includes(S.role)) tasks.push(api('/ponto/hoje').then(r=>{S.pontoHoje=r}).catch(()=>{S.pontoHoje=null}));
+    if(['colaborador','professor_colab'].includes(S.role)) tasks.push(api('/ponto/historico').then(r=>{S.pontoHistorico=r.data||[]}).catch(()=>{S.pontoHistorico=[]}));
+    if(['colaborador','professor_colab'].includes(S.role)) tasks.push(api('/holerites').then(r=>{S.holeritesApi=r.data||[]}).catch(()=>{S.holeritesApi=[]}));
+    if(['colaborador','professor_colab'].includes(S.role)) tasks.push(api('/colaborador/perfil',{v2:true}).then(r=>{S.perfilApi=r}).catch(()=>{S.perfilApi=null}));
+    if(['responsavel','aluno'].includes(S.role)) tasks.push(api('/settings',{v2:true}).then(r=>{
+      S.settingsApi=r.data||r;
+      S.somMarcacao=!!S.settingsApi?.som_marcacao;
+      S.notifPush=!!S.settingsApi?.notif_push;
+      S.biometria=!!S.settingsApi?.biometria_ativa;
+    }).catch(()=>{S.settingsApi=null}));
+    if(['gestor','suporte'].includes(S.role)) tasks.push(api('/settings',{v2:true}).then(r=>{
+      S.settingsApi=r.data||r;
+      S.somMarcacao=!!S.settingsApi?.som_marcacao;
+      S.notifPush=!!S.settingsApi?.notif_push;
+      S.biometria=!!S.settingsApi?.biometria_ativa;
+    }).catch(()=>{S.settingsApi=null}));
+    await Promise.all(tasks);
+    setApiOnline(true);
+    renderHdr();
+    renderScr();
+  }catch(err){
+    setApiOnline(false);
+  }
+}
 function cm(id,e){if(e.target.id===id)document.getElementById(id).classList.remove('open')}
 function cl(id){document.getElementById(id).classList.remove('open')}
 function op(id){document.getElementById(id).classList.add('open')}
@@ -490,13 +637,214 @@ function canEdit(){return['suporte','gestor'].includes(S.role)}
 function updConv(){const v=document.getElementById('crole').value;document.getElementById('ctw').style.display=v==='responsavel'?'none':'block';if(S.role==='suporte')document.getElementById('cog').style.display='block'}
 function loadLogo(inp){if(inp.files&&inp.files[0]){const r=new FileReader();r.onload=e=>{S.empresa.logo=e.target.result;const p=document.getElementById('logoprev');p.innerHTML=`<img src="${e.target.result}" alt="Logo">`;toast('Logo carregada! Clique em Salvar.')};r.readAsDataURL(inp.files[0])}}
 function salvarLogo(){S.empresa.nome=document.getElementById('logonom').value;cl('m-logo');toast('✅ Logo aplicada em todos os portais!',3500);renderHdr()}
-function salvarPlano(){const t=document.getElementById('plt').value.trim();if(!t){toast('Preencha o título');return}S.planos.push({titulo:t,turma:'Ballet Infantil B',ordem:S.planos.length+1,dur:60,status:'bloqueado',mats:[]});cl('m-plano');toast('✅ Plano salvo!');renderScr()}
-function genConv(){const n=document.getElementById('cnome').value.trim(),e=document.getElementById('cemail').value.trim();if(!n||!e.includes('@')){toast('Preencha nome e e-mail');return}const tok=[...Array(32)].map(()=>Math.floor(Math.random()*16).toString(16)).join('');const role=document.getElementById('crole').value;const link=`https://app.i9smart.com.br/instalar/${role}?token=${tok}`;document.getElementById('clink').textContent=link;document.getElementById('cresult').style.display='block';S.convites.unshift({nome:n,role,st:'pendente',dt:new Date().toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'}),t:'—'});toast('✅ Convite + instalador gerado!')}
+async function salvarPlano(){
+  const t=document.getElementById('plt').value.trim();
+  if(!t){toast('Preencha o título');return}
+  try{
+    const data = await api('/planos', {
+      method:'POST',
+      v2:true,
+      body:{
+        titulo:t,
+        status:document.getElementById('plstatus')?.selectedIndex===1 ? 'publicado' : 'rascunho',
+        ordem:Number(document.getElementById('plordem')?.value || 1),
+        duracao_min:Number(document.getElementById('pldur')?.value || 60),
+        descricao:document.getElementById('pldesc')?.value || '',
+        materiais:[],
+      }
+    });
+    S.planos.unshift({
+      titulo:data?.data?.titulo || t,
+      turma:'Ballet Infantil B',
+      ordem:data?.data?.ordem || S.planos.length+1,
+      dur:Number(data?.data?.duracao_min || 60),
+      status:data?.data?.status || 'rascunho',
+      mats:[]
+    });
+    cl('m-plano');
+    toast('✅ Plano salvo no backend!');
+    renderScr();
+  }catch(err){
+    toast(`Falha ao salvar plano: ${err.message}`,5000);
+  }
+}
+async function genConv(){
+  const n=document.getElementById('cnome').value.trim(),e=document.getElementById('cemail').value.trim();
+  if(!n||!e.includes('@')){toast('Preencha nome e e-mail');return}
+  const role=document.getElementById('crole').value;
+  if(role==='colaborador'){
+    toast('Convite de colaborador ainda não está disponível na API.');
+    return;
+  }
+  try{
+    const data = await api('/convites', {
+      method:'POST',
+      body:{
+        role_destino:role,
+        email_destino:e,
+        nome_destino:n,
+        metadata:{},
+      }
+    });
+    document.getElementById('clink').textContent=data.link;
+    document.getElementById('cresult').style.display='block';
+    S.convites.unshift({nome:n,role,st:'pendente',dt:new Date().toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'}),t:'—'});
+    S.convitesApi.unshift({token:data.token,nome_destino:n,role_destino:role,status:'pendente',criado_em:new Date().toISOString(),turma_nome:'—'});
+    toast('✅ Convite criado no backend!');
+  }catch(err){
+    toast(`Falha ao criar convite: ${err.message}`,5000);
+  }
+}
 function ccopy(){toast('📋 Link copiado!')}
+async function togglePlanoStatus(i){
+  const pl = S.planos[i];
+  if(!pl) return;
+  const current = pl.status || 'rascunho';
+  const next = current === 'publicado' ? 'rascunho' : 'publicado';
+  const prev = pl.status;
+  S.planos[i].status = next;
+  renderScr();
+  try{
+    const apiItem = S.planosApi[i];
+    if(apiItem?.id){
+      await api(`/planos/${apiItem.id}/status`, {
+        method:'PATCH',
+        v2:true,
+        body:{status:next},
+      });
+    }else{
+      throw new Error('Plano sem id para atualização');
+    }
+    toast(next === 'publicado' ? '✅ Liberado para o professor!' : '🔒 Bloqueado!');
+  }catch(err){
+    S.planos[i].status = prev;
+    renderScr();
+    toast(`Falha ao atualizar plano: ${err.message}`,5000);
+  }
+}
+async function deletePlano(i){
+  const pl = S.planos[i];
+  if(!pl) return;
+  const apiItem = S.planosApi[i];
+  if(!apiItem?.id){
+    S.planos.splice(i,1);
+    renderScr();
+    toast('Plano removido');
+    return;
+  }
+  try{
+    await api(`/planos/${apiItem.id}`, { method:'DELETE', v2:true });
+    S.planos.splice(i,1);
+    S.planosApi.splice(i,1);
+    renderScr();
+    toast('Plano removido');
+  }catch(err){
+    toast(`Falha ao remover plano: ${err.message}`,5000);
+  }
+}
+async function deleteConvite(i){
+  const item = S.convitesApi[i];
+  const token = item?.token;
+  if(!token){
+    S.convites.splice(i,1);
+    S.convitesApi.splice(i,1);
+    renderScr();
+    toast('Convite removido');
+    return;
+  }
+  try{
+    await api(`/convites/${token}`, { method:'DELETE' });
+    S.convites.splice(i,1);
+    S.convitesApi.splice(i,1);
+    renderScr();
+    toast('Convite removido');
+  }catch(err){
+    toast(`Falha ao remover convite: ${err.message}`,5000);
+  }
+}
+async function marcarNotifLida(id){
+  try{
+    await api(`/notificacoes/${id}/lida`,{method:'PATCH',v2:true});
+    S.notificacoes = S.notificacoes.map(n=>n.id===id?{...n,lida:true,lida_em:new Date().toISOString()}:n);
+    S.notificacoesNaoLidas = Math.max(0, S.notificacoesNaoLidas - 1);
+    renderHdr();
+    renderScr();
+  }catch(err){
+    toast(`Falha ao marcar notificação: ${err.message}`,5000);
+  }
+}
+async function toggleSetting(key){
+  const map={somMarcacao:'som_marcacao',notifPush:'notif_push',biometria:'biometria_ativa'};
+  if(!map[key]) return;
+  const next = !S[key];
+  const prev = S[key];
+  S[key] = next;
+  renderScr();
+  try{
+    const data = await api('/settings',{
+      method:'PUT',
+      v2:true,
+      body:{[map[key]]:next},
+    });
+    S.settingsApi = data?.data || data || S.settingsApi;
+  }catch(err){
+    S[key] = prev;
+    renderScr();
+    toast(`Falha ao salvar configuração: ${err.message}`,5000);
+  }
+}
 function envPM(){S.pontosManual.push({tipo:'Saída',data:'24/05',hora:'17:05',motivo:'Esquecimento',status:'pendente'});cl('m-pm');toast('📤 Ponto manual enviado para aprovação!',4000)}
 function selH(h){S.humorSel=h;['ex','bm','nt','st','ml'].forEach((id,i)=>{const k=['excelente','bem','neutro','estressado','mal'][i];const el=document.getElementById('h-'+id);el.className='hbtn'+(k===h?' sel-'+k:'')});document.getElementById('hextra').style.display=['estressado','mal'].includes(h)?'block':'none'}
-function envH(){if(!S.humorSel){toast('Selecione seu estado emocional');return}cl('m-humor');toast('✅ Estado emocional registrado confidencialmente.',3500);S.humorSel=null}
-function envPGR(){cl('m-pgr');toast('🔒 Relato PGR registrado. Dados imutáveis por lei.',5000)}
+async function envH(){
+  if(!S.humorSel){toast('Selecione seu estado emocional');return}
+  try{
+    await api('/pgr/humor', {
+      method:'POST',
+      v2:true,
+      body:{
+        humor:S.humorSel,
+        detalhamento:document.querySelector('#hextra textarea')?.value || undefined,
+        quer_contato:document.getElementById('hcont')?.checked || false,
+        anonimo:true,
+      }
+    });
+    cl('m-humor');
+    toast('✅ Estado emocional registrado no backend.',3500);
+    S.humorSel=null;
+  }catch(err){
+    toast(`Falha ao registrar humor: ${err.message}`,5000);
+  }
+}
+async function envPGR(){
+  const select = document.getElementById('pgrcat');
+  const anonimo = document.getElementById('pgranon')?.checked ?? true;
+  const contato = document.getElementById('pgrcont')?.checked ?? false;
+  const mapa = {
+    'Assédio moral':'assedio_moral',
+    'Assédio sexual':'assedio_sexual',
+    'Discriminação':'discriminacao',
+    'Condições inadequadas':'condicoes_trabalho',
+    'Relacionamento':'relacionamento',
+    'Outro':'outro',
+  };
+  try{
+    await api('/pgr/relato', {
+      method:'POST',
+      v2:true,
+      body:{
+        categoria: mapa[select?.value || 'Outro'] || 'outro',
+        descricao: document.getElementById('pgrdesc')?.value || 'Relato registrado pelo app.',
+        envolvidos: document.getElementById('pgrenv')?.value || undefined,
+        anonimo,
+        urgente: contato,
+      }
+    });
+    cl('m-pgr');
+    toast('🔒 Relato PGR registrado no backend.',5000);
+  }catch(err){
+    toast(`Falha ao registrar PGR: ${err.message}`,5000);
+  }
+}
 function selAv(v){S.avalSel=v;['feliz','mmm','triste'].forEach(x=>{const el=document.getElementById('av-'+x);el.className='abtn'+(x===v?' sel-'+x:'')})}
 // ════ HOLD BUTTON ════════════════════════════════════════════════════════════
 const holds={};
@@ -523,7 +871,7 @@ function renderHdr(){
   const pgs={suporte:['escolas'],gestor:['dashboard'],professor_colab:['turmas'],colaborador:['ponto'],responsavel:['frequencia'],aluno:['turma']};
   const showBack=['suporte','gestor','professor_colab'].includes(S.role)&&!pgs[S.role].includes(S.page)&&pageHistory.length>0;
   const backBtn=showBack?`<button style="display:flex;align-items:center;gap:6px;background:rgba(255,255,255,.12);border:.5px solid rgba(255,255,255,.2);border-radius:9px;padding:6px 11px;color:#fff;font-size:12px;font-weight:500;cursor:pointer;border-style:solid;margin-bottom:10px;font-family:inherit" onclick="goBack()"><i class="ti ti-arrow-left" style="font-size:16px"></i> Voltar</button>`:'';
-  h.innerHTML=`${backBtn}<div class="hrow">${logoHtml}<div style="flex:1"><p style="color:rgba(255,255,255,.6);font-size:10px">${S.empresa.nome}</p><p style="color:#fff;font-size:15px;font-weight:700;margin-top:1px">${Ri.n}</p><p style="color:rgba(255,255,255,.55);font-size:10px;margin-top:1px">${Ri.sub}</p></div>${!['aluno','responsavel'].includes(S.role)?`<button style="background:rgba(255,255,255,.1);border:.5px solid rgba(255,255,255,.2);border-radius:9px;padding:7px 9px;color:#fff;font-size:13px;cursor:pointer;border-style:solid" onclick="toast('Sem novas notificações')">🔔</button>`:''}</div>${kmap[S.role]||''}`
+  h.innerHTML=`${backBtn}<div class="hrow">${logoHtml}<div style="flex:1"><p style="color:rgba(255,255,255,.6);font-size:10px">${S.empresa.nome}</p><p style="color:#fff;font-size:15px;font-weight:700;margin-top:1px">${Ri.n}</p><p style="color:rgba(255,255,255,.55);font-size:10px;margin-top:1px">${Ri.sub}</p></div><span id="api-badge" style="margin-right:8px;background:rgba(245,158,11,.18);color:#d97706;border:.5px solid rgba(255,255,255,.18);border-radius:999px;padding:4px 8px;font-size:9px;font-weight:700;white-space:nowrap">${S.apiOnline?'API online':'Modo demo'}</span>${!['aluno','responsavel'].includes(S.role)?`<button style="background:rgba(255,255,255,.1);border:.5px solid rgba(255,255,255,.2);border-radius:9px;padding:7px 9px;color:#fff;font-size:13px;cursor:pointer;border-style:solid" onclick="op('m-notif')">🔔${S.notificacoesNaoLidas?` <span style="font-size:10px;font-weight:700">(${S.notificacoesNaoLidas})</span>`:''}</button>`:''}</div>${kmap[S.role]||''}`
 }
 let clkI=null;
 function renderFC(){
@@ -650,11 +998,22 @@ function vGTurmas(){return`
     <p style="font-size:14px;font-weight:700;color:var(--tx)">Turmas</p>
     <button class="btn b-prim" style="font-size:11px;padding:7px 11px" onclick="toast('Formulário de nova turma')">+ Nova turma</button>
   </div>
-  ${[{n:'Ballet Infantil A',p:'Ana Paula F.',h:'Qua/Sex 08h',v:12,m:11,pc:91},
-     {n:'Ballet Infantil B',p:'Ana Paula F.',h:'Sáb 09h',    v:12,m:10,pc:83},
-     {n:'Robótica Avançada',p:'Carlos Lima', h:'Ter/Qui 14h',v:10,m:8, pc:80},
-     {n:'Violão Iniciante', p:'Sônia Ramos', h:'Seg/Qua 10h',v:15,m:12,pc:80},
-     {n:'Dança Contemp.',   p:'Beatriz Nery',h:'Ter 19h',    v:12,m:7, pc:58}].map(t=>`
+  ${(() => {
+    const turmas = S.turmasApi.length ? S.turmasApi.map(t => ({
+      n: t.nome || 'Turma',
+      p: t.colaboradores?.nome || t.professor_nome || 'Professor',
+      h: t.hora_inicio || t.horario || '—',
+      v: Number(t.vagas_total || 0),
+      m: Number(t.total_alunos || t._count?.matriculas || 0),
+      pc: t.vagas_total ? Math.round(((t.total_alunos || t._count?.matriculas || 0) / t.vagas_total) * 100) : 0,
+    })) : [
+      {n:'Ballet Infantil A',p:'Ana Paula F.',h:'Qua/Sex 08h',v:12,m:11,pc:91},
+      {n:'Ballet Infantil B',p:'Ana Paula F.',h:'Sáb 09h',v:12,m:10,pc:83},
+      {n:'Robótica Avançada',p:'Carlos Lima',h:'Ter/Qui 14h',v:10,m:8,pc:80},
+      {n:'Violão Iniciante',p:'Sônia Ramos',h:'Seg/Qua 10h',v:15,m:12,pc:80},
+      {n:'Dança Contemp.',p:'Beatriz Nery',h:'Ter 19h',v:12,m:7,pc:58},
+    ];
+    return turmas.map(t=>`
   <div class="card">
     <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:9px">
       <div><p style="font-size:13px;font-weight:700;color:var(--tx)">${t.n}</p><p style="font-size:10px;color:var(--tx3);margin-top:2px">👤 ${t.p} · 🕐 ${t.h}</p></div>
@@ -669,26 +1028,34 @@ function vGTurmas(){return`
       <button class="btn" style="flex:1;font-size:11px" onclick="op('m-ea')">✏️ Aluno</button>
       <button class="btn b-prim" style="padding:7px 10px;font-size:11px" onclick="op('m-conv')">🔗</button>
     </div>
-  </div>`).join('')}`}
+  </div>`).join('');
+  })()}`}
 
 function vGFin(){return`
   <div class="card">
-    <p class="ct">💰 Maio 2026</p>
-    <div style="display:flex;align-items:center;gap:13px;margin-bottom:12px">
-      <div style="position:relative;width:74px;height:74px;flex-shrink:0">
-        <svg viewBox="0 0 74 74" style="transform:rotate(-90deg);width:74px;height:74px">
-          <circle cx="37" cy="37" r="27" fill="none" stroke="#f3f4f6" stroke-width="9"/>
-          <circle cx="37" cy="37" r="27" fill="none" stroke="#4338ca" stroke-width="9" stroke-dasharray="139 170" stroke-linecap="round"/>
-        </svg>
-        <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:#4338ca">82%</div>
-      </div>
-      <div style="flex:1">
-        <div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="font-size:10px;color:var(--tx2)">Recebido</span><span style="font-size:11px;font-weight:700;color:var(--green)">R$ 11.760</span></div>
-        <div class="fb" style="margin-bottom:7px"><div class="ff" style="width:82%;background:var(--green)"></div></div>
-        <div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="font-size:10px;color:var(--tx2)">Inadimplência</span><span style="font-size:11px;font-weight:700;color:var(--red)">R$ 2.520</span></div>
-        <div class="fb"><div class="ff" style="width:18%;background:var(--red)"></div></div>
-      </div>
-    </div>
+    <p class="ct">💰 ${new Date().toLocaleDateString('pt-BR',{month:'long',year:'numeric'})}</p>
+    ${(() => {
+      const cobs = S.cobrancasApi.length ? S.cobrancasApi : [];
+      const total = cobs.reduce((s,c)=>s+Number(c.valor||0),0);
+      const recebido = cobs.filter(c=>c.status==='pago').reduce((s,c)=>s+Number(c.pago_valor || c.valor || 0),0);
+      const taxa = total>0 ? Math.round((recebido/total)*100) : 0;
+      return `
+      <div style="display:flex;align-items:center;gap:13px;margin-bottom:12px">
+        <div style="position:relative;width:74px;height:74px;flex-shrink:0">
+          <svg viewBox="0 0 74 74" style="transform:rotate(-90deg);width:74px;height:74px">
+            <circle cx="37" cy="37" r="27" fill="none" stroke="#f3f4f6" stroke-width="9"/>
+            <circle cx="37" cy="37" r="27" fill="none" stroke="#4338ca" stroke-width="9" stroke-dasharray="${Math.round((taxa/100)*170)} 170" stroke-linecap="round"/>
+          </svg>
+          <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:#4338ca">${taxa}%</div>
+        </div>
+        <div style="flex:1">
+          <div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="font-size:10px;color:var(--tx2)">Recebido</span><span style="font-size:11px;font-weight:700;color:var(--green)">R$ ${recebido.toFixed(2)}</span></div>
+          <div class="fb" style="margin-bottom:7px"><div class="ff" style="width:${taxa}%;background:var(--green)"></div></div>
+          <div style="display:flex;justify-content:space-between;margin-bottom:4px"><span style="font-size:10px;color:var(--tx2)">Inadimplência</span><span style="font-size:11px;font-weight:700;color:var(--red)">R$ ${(total-recebido).toFixed(2)}</span></div>
+          <div class="fb"><div class="ff" style="width:${Math.max(0,100-taxa)}%;background:var(--red)"></div></div>
+        </div>
+      </div>`;
+    })()}
   </div>
   <div class="card"><p class="ct">😊 Dashboard PGR — Equipe</p>
     <div class="g3" style="margin-bottom:10px">
@@ -700,13 +1067,23 @@ function vGFin(){return`
   </div>
   <div class="card" style="padding:0 14px">
     <p class="ct" style="padding-top:13px">⚠️ Inadimplentes</p>
-    ${[{n:'Gabriela Oliveira',d:19,v:280},{n:'Pedro Henrique',d:34,v:350}].map(a=>`
+    ${(() => {
+      const cobs = S.cobrancasApi.length ? S.cobrancasApi : [];
+      const inad = cobs.filter(c=>c.status === 'pendente' || c.status === 'vencido').slice(0,4);
+      const fallback = [{n:'Gabriela Oliveira',d:19,v:280},{n:'Pedro Henrique',d:34,v:350}];
+      const list = inad.length ? inad.map(c => ({
+        n: c.matriculas?.alunos?.nome || 'Aluno',
+        d: Math.max(0, Math.ceil((Date.now() - new Date(c.vencimento).getTime()) / 86400000)),
+        v: Number(c.valor || 0),
+      })) : fallback;
+      return list.map(a=>`
     <div class="row">
       <div class="avr" style="background:${a.d>30?'var(--red-l)':'var(--amber-l)'};color:${a.d>30?'var(--red)':'var(--amber)'}">${a.n.split(' ').map(x=>x[0]).slice(0,2).join('')}</div>
       <div style="flex:1;min-width:0"><p style="font-size:12px;font-weight:600;color:var(--tx);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${a.n}</p><p style="font-size:10px;color:${a.d>30?'var(--red)':'var(--amber)'}">⏰ ${a.d} dias em atraso</p></div>
       <button class="btn b-ok" style="padding:5px 9px;font-size:10px" onclick="toast('Cobrança enviada!')">Cobrar</button>
       <button class="btn" style="padding:5px 7px;font-size:10px;margin-left:4px" onclick="toast('✅ Marcado como pago em dinheiro!')">💵</button>
-    </div>`).join('')}
+    </div>`).join('');
+    })()}
   </div>`}
 
 function vPlanos(){return`
@@ -727,17 +1104,28 @@ function vPlanos(){return`
     <div style="margin-bottom:9px">${pl.mats.map(m=>`<span class="pill p-info" style="font-size:9px;margin-right:4px">${m.includes('PDF')?'📄':m.includes('Vídeo')||m.includes('MP4')?'🎬':m.includes('MP3')?'🎵':'🔗'} ${m}</span>`).join('')}</div>
     <div style="display:flex;gap:6px">
       <button class="btn" style="flex:1;font-size:11px" onclick="toast('Editando plano ${i+1}')">✏️ Editar</button>
-      <button class="btn ${pl.status==='publicado'?'b-warn':'b-ok'}" style="flex:1;font-size:11px" onclick="S.planos[${i}].status=S.planos[${i}].status==='publicado'?'bloqueado':'publicado';renderScr();toast(S.planos[${i}].status==='publicado'?'✅ Liberado para o professor!':'🔒 Bloqueado!')">
+      <button class="btn ${pl.status==='publicado'?'b-warn':'b-ok'}" style="flex:1;font-size:11px" onclick="togglePlanoStatus(${i})">
         ${pl.status==='publicado'?'🔒 Bloquear':'✅ Liberar'}
       </button>
-      <button class="btn b-err" style="padding:7px 9px;font-size:11px" onclick="S.planos.splice(${i},1);renderScr();toast('Plano removido')">🗑️</button>
+      <button class="btn b-err" style="padding:7px 9px;font-size:11px" onclick="deletePlano(${i})">🗑️</button>
     </div>
   </div>`).join('')}`}
 
 // ── PROFESSOR ────────────────────────────────────────────────────────────────
 function vPTurmas(){return`
-  ${[{n:'Ballet Infantil B',h:'Sáb 09h–10h30',sala:'Sala 2',a:10,f:87,prx:'31/05'},
-     {n:'Ballet Infantil A',h:'Qua/Sex 08h',sala:'Sala 1',a:11,f:91,prx:'28/05'}].map(t=>`
+  ${(() => {
+    const turmas = S.turmasApi.length ? S.turmasApi.map(t => ({
+      n: t.nome || 'Turma',
+      h: t.hora_inicio || t.horario || '—',
+      sala: t.sala || t.local || 'Sala',
+      a: Number(t.total_alunos || t._count?.matriculas || 0),
+      f: Number(t.frequencia_media || 87),
+      prx: t.proxima_aula ? new Date(t.proxima_aula).toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'}) : '31/05',
+    })) : [
+      {n:'Ballet Infantil B',h:'Sáb 09h–10h30',sala:'Sala 2',a:10,f:87,prx:'31/05'},
+      {n:'Ballet Infantil A',h:'Qua/Sex 08h',sala:'Sala 1',a:11,f:91,prx:'28/05'}
+    ];
+    return turmas.map(t=>`
   <div class="card">
     <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px">
       <div><p style="font-size:14px;font-weight:700;color:var(--tx)">${t.n}</p><p style="font-size:10px;color:var(--tx3);margin-top:2px">🕐 ${t.h} · ${t.sala}</p></div>
@@ -752,7 +1140,8 @@ function vPTurmas(){return`
       <button class="btn b-ok" style="flex:1;font-size:11px" onclick="gp('chamada')">📋 Chamada</button>
       <button class="btn b-prim" style="flex:1;font-size:11px" onclick="gp('planos_prof')">📋 Planos</button>
     </div>
-  </div>`).join('')}
+  </div>`).join('');
+  })()}
   <div style="background:#f3f4f6;border:.5px solid var(--bdr);border-radius:11px;padding:10px 12px;display:flex;align-items:center;gap:7px">
     <i class="ti ti-lock" style="color:var(--tx3)"></i>
     <span style="font-size:10px;color:var(--tx3)">Dados financeiros não disponíveis para este perfil</span>
@@ -931,10 +1320,10 @@ function vSettings(){return`
       {i:'ti-headphones',bg:'var(--purple-l)',ic:'var(--purple)',l:'Ajuda / Suporte',sub:'Central de atendimento',tog:false,fn:`toast('Abrindo central de ajuda...')`},
       {i:'ti-flag',bg:'var(--amber-l)',ic:'var(--amber)',l:'Visualizar tour novamente',sub:'Onboarding guiado do sistema',tog:false,fn:`toast('Iniciando tour do sistema...')`},
     ].map(it=>`
-    <div class="set-item" onclick="${it.tog?`S.${it.key}=!S.${it.key};renderScr()`:it.fn||''}" aria-label="${it.l}">
+    <div class="set-item" onclick="${it.tog?`toggleSetting('${it.key}')`:it.fn||''}" aria-label="${it.l}">
       <div class="set-icon" style="background:${it.bg}"><i class="ti ${it.i}" style="font-size:19px;color:${it.ic}"></i></div>
       <div style="flex:1"><p class="set-lbl">${it.l}</p><p class="set-sub">${it.sub}</p></div>
-      ${it.tog?`<button class="sw-tog ${S[it.key]?'on':'off'}" onclick="event.stopPropagation();S.${it.key}=!S.${it.key};renderScr()"></button>`:`<i class="ti ti-chevron-right" style="color:var(--tx3)"></i>`}
+      ${it.tog?`<button class="sw-tog ${S[it.key]?'on':'off'}" onclick="event.stopPropagation();toggleSetting('${it.key}')"></button>`:`<i class="ti ti-chevron-right" style="color:var(--tx3)"></i>`}
     </div>`).join('')}
     <div class="set-item" style="border-bottom:none" onclick="doLogout()" aria-label="Sair">
       <div class="set-icon" style="background:var(--red-l)"><i class="ti ti-logout" style="font-size:19px;color:var(--red)"></i></div>
@@ -978,19 +1367,32 @@ function vRFreq(){return`
     </div>`).join('')}
   </div>`}
 
-function vRCob(){return`
+function vRCob(){
+  const cobs = S.cobrancasApi.length ? S.cobrancasApi.map(c => ({
+    m: c.competencia || c.mes || 'Mensalidade',
+    vc: c.vencimento ? new Date(c.vencimento).toLocaleDateString('pt-BR') : (c.vencimento_texto || '—'),
+    v: Number(c.valor || 0),
+    s: c.status || 'pendente',
+  })) : [
+    {m:'Junho 2026',vc:'05/06/2026',v:280,s:'pendente'},
+    {m:'Maio 2026',vc:'05/05/2026',v:280,s:'pago'},
+    {m:'Abril 2026',vc:'05/04/2026',v:280,s:'pago'}
+  ];
+  return `
   <p style="font-size:13px;font-weight:700;color:var(--tx);margin-bottom:11px">Mensalidades — Sofia Almeida</p>
-  ${[{m:'Junho 2026',vc:'05/06/2026',v:280,s:'pendente'},{m:'Maio 2026',vc:'05/05/2026',v:280,s:'pago'},{m:'Abril 2026',vc:'05/04/2026',v:280,s:'pago'}].map(c=>`
+  ${cobs.map(c=>`
   <div class="card" style="background:${c.s==='pendente'?'var(--amber-l)':'var(--card)'}">
     <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:${c.s!=='pago'?10:0}px">
       <div><p style="font-size:14px;font-weight:700;color:var(--tx)">${c.m}</p><p style="font-size:10px;color:var(--tx3);margin-top:2px">Venc.: ${c.vc}</p></div>
-      <div style="text-align:right"><p style="font-size:16px;font-weight:700;color:var(--tx)">R$ ${c.v},00</p><span class="pill ${c.s==='pago'?'p-ok':'p-warn'}">${c.s==='pago'?'✓ Pago':'Pendente'}</span></div>
+      <div style="text-align:right"><p style="font-size:16px;font-weight:700;color:var(--tx)">R$ ${Number(c.v).toFixed(2)}</p><span class="pill ${c.s==='pago'?'p-ok':'p-warn'}">${c.s==='pago'?'✓ Pago':'Pendente'}</span></div>
     </div>
     ${c.s!=='pago'?`<div style="display:flex;gap:7px">
       <button class="btn b-ok" style="flex:1;font-size:11px" onclick="op('m-pix')">⚡ Pix</button>
       <button class="btn b-info" style="flex:1;font-size:11px" onclick="toast('Gerando boleto...')">📄 Boleto</button>
     </div>`:''}
-  </div>`).join('')}`}
+  </div>`).join('')}
+  `;
+}
 
 function vRDados(){return`
   <div class="card"><p class="ct">📋 Matrícula</p>
@@ -1054,13 +1456,20 @@ function vConvites(){
   const rc={professor:'#0f6e56',professor_colab:'#085041',colaborador:'#4338ca',responsavel:'#0369a1',aluno:'#854f0b',gestor:'#004077'};
   const rl={professor:'Professor',professor_colab:'Prof+Colab',colaborador:'Colaborador',responsavel:'Responsável',aluno:'Aluno',gestor:'Gestor'};
   const can=['suporte','gestor'].includes(S.role);
-  return`
+  const convites = S.convitesApi.length ? S.convitesApi.map(c => ({
+    nome: c.nome_destino || c.nome || 'Convite',
+    role: c.role_destino || c.role || 'responsavel',
+    st: c.status || c.st || 'pendente',
+    dt: c.criado_em ? new Date(c.criado_em).toLocaleDateString('pt-BR',{day:'2-digit',month:'2-digit'}) : (c.dt || '--/--'),
+    t: c.turma_nome || c.turma || '—',
+  })) : S.convites;
+  return `
   <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
     <p style="font-size:14px;font-weight:700;color:var(--tx)">Convites de acesso</p>
     ${can?`<button class="btn b-prim" style="font-size:11px;padding:7px 11px" onclick="op('m-conv')">+ Novo</button>`:''}
   </div>
   <div class="card" style="padding:0 14px">
-    ${S.convites.map((c,i)=>`
+    ${convites.map((c,i)=>`
     <div class="row">
       <div style="width:8px;height:8px;border-radius:50%;background:${rc[c.role]||'#9ca3af'};flex-shrink:0"></div>
       <div style="flex:1;min-width:0">
@@ -1070,30 +1479,78 @@ function vConvites(){
       <span class="pill ${c.st==='usado'?'p-ok':c.st==='expirado'?'p-neu':'p-warn'}" style="font-size:9px">${c.st==='usado'?'Aceito':c.st==='expirado'?'Expirado':'Pendente'}</span>
       ${c.st==='pendente'&&can?`
         <button class="btn" style="padding:4px 6px;font-size:10px;margin-left:4px" onclick="toast('Link copiado!')"><i class="ti ti-copy"></i></button>
-        <button class="btn b-err" style="padding:4px 6px;font-size:10px;margin-left:3px" onclick="S.convites.splice(${i},1);renderScr();toast('Convite removido!')"><i class="ti ti-trash"></i></button>`:''}
+        <button class="btn b-err" style="padding:4px 6px;font-size:10px;margin-left:3px" onclick="deleteConvite(${i})"><i class="ti ti-trash"></i></button>`:''}
     </div>`).join('')}
   </div>`;
 }
 
 // ════ LOGIN / LOGOUT ══════════════════════════════════════════════════════════
-function doLogin(){const e=document.getElementById('lemail').value,s=document.getElementById('lsenha').value;if(!e||!s){toast('Preencha e-mail e senha');return}S.logado=true;document.getElementById('lscr').classList.add('hidden');toast('✅ Login realizado com sucesso!');render()}
-function doBio(){S.logado=true;document.getElementById('lscr').classList.add('hidden');toast('🔐 Biometria reconhecida!');render()}
-function doLogout(){S.logado=false;S.pontos={entrada:null,intervalo:null,retorno:null,saida:null};document.getElementById('lscr').classList.remove('hidden');toast('Sessão encerrada.')}
+async function doLogin(){
+  const e=document.getElementById('lemail').value,s=document.getElementById('lsenha').value;
+  if(!e||!s){toast('Preencha e-mail e senha');return}
+  try{
+    const data = await api('/auth/login',{method:'POST',auth:false,body:{email:e,password:s}});
+    setSession(data,{...data.user});
+    changeRole(data.user.role,true);
+    toast('✅ Login realizado com sucesso!');
+    render();
+  }catch(err){
+    toast(`Falha no login: ${err.message}`,5000);
+  }
+}
+function doBio(){
+  const storedUser = JSON.parse(localStorage.getItem('i9_user') || '{}');
+  const storedToken = localStorage.getItem('i9_access_token');
+  if(storedToken){
+    S.token = storedToken;
+    S.refreshToken = localStorage.getItem('i9_refresh_token');
+    S.user = storedUser;
+    S.logado = true;
+    document.getElementById('lscr').classList.add('hidden');
+    if(storedUser.role){ changeRole(storedUser.role,true); }
+    toast('🔐 Biometria reconhecida!');
+    render();
+    return;
+  }
+  toast('Nenhuma sessão salva para biometria.');
+}
+function doLogout(){
+  clearSession();
+  S.pontos={entrada:null,intervalo:null,retorno:null,saida:null};
+  toast('Sessão encerrada.');
+  render();
+}
 
 // ════ ROLE CHANGE ════════════════════════════════════════════════════════════
-function changeRole(r){
+function changeRole(r, keepLogged=false){
   S.role=r;S.page=NAV[r][0]?.id||'ponto';
   S.pontos={entrada:null,intervalo:null,retorno:null,saida:null};
   S.alunos.forEach(a=>a.s='pend');
   const lmap={suporte:'Portal do Suporte (i9 Smart)',gestor:'Portal do Gestor',professor_colab:'Portal do Professor',colaborador:'Portal do Colaborador',responsavel:'Portal do Responsável',aluno:'Portal do Aluno'};
   document.getElementById('llbl').textContent=lmap[r]||'ERP Educacional';
-  document.getElementById('lscr').classList.remove('hidden');
-  S.logado=false;
+  if(!keepLogged){
+    document.getElementById('lscr').classList.remove('hidden');
+    S.logado=false;
+  } else {
+    document.getElementById('lscr').classList.add('hidden');
+    S.logado=true;
+    if (S.token) loadRemoteData();
+  }
 }
 
 // INIT
-changeRole('colaborador');
-document.getElementById('rsel').value='colaborador';
+const savedUser = JSON.parse(localStorage.getItem('i9_user') || '{}');
+if(localStorage.getItem('i9_access_token') && savedUser?.role){
+  S.token = localStorage.getItem('i9_access_token');
+  S.refreshToken = localStorage.getItem('i9_refresh_token');
+  S.user = savedUser;
+  changeRole(savedUser.role,true);
+} else {
+  changeRole('colaborador');
+}
+document.getElementById('rsel').value=S.role;
+if(S.logado){document.getElementById('lscr').classList.add('hidden')}
+render();
 </script>
 </body>
 </html>

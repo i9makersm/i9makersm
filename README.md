@@ -10,16 +10,18 @@
 erp-educacional/
 ├── app-v3.html              ← App integrado (todos os portais, 98KB, standalone)
 ├── app-integrado.html       ← Versão anterior (55KB, referência)
+├── backend-test.html        ← Página de teste do backend (health, login, rotas, ações por perfil)
 ├── schema.sql               ← Banco PostgreSQL — estrutura principal
 ├── schema-v2-additions.sql  ← Adições v2: PGR, Avaliação, Planos, etc.
-├── seed-test-data.sql       ← Dados de teste prontos para uso
+├── scripts/provision-test-env.js ← Provisionamento idempotente de dados de teste
 ├── api-backend.ts           ← API REST principal (Fastify + Prisma)
 ├── api-routes-v2.ts         ← Rotas v2: PGR, Avaliação, Feedback, Planos
 ├── prisma-schema.prisma     ← ORM Prisma (todos os modelos tipados)
+├── tsconfig.json             ← Build TypeScript para `dist/`
+├── .env.example              ← Variáveis de ambiente de exemplo
 ├── design-system.md         ← Tokens, paletas, componentes por portal
 ├── deploy-checklist.md      ← Passo a passo de deploy e testes
 ├── package.json             ← Dependências do projeto
-├── .env.example             ← Variáveis de ambiente necessárias
 └── README.md                ← Este arquivo
 ```
 
@@ -107,6 +109,11 @@ Cada convite gera um link com instalador do app específico:
 - Aparece no cabeçalho de **todos os portais**
 - Armazenada no Supabase Storage
 
+### Painel de teste do backend
+- `backend-test.html` filtra ações por perfil e mostra só os botões relevantes
+- A suíte cobre leitura e escrita principal por papel
+- Selecione o perfil antes de rodar para reduzir ruído visual
+
 ### Remoção de escola
 - Somente o Suporte pode remover
 - Escola tem **30 dias para fazer backup** de todos os dados
@@ -123,26 +130,23 @@ Cada convite gera um link com instalador do app específico:
 
 ### 1. Banco de dados (Supabase)
 ```bash
-# No SQL Editor do Supabase, execute na ordem:
-1. schema.sql
-2. schema-v2-additions.sql
-3. seed-test-data.sql
+npm run db:bootstrap
 ```
 
 ### 2. Backend
 ```bash
 cp .env.example .env
-# Preencher SUPABASE_URL e SERVICE_ROLE_KEY
+# Preencher SUPABASE_URL e SUPABASE_SERVICE_ROLE_KEY
 
 npm install
 npx prisma generate
-npx ts-node api-backend.ts      # Porta 4000
-npx ts-node api-routes-v2.ts    # Porta 4001 (ou mesmo servidor)
+npm run setup
 ```
 
 ### 3. App
 ```bash
 # Abrir app-v3.html diretamente no browser para testes
+# Abrir backend-test.html para validar a API sem abrir os portais
 # Para produção: hospedar no Vercel ou Netlify
 ```
 

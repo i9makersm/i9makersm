@@ -14,6 +14,7 @@ enum RoleUsuario {
   suporte
   gestor
   professor
+  professor_colab
   colaborador
   responsavel
   aluno
@@ -47,19 +48,31 @@ enum StatusCobranca {
 }
 
 model users {
-  id         String      @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
-  email      String      @unique
-  role       RoleUsuario
-  ativo      Boolean     @default(true)
-  created_at DateTime    @default(now()) @db.Timestamptz
-  updated_at DateTime    @default(now()) @db.Timestamptz
+  id              String      @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  email           String      @unique
+  role            RoleUsuario
+  ativo           Boolean     @default(true)
+  created_at      DateTime    @default(now()) @db.Timestamptz
+  updated_at      DateTime    @default(now()) @db.Timestamptz
+  removido_em     DateTime?   @db.Timestamptz
+  removido_por    String?     @db.Uuid
+  motivo_remocao  String?
 
-  gestores      gestores[]
-  colaboradores colaboradores[]
-  responsaveis  responsaveis[]
-  alunos        alunos[]
-  convites_criados convites[] @relation("CriadoPor")
-  convites_usados  convites[] @relation("UserCriado")
+  gestores            gestores[]
+  colaboradores       colaboradores[]
+  responsaveis        responsaveis[]
+  alunos              alunos[]
+  settings            user_settings?
+  notificacoes        notificacoes[]
+  feedbacks_enviados   feedbacks[] @relation("FeedbackDe")
+  feedbacks_recebidos  feedbacks[] @relation("FeedbackPara")
+  contratos_bloqueados contratos_escola[] @relation("ContratoBloqueadoPor")
+  planos_criados       planos_aula[] @relation("PlanoCriadoPor")
+  planos_editados      planos_aula[] @relation("PlanoEditadoPor")
+  usuarios_removidos   users[] @relation("RemovidoPor")
+  usuario_removente    users?   @relation("RemovidoPor", fields: [removido_por], references: [id])
+  convites_criados     convites[] @relation("CriadoPor")
+  convites_usados      convites[] @relation("UserCriado")
 }
 
 model empresas {
@@ -79,6 +92,9 @@ model empresas {
   turmas     turmas[]
   convites   convites[]
   colaboradores colaboradores[]
+  feedbacks  feedbacks[]
+  contratos_escola contratos_escola[]
+  planos_aula planos_aula[]
 }
 
 model convites {
@@ -138,6 +154,9 @@ model colaboradores {
   turmas_titular  turmas[]
   freq_registrada registros_frequencia[]
   atividades      atividades_aula[]
+  perfil          colaborador_perfil?
+  pgr_logs        pgr_emotional_logs[]
+  pgr_relatos     pgr_relatos[]
 
   @@unique([user_id, empresa_id])
 }
@@ -153,6 +172,7 @@ model registros_ponto {
   created_at     DateTime     @default(now()) @db.Timestamptz
 
   colaboradores colaboradores @relation(fields: [colaborador_id], references: [id])
+  pgr_emotional_logs pgr_emotional_logs[]
 }
 
 model ferias {
@@ -211,6 +231,7 @@ model alunos {
   responsaveis responsaveis? @relation(fields: [responsavel_id], references: [id])
   matriculas   matriculas[]
   frequencias  registros_frequencia[]
+  avaliacoes   avaliacoes_aula[]
 }
 
 model turmas {
@@ -233,6 +254,7 @@ model turmas {
   matriculas    matriculas[]
   aulas         aulas[]
   professores   professor_turmas[]
+  planos        planos_aula[]
 }
 
 model professor_turmas {
@@ -276,6 +298,8 @@ model aulas {
   turmas      turmas                 @relation(fields: [turma_id], references: [id])
   frequencias registros_frequencia[]
   atividades  atividades_aula[]
+  avaliacoes  avaliacoes_aula[]
+  planos      planos_aula[]
 
   @@unique([turma_id, data])
 }
@@ -326,4 +350,185 @@ model cobrancas {
   matriculas matriculas @relation(fields: [matricula_id], references: [id])
 
   @@unique([matricula_id, referencia_mes, referencia_ano])
+}
+
+model user_settings {
+  user_id         String   @id @db.Uuid
+  biometria_ativa Boolean  @default(false)
+  som_marcacao    Boolean  @default(true)
+  notif_push      Boolean  @default(true)
+  tema            String   @default("light")
+  idioma          String   @default("pt-BR")
+  updated_at      DateTime @default(now()) @db.Timestamptz
+
+  users users @relation(fields: [user_id], references: [id], onDelete: Cascade)
+}
+
+model colaborador_perfil {
+  colaborador_id      String   @id @db.Uuid
+  foto_url            String?
+  data_nascimento     DateTime? @db.Date
+  genero              String?
+  raca_cor            String?
+  estado_civil        String?
+  pcd                 Boolean? @default(false)
+  tipo_pcd            String?
+  nacionalidade       String? @default("Brasileira")
+  naturalidade        String?
+  telefone_pessoal    String?
+  telefone_emergencia String?
+  nome_emergencia     String?
+  cep                 String?
+  logradouro          String?
+  numero              String?
+  complemento         String?
+  bairro              String?
+  cidade              String?
+  uf                  String?
+  rg                  String?
+  rg_emissor          String?
+  rg_data             DateTime? @db.Date
+  pis                 String?
+  ctps                String?
+  titulo_eleitor      String?
+  escolaridade        String?
+  curso               String?
+  instituicao         String?
+  ano_conclusao       Int?
+  updated_at          DateTime @default(now()) @db.Timestamptz
+
+  colaboradores colaboradores @relation(fields: [colaborador_id], references: [id], onDelete: Cascade)
+}
+
+model pgr_emotional_logs {
+  id             String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  colaborador_id String   @db.Uuid
+  humor          String
+  detalhamento   String?
+  quer_contato   Boolean  @default(false)
+  anonimo        Boolean  @default(false)
+  ponto_id       String?  @db.Uuid
+  created_at     DateTime @default(now()) @db.Timestamptz
+
+  colaboradores colaboradores @relation(fields: [colaborador_id], references: [id])
+  registros_ponto registros_ponto? @relation(fields: [ponto_id], references: [id])
+
+  @@index([colaborador_id, created_at])
+  @@index([created_at])
+}
+
+model pgr_relatos {
+  id             String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  colaborador_id String   @db.Uuid
+  categoria      String
+  descricao      String
+  envolvidos     String?
+  anonimo        Boolean  @default(true)
+  urgente        Boolean  @default(false)
+  status         String   @default("aberto")
+  created_at     DateTime @default(now()) @db.Timestamptz
+
+  colaboradores colaboradores @relation(fields: [colaborador_id], references: [id])
+}
+
+model avaliacoes_aula {
+  id          String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  aula_id     String   @db.Uuid
+  aluno_id    String   @db.Uuid
+  avaliacao   String
+  comentario  String?
+  created_at  DateTime @default(now()) @db.Timestamptz
+  updated_at  DateTime @default(now()) @db.Timestamptz
+
+  aulas aulas @relation(fields: [aula_id], references: [id], onDelete: Cascade)
+  alunos alunos @relation(fields: [aluno_id], references: [id])
+
+  @@unique([aula_id, aluno_id])
+}
+
+model feedbacks {
+  id           String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  de_user_id   String   @db.Uuid
+  para_user_id String   @db.Uuid
+  empresa_id   String   @db.Uuid
+  titulo       String
+  mensagem     String
+  tipo         String   @default("geral")
+  lido         Boolean  @default(false)
+  lido_em      DateTime? @db.Timestamptz
+  created_at   DateTime @default(now()) @db.Timestamptz
+
+  de_user   users @relation("FeedbackDe", fields: [de_user_id], references: [id])
+  para_user users @relation("FeedbackPara", fields: [para_user_id], references: [id])
+  empresas  empresas @relation(fields: [empresa_id], references: [id], onDelete: Cascade)
+}
+
+model contratos_escola {
+  id             String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  empresa_id     String   @unique @db.Uuid
+  plano          String
+  data_inicio    DateTime @default(now()) @db.Date
+  data_fim       DateTime? @db.Date
+  valor_mensal   Decimal? @db.Decimal(10, 2)
+  status         String   @default("ativo")
+  aceite_termos  Boolean  @default(false)
+  aceite_em      DateTime? @db.Timestamptz
+  bkp_prazo_dias Int      @default(30)
+  bkp_solicitado DateTime? @db.Timestamptz
+  bkp_realizado  DateTime? @db.Timestamptz
+  bloqueado_em   DateTime? @db.Timestamptz
+  bloqueado_por  String?  @db.Uuid
+  created_at     DateTime @default(now()) @db.Timestamptz
+
+  empresas empresas @relation(fields: [empresa_id], references: [id], onDelete: Cascade)
+  users    users?   @relation("ContratoBloqueadoPor", fields: [bloqueado_por], references: [id])
+}
+
+model notificacoes {
+  id         String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  user_id    String   @db.Uuid
+  titulo     String
+  mensagem   String
+  tipo       String   @default("info")
+  lida       Boolean  @default(false)
+  lida_em    DateTime? @db.Timestamptz
+  link       String?
+  created_at DateTime @default(now()) @db.Timestamptz
+
+  users users @relation(fields: [user_id], references: [id], onDelete: Cascade)
+}
+
+model planos_aula {
+  id          String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  empresa_id  String   @db.Uuid
+  turma_id    String?  @db.Uuid
+  titulo      String
+  descricao   String?
+  ordem       Int      @default(1)
+  duracao_min Int      @default(60)
+  status      String   @default("rascunho")
+  aula_id     String?  @db.Uuid
+  criado_por  String?  @db.Uuid
+  editado_por String?  @db.Uuid
+  created_at  DateTime @default(now()) @db.Timestamptz
+  updated_at  DateTime @default(now()) @db.Timestamptz
+
+  empresas    empresas @relation(fields: [empresa_id], references: [id])
+  turmas      turmas?  @relation(fields: [turma_id], references: [id])
+  aulas       aulas?   @relation(fields: [aula_id], references: [id])
+  criador     users?   @relation("PlanoCriadoPor", fields: [criado_por], references: [id])
+  editor      users?   @relation("PlanoEditadoPor", fields: [editado_por], references: [id])
+  plano_materiais plano_materiais[]
+}
+
+model plano_materiais {
+  id         String   @id @default(dbgenerated("uuid_generate_v4()")) @db.Uuid
+  plano_id   String   @db.Uuid
+  tipo       String
+  nome       String
+  url        String
+  ordem      Int      @default(1)
+  created_at DateTime @default(now()) @db.Timestamptz
+
+  planos_aula planos_aula @relation(fields: [plano_id], references: [id], onDelete: Cascade)
 }

@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>i9 Smart ERP - Backend Test</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#07111f;
+  --panel:#0d1b2a;
+  --panel-2:#10243a;
+  --line:rgba(255,255,255,.08);
+  --text:#e5eef9;
+  --muted:#9db0c9;
+  --accent:#4dd0ff;
+  --accent-2:#7cdb7c;
+  --warn:#ffb84d;
+  --bad:#ff6b6b;
+  --chip:#17324d;
+  font-family:Inter,Segoe UI,system-ui,sans-serif;
+}
+body{
+  min-height:100vh;
+  background:
+    radial-gradient(circle at top left, rgba(77,208,255,.12), transparent 28%),
+    radial-gradient(circle at top right, rgba(124,219,124,.08), transparent 24%),
+    linear-gradient(180deg, #050b14, var(--bg));
+  color:var(--text);
+  padding:24px;
+}
+.wrap{max-width:1200px;margin:0 auto;display:grid;gap:18px}
+.hero{
+  background:linear-gradient(135deg, rgba(77,208,255,.12), rgba(124,219,124,.08));
+  border:1px solid var(--line);
+  border-radius:22px;
+  padding:22px;
+  box-shadow:0 18px 50px rgba(0,0,0,.24);
+}
+.hero h1{font-size:28px;letter-spacing:-.04em;margin-bottom:6px}
+.hero p{color:var(--muted);line-height:1.5;max-width:900px}
+.hero .chips{margin-top:14px;margin-bottom:0}
+.grid{display:grid;grid-template-columns:1.15fr .85fr;gap:18px}
+@media (max-width:980px){.grid{grid-template-columns:1fr}}
+.card{
+  background:rgba(13,27,42,.92);
+  border:1px solid var(--line);
+  border-radius:20px;
+  padding:18px;
+  box-shadow:0 10px 36px rgba(0,0,0,.24);
+}
+.card h2{font-size:16px;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;gap:12px}
+.card h2 .hint{font-size:12px;color:var(--muted);font-weight:500}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media (max-width:700px){.row{grid-template-columns:1fr}}
+.field{display:grid;gap:6px;margin-bottom:12px}
+.field label{font-size:12px;color:var(--muted)}
+.field input,.field select,.field textarea{
+  width:100%;
+  border:1px solid var(--line);
+  border-radius:12px;
+  padding:12px 14px;
+  background:#081220;
+  color:var(--text);
+  outline:none;
+  font:inherit;
+}
+.field input[readonly]{
+  background:#0b1727;
+  color:#c8d6ea;
+  opacity:.95;
+}
+.field textarea{min-height:110px;resize:vertical}
+.actions{display:grid;gap:14px}
+.action-section{
+  border:1px solid var(--line);
+  border-radius:16px;
+  background:rgba(255,255,255,.02);
+  padding:12px;
+}
+.action-title{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+  font-size:12px;
+  color:var(--muted);
+  font-weight:700;
+  margin-bottom:10px;
+  text-transform:uppercase;
+  letter-spacing:.08em;
+}
+.action-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(138px,1fr));
+  gap:10px;
+}
+button{
+  border:none;
+  border-radius:12px;
+  padding:11px 14px;
+  cursor:pointer;
+  font-weight:700;
+  background:var(--chip);
+  color:var(--text);
+  transition:transform .12s ease, opacity .12s ease, background .12s ease;
+  width:100%;
+  min-height:42px;
+}
+button:hover{transform:translateY(-1px)}
+button:active{transform:translateY(0)}
+.primary{background:linear-gradient(135deg,#19a7ff,#7f6bff)}
+.success{background:linear-gradient(135deg,#12b886,#2fbf71)}
+.soft{background:var(--chip)}
+.danger{background:linear-gradient(135deg,#ff6b6b,#ff8a48)}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.chip{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:6px 10px;border-radius:999px;
+  background:rgba(255,255,255,.05);
+  border:1px solid var(--line);
+  color:var(--muted);font-size:12px;font-weight:600;
+}
+.endpoints{display:grid;gap:10px}
+.group{border:1px solid var(--line);border-radius:16px;padding:14px;background:rgba(255,255,255,.03)}
+.group h3{font-size:13px;margin-bottom:10px;color:#dbe8f7}
+.ep{display:grid;grid-template-columns:90px 1fr;gap:10px;align-items:start;padding:8px 0;border-top:1px solid rgba(255,255,255,.05)}
+.ep:first-of-type{border-top:none}
+.method{display:inline-flex;align-items:center;justify-content:center;min-width:70px;padding:6px 8px;border-radius:999px;font-size:11px;font-weight:800;letter-spacing:.03em}
+.get{background:rgba(77,208,255,.13);color:var(--accent)}
+.post{background:rgba(124,219,124,.13);color:var(--accent-2)}
+.patch{background:rgba(255,184,77,.13);color:var(--warn)}
+.delete{background:rgba(255,107,107,.13);color:var(--bad)}
+.path{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:12px;color:#d7e7fb}
+.desc{font-size:12px;color:var(--muted);margin-top:3px;line-height:1.4}
+.log{
+  min-height:360px;
+  max-height:560px;
+  overflow:auto;
+  background:#050b14;
+  border:1px solid var(--line);
+  border-radius:16px;
+  padding:16px;
+  white-space:pre-wrap;
+  font-family:ui-monospace,SFMono-Regular,Consolas,monospace;
+  font-size:12.5px;
+  line-height:1.6;
+}
+.status{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+.badge{padding:6px 10px;border-radius:999px;font-size:12px;font-weight:700}
+.ok{background:rgba(18,184,134,.16);color:#8ef0c5;border:1px solid rgba(18,184,134,.3)}
+.fail{background:rgba(255,107,107,.16);color:#ffc3c3;border:1px solid rgba(255,107,107,.3)}
+.neutral{background:rgba(255,255,255,.05);color:var(--muted);border:1px solid var(--line)}
+.footer{color:var(--muted);font-size:12px;padding:4px 2px 0;line-height:1.4}
+@media (max-width:700px){
+  body{padding:14px}
+  .hero,.card{padding:14px}
+  .hero h1{font-size:24px}
+  .card h2{flex-direction:column;align-items:flex-start}
+  .card h2 .hint{font-size:11px}
+  .action-section{padding:10px}
+  .action-grid{grid-template-columns:repeat(auto-fit,minmax(120px,1fr))}
+  .action-title{margin-bottom:8px}
+  .chip{font-size:11px}
+  .log{min-height:280px;font-size:12px}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <section class="hero">
+    <h1>i9 Smart ERP Backend Test</h1>
+    <p>Arquivo HTML standalone para inspecionar o backend sem abrir os portais. Ele testa <code>/health</code>, login e algumas rotas protegidas, com base nos servidores locais <code>4000</code> e <code>4001</code>.</p>
+  </section>
+
+  <div class="grid">
+    <section class="card">
+      <h2>Controles de teste <span class="hint">login, health e rotas protegidas</span></h2>
+      <div class="chips">
+        <span class="chip">Backend: <code>4000</code></span>
+        <span class="chip">API v2: <code>4001</code></span>
+        <span class="chip">CORS: habilitado</span>
+        <span class="chip">Sessão: <code id="sessionState">sem token</code></span>
+        <span class="chip">Perfil: <code id="presetLabel">Gestor</code></span>
+      </div>
+
+      <div class="row">
+        <div class="field">
+          <label>Base URL Backend</label>
+          <input id="apiBase" value="http://127.0.0.1:4000">
+        </div>
+        <div class="field">
+          <label>Base URL v2</label>
+          <input id="apiV2Base" value="http://127.0.0.1:4001">
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="field">
+          <label>Perfil de teste</label>
+          <select id="preset">
+            <option value="gestor">Gestor</option>
+            <option value="professor">Professor + Colab</option>
+            <option value="responsavel">Responsável</option>
+            <option value="aluno">Aluno</option>
+            <option value="suporte">Suporte</option>
+          </select>
+          <div class="footer" style="padding:0">As ações abaixo mudam conforme o perfil selecionado.</div>
+        </div>
+        <div class="field">
+          <label>E-mail</label>
+          <input id="email" value="gestor@arteemmovimento.com">
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="field">
+          <label>Senha</label>
+          <input id="password" type="password" value="Gestor@2026">
+        </div>
+        <div class="field">
+          <label>Token atual</label>
+          <input id="tokenView" readonly placeholder="Faça login para exibir o access token">
+        </div>
+      </div>
+
+      <div class="actions">
+        <div class="action-section">
+          <div class="action-title">Ações gerais</div>
+          <div class="action-grid">
+            <button class="primary" onclick="runSuite()">Rodar suíte</button>
+            <button class="soft" onclick="testHealth('apiBase')">Health 4000</button>
+            <button class="soft" onclick="testHealth('apiV2Base')">Health 4001</button>
+            <button class="success" onclick="testLogin()">Login</button>
+            <button class="soft" onclick="copyToken()">Copiar token</button>
+            <button class="soft" onclick="clearLog()">Limpar log</button>
+          </div>
+        </div>
+
+        <div class="action-section" data-profile-group>
+          <div class="action-title">Escrita</div>
+          <div class="action-grid">
+            <button class="soft" data-profiles="professor" onclick="postPontoAutomatico()">Ponto automático</button>
+            <button class="soft" data-profiles="professor" onclick="postPgrHumor()">PGR humor</button>
+            <button class="soft" data-profiles="professor" onclick="postChamadaSeed()">Chamada seed</button>
+            <button class="soft" data-profiles="gestor,suporte" onclick="postGerarCobrancas()">Gerar cobranças</button>
+            <button class="soft" data-profiles="suporte" onclick="postCronInadimplencia()">Cron inadimplência</button>
+            <button class="soft" data-profiles="gestor,suporte" onclick="postConviteProfessor()">Convite professor</button>
+            <button class="soft" data-profiles="aluno" onclick="postAvaliacaoSeed()">Avaliação aula</button>
+          </div>
+        </div>
+
+        <div class="action-section" data-profile-group>
+          <div class="action-title">Leitura</div>
+          <div class="action-grid">
+            <button class="soft" data-profiles="gestor,suporte" onclick="testProtected('/convites', 'GET', 'apiBase')">Convites</button>
+            <button class="soft" data-profiles="gestor,suporte,professor,aluno" onclick="testProtected('/turmas', 'GET', 'apiBase')">Turmas</button>
+            <button class="soft" data-profiles="professor" onclick="testProtected('/ponto/hoje', 'GET', 'apiBase')">Ponto hoje</button>
+            <button class="soft" data-profiles="responsavel" onclick="testProtected('/cobrancas/minhas', 'GET', 'apiBase')">Cobranças</button>
+            <button class="soft" data-profiles="professor" onclick="testProtected('/holerites', 'GET', 'apiBase')">Holerites</button>
+            <button class="soft" data-profiles="gestor,suporte" onclick="testProtected('/financeiro/dashboard', 'GET', 'apiBase')">Financeiro</button>
+            <button class="soft" data-profiles="gestor,suporte" onclick="testProtected('/pgr/dashboard', 'GET', 'apiV2Base')">PGR</button>
+            <button class="soft" data-profiles="gestor,suporte,professor,aluno,responsavel" onclick="testProtected('/notificacoes', 'GET', 'apiV2Base')">Notificações</button>
+          </div>
+        </div>
+      </div>
+
+      <div class="status" id="status"></div>
+    </section>
+
+    <section class="card">
+      <h2>Log de execução <span class="hint">resposta bruta da API</span></h2>
+      <div class="log" id="log">Pronto para testar.</div>
+      <div class="footer">Dica: se o backend estiver rodando, os testes retornam JSON diretamente aqui.</div>
+    </section>
+  </div>
+
+  <section class="card">
+    <h2>Rotas implementadas <span class="hint">referência rápida</span></h2>
+    <div class="endpoints">
+      <div class="group">
+        <h3>Auth e convites</h3>
+        <div class="ep"><span class="method post">POST</span><div><div class="path">/auth/login</div><div class="desc">Login com Supabase Auth.</div></div></div>
+        <div class="ep"><span class="method post">POST</span><div><div class="path">/auth/refresh</div><div class="desc">Renova sessão com refresh token.</div></div></div>
+        <div class="ep"><span class="method post">POST</span><div><div class="path">/convites</div><div class="desc">Cria convite para gestor/professor/responsável/aluno.</div></div></div>
+        <div class="ep"><span class="method get">GET</span><div><div class="path">/convites/:token</div><div class="desc">Consulta status de um convite.</div></div></div>
+        <div class="ep"><span class="method post">POST</span><div><div class="path">/convites/:token/aceitar</div><div class="desc">Aceita convite e cria usuário.</div></div></div>
+        <div class="ep"><span class="method delete">DELETE</span><div><div class="path">/convites/:token</div><div class="desc">Remove convite.</div></div></div>
+      </div>
+
+      <div class="group">
+        <h3>Operação principal</h3>
+        <div class="ep"><span class="method get">GET</span><div><div class="path">/health</div><div class="desc">Health do backend principal.</div></div></div>
+        <div class="ep"><span class="method post">POST</span><div><div class="path">/ponto/registrar</div><div class="desc">Registro de ponto com timestamp no servidor.</div></div></div>
+        <div class="ep"><span class="method get">GET</span><div><div class="path">/ponto/hoje</div><div class="desc">Resumo do dia do colaborador.</div></div></div>
+        <div class="ep"><span class="method get">GET</span><div><div class="path">/turmas</div><div class="desc">Lista turmas por papel.</div></div></div>
+        <div class="ep"><span class="method post">POST</span><div><div class="path">/turmas/:id/chamada</div><div class="desc">Chamada automática por aula.</div></div></div>
+        <div class="ep"><span class="method get">GET</span><div><div class="path">/cobrancas/minhas</div><div class="desc">Cobranças do responsável.</div></div></div>
+        <div class="ep"><span class="method get">GET</span><div><div class="path">/financeiro/dashboard</div><div class="desc">Resumo financeiro do gestor.</div></div></div>
+        <div class="ep"><span class="method get">GET</span><div><div class="path">/holerites</div><div class="desc">Holerites do colaborador.</div></div></div>
+      </div>
+
+      <div class="group">
+        <h3>Rotas v2</h3>
+        <div class="ep"><span class="method get">GET</span><div><div class="path">/health</div><div class="desc">Health da API v2.</div></div></div>
+        <div class="ep"><span class="method post">POST</span><div><div class="path">/pgr/humor</div><div class="desc">Registro emocional append-only.</div></div></div>
+        <div class="ep"><span class="method post">POST</span><div><div class="path">/pgr/relato</div><div class="desc">Relato PGR imutável.</div></div></div>
+        <div class="ep"><span class="method get">GET</span><div><div class="path">/pgr/dashboard</div><div class="desc">Resumo anônimo para gestor/suporte.</div></div></div>
+        <div class="ep"><span class="method post">POST</span><div><div class="path">/avaliacoes/aula/:aula_id</div><div class="desc">Avaliação de aula editável pelo aluno.</div></div></div>
+        <div class="ep"><span class="method get">GET</span><div><div class="path">/avaliacoes/turma/:turma_id</div><div class="desc">Resumo das avaliações da turma.</div></div></div>
+        <div class="ep"><span class="method get">GET</span><div><div class="path">/notificacoes</div><div class="desc">Lista de notificações do usuário logado.</div></div></div>
+        <div class="ep"><span class="method post">POST</span><div><div class="path">/cron/verificar-inadimplencia</div><div class="desc">Cron manual para cobranças vencidas.</div></div></div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<script>
+const logEl = document.getElementById('log');
+const statusEl = document.getElementById('status');
+
+function log(message) {
+  const line = typeof message === 'string' ? message : JSON.stringify(message, null, 2);
+  logEl.textContent = `${line}\n\n${logEl.textContent === 'Pronto para testar.' ? '' : logEl.textContent}`.trim();
+}
+
+function clearLog() {
+  logEl.textContent = 'Pronto para testar.';
+  statusEl.innerHTML = '';
+}
+
+function setSessionState(text) {
+  document.getElementById('sessionState').textContent = text;
+}
+
+function setPresetLabel(value) {
+  const labels = {
+    gestor: 'Gestor',
+    professor: 'Professor + Colab',
+    responsavel: 'Responsável',
+    aluno: 'Aluno',
+    suporte: 'Suporte',
+  };
+  document.getElementById('presetLabel').textContent = labels[value] || 'Gestor';
+}
+
+function setStatus(kind, text) {
+  const cls = kind === 'ok' ? 'ok' : kind === 'fail' ? 'fail' : 'neutral';
+  statusEl.innerHTML = `<span class="badge ${cls}">${text}</span>`;
+}
+
+function baseInput(id) {
+  return document.getElementById(id).value.replace(/\/$/, '');
+}
+
+async function apiFetch(base, path, options = {}) {
+  const response = await fetch(`${base}${path}`, options);
+  const contentType = response.headers.get('content-type') || '';
+  const body = contentType.includes('application/json') ? await response.json() : await response.text();
+  return { status: response.status, ok: response.ok, body };
+}
+
+const PRESETS = {
+  gestor: { email: 'gestor@arteemmovimento.com', password: 'Gestor@2026' },
+  professor: { email: 'anapaula@arteemmovimento.com', password: 'Prof@2026' },
+  responsavel: { email: 'carla@email.com', password: 'Resp@2026' },
+  aluno: { email: 'sofia@email.com', password: 'Aluno@2026' },
+  suporte: { email: 'suporte@erp.com', password: 'Suporte@2026' },
+};
+
+const SEED = {
+  turma_id: '55555555-5555-5555-5555-555555555551',
+  aluno_id: '44444444-4444-4444-4444-444444444445',
+  aula_id: '66666666-6666-6666-6666-666666666661',
+};
+
+function persistField(id) {
+  localStorage.setItem(`i9-backend-test:${id}`, document.getElementById(id).value);
+}
+
+function restoreField(id, fallback) {
+  const value = localStorage.getItem(`i9-backend-test:${id}`);
+  if (value !== null) document.getElementById(id).value = value;
+  else if (fallback !== undefined) document.getElementById(id).value = fallback;
+}
+
+function persistToken(token) {
+  if (token) localStorage.setItem('i9-backend-test:token', token);
+  else localStorage.removeItem('i9-backend-test:token');
+  document.getElementById('tokenView').value = token || '';
+  setSessionState(token ? 'token pronto' : 'sem token');
+}
+
+function restoreToken() {
+  const token = localStorage.getItem('i9-backend-test:token');
+  document.getElementById('tokenView').value = token || '';
+  setSessionState(token ? 'token pronto' : 'sem token');
+  return token;
+}
+
+function applyPreset(value) {
+  const preset = PRESETS[value];
+  if (!preset) return;
+  document.getElementById('email').value = preset.email;
+  document.getElementById('password').value = preset.password;
+  localStorage.setItem('i9-backend-test:preset', value);
+  setPresetLabel(value);
+  refreshActionVisibility(value);
+  persistField('email');
+  persistField('password');
+}
+
+function refreshActionVisibility(preset) {
+  const active = (preset || 'gestor').trim();
+  document.querySelectorAll('[data-profiles]').forEach((button) => {
+    const profiles = button.getAttribute('data-profiles').split(',').map((p) => p.trim());
+    button.hidden = !profiles.includes(active);
+  });
+  document.querySelectorAll('[data-profile-group]').forEach((group) => {
+    const buttons = [...group.querySelectorAll('[data-profiles]')];
+    group.hidden = buttons.length > 0 && buttons.every((button) => button.hidden);
+  });
+}
+
+async function testHealth(which) {
+  const base = baseInput(which);
+  try {
+    const result = await apiFetch(base, '/health');
+    log({ check: `health ${base}`, ...result });
+    setStatus(result.ok ? 'ok' : 'fail', `${which} ${result.status}`);
+  } catch (error) {
+    log({ check: `health ${base}`, error: String(error) });
+    setStatus('fail', `${which} error`);
+  }
+}
+
+async function testLogin() {
+  const base = baseInput('apiBase');
+  const email = document.getElementById('email').value.trim();
+  const password = document.getElementById('password').value;
+  try {
+    const result = await apiFetch(base, '/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password }),
+    });
+    window.__token = result.body.access_token;
+    persistToken(window.__token || '');
+    log({ check: 'login', status: result.status, user: result.body.user, token: result.body.access_token ? 'ok' : 'missing' });
+    setStatus(result.ok ? 'ok' : 'fail', `login ${result.status}`);
+  } catch (error) {
+    log({ check: 'login', error: String(error) });
+    persistToken('');
+    setStatus('fail', 'login error');
+  }
+}
+
+async function testProtected(path, method, which) {
+  const base = baseInput(which);
+  const token = window.__token;
+  if (!token) {
+    log({ check: path, error: 'Faça login primeiro.' });
+    setStatus('fail', 'sem token');
+    return;
+  }
+  try {
+    const result = await apiFetch(base, path, {
+      method,
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    log({ check: `${method} ${path}`, status: result.status, body: result.body });
+    setStatus(result.ok ? 'ok' : 'fail', `${path} ${result.status}`);
+  } catch (error) {
+    log({ check: `${method} ${path}`, error: String(error) });
+    setStatus('fail', 'request error');
+  }
+}
+
+async function testJsonProtected(path, method, which, body) {
+  const base = baseInput(which);
+  const token = window.__token;
+  if (!token) {
+    log({ check: path, error: 'Faça login primeiro.' });
+    setStatus('fail', 'sem token');
+    return;
+  }
+  try {
+    const result = await apiFetch(base, path, {
+      method,
+      headers: {
+        Authorization: `Bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(body),
+    });
+    log({ check: `${method} ${path}`, body, status: result.status, response: result.body });
+    setStatus(result.ok ? 'ok' : 'fail', `${path} ${result.status}`);
+  } catch (error) {
+    log({ check: `${method} ${path}`, error: String(error) });
+    setStatus('fail', 'request error');
+  }
+}
+
+async function copyToken() {
+  const token = window.__token || localStorage.getItem('i9-backend-test:token') || '';
+  if (!token) {
+    log({ check: 'token', error: 'Nenhum token disponível.' });
+    setStatus('fail', 'sem token');
+    return;
+  }
+  try {
+    await navigator.clipboard.writeText(token);
+    log({ check: 'token', status: 'copiado' });
+    setStatus('ok', 'token copiado');
+  } catch (error) {
+    log({ check: 'token', error: String(error) });
+    setStatus('fail', 'cópia bloqueada');
+  }
+}
+
+function currentCompetencia() {
+  const now = new Date();
+  return { mes: now.getMonth() + 1, ano: now.getFullYear() };
+}
+
+async function postPontoAutomatico() {
+  const base = baseInput('apiBase');
+  const token = window.__token || localStorage.getItem('i9-backend-test:token') || '';
+  if (!token) {
+    log({ check: 'ponto', error: 'Faça login primeiro.' });
+    setStatus('fail', 'sem token');
+    return;
+  }
+
+  const hoje = await apiFetch(base, '/ponto/hoje', {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!hoje.ok) {
+    log({ check: 'GET /ponto/hoje', status: hoje.status, body: hoje.body });
+    setStatus('fail', `ponto ${hoje.status}`);
+    return;
+  }
+
+  const tipo = !hoje.body.entrada
+    ? 'entrada'
+    : !hoje.body.inicio_intervalo
+      ? 'inicio_intervalo'
+      : !hoje.body.fim_intervalo
+        ? 'fim_intervalo'
+        : !hoje.body.saida
+          ? 'saida'
+          : null;
+
+  if (!tipo) {
+    log({ check: 'ponto', status: 'já completo', body: hoje.body });
+    setStatus('neutral', 'ponto completo');
+    return;
+  }
+
+  log({ check: 'ponto', status: 'tipo escolhido', tipo });
+  return testJsonProtected('/ponto/registrar', 'POST', 'apiBase', {
+    tipo,
+    latitude: -29.6868,
+    longitude: -53.8011,
+  });
+}
+
+function postPgrHumor() {
+  return testJsonProtected('/pgr/humor', 'POST', 'apiV2Base', {
+    humor: 'bem',
+    quer_contato: false,
+    anonimo: false,
+  });
+}
+
+function postChamadaSeed() {
+  return testJsonProtected(`/turmas/${SEED.turma_id}/chamada`, 'POST', 'apiBase', {
+    topico: 'Variações de Barra',
+    registros: [{ aluno_id: SEED.aluno_id, presente: true }],
+  });
+}
+
+function postGerarCobrancas() {
+  return testJsonProtected('/cobrancas/gerar', 'POST', 'apiBase', currentCompetencia());
+}
+
+function postCronInadimplencia() {
+  return testJsonProtected('/cron/verificar-inadimplencia', 'POST', 'apiV2Base', {});
+}
+
+function postConviteProfessor() {
+  return testJsonProtected('/convites', 'POST', 'apiBase', {
+    role_destino: 'professor',
+    email_destino: `novo.professor+${Date.now()}@example.com`,
+    nome_destino: 'Professor Teste',
+    metadata: { turma_id: SEED.turma_id },
+  });
+}
+
+function postAvaliacaoSeed() {
+  return testJsonProtected(`/avaliacoes/aula/${SEED.aula_id}`, 'POST', 'apiV2Base', {
+    avaliacao: 'feliz',
+    comentario: 'Aula ótima.',
+  });
+}
+
+async function runSuite() {
+  clearLog();
+  await testHealth('apiBase');
+  await testHealth('apiV2Base');
+  await testLogin();
+  const preset = document.getElementById('preset').value;
+  if (preset === 'gestor' || preset === 'suporte') {
+    await testProtected('/convites', 'GET', 'apiBase');
+    await testProtected('/turmas', 'GET', 'apiBase');
+    await testProtected('/financeiro/dashboard', 'GET', 'apiBase');
+    await testProtected('/pgr/dashboard', 'GET', 'apiV2Base');
+    await testProtected('/notificacoes', 'GET', 'apiV2Base');
+    await postGerarCobrancas();
+    await postCronInadimplencia();
+  } else if (preset === 'responsavel') {
+    await testProtected('/cobrancas/minhas', 'GET', 'apiBase');
+    await testProtected('/notificacoes', 'GET', 'apiV2Base');
+  } else {
+    await testProtected('/ponto/hoje', 'GET', 'apiBase');
+    await testProtected('/holerites', 'GET', 'apiBase');
+    await testProtected('/pgr/dashboard', 'GET', 'apiV2Base');
+    await testProtected('/notificacoes', 'GET', 'apiV2Base');
+    await postPontoAutomatico();
+    await postPgrHumor();
+    await postChamadaSeed();
+    await postAvaliacaoSeed();
+  }
+}
+
+document.getElementById('preset').addEventListener('change', (event) => applyPreset(event.target.value));
+document.getElementById('apiBase').addEventListener('input', () => persistField('apiBase'));
+document.getElementById('apiV2Base').addEventListener('input', () => persistField('apiV2Base'));
+document.getElementById('email').addEventListener('input', () => persistField('email'));
+document.getElementById('password').addEventListener('input', () => persistField('password'));
+
+restoreField('apiBase', 'http://127.0.0.1:4000');
+restoreField('apiV2Base', 'http://127.0.0.1:4001');
+restoreField('email', 'gestor@arteemmovimento.com');
+restoreField('password', 'Gestor@2026');
+document.getElementById('preset').value = localStorage.getItem('i9-backend-test:preset') || 'gestor';
+setPresetLabel(document.getElementById('preset').value);
+refreshActionVisibility(document.getElementById('preset').value);
+restoreToken();
+window.__token = localStorage.getItem('i9-backend-test:token') || '';
+
+clearLog();
+</script>
+</body>
+</html>

@@ -4,20 +4,72 @@
  * Arquivo único — todos os módulos
  */
 
+import fs from "node:fs";
+import path from "node:path";
 import Fastify from "fastify";
+import cors from "@fastify/cors";
 import { PrismaClient } from "@prisma/client";
 import { createClient } from "@supabase/supabase-js";
 import { z } from "zod";
+import WebSocket from "ws";
 
-const app     = Fastify({ logger: true });
-const prisma  = new PrismaClient();
-const supabase = createClient(process.env.SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!);
+function loadEnvFile(envPath = path.resolve(process.cwd(), ".env")) {
+  if (!fs.existsSync(envPath)) return;
+
+  const content = fs.readFileSync(envPath, "utf8");
+  for (const rawLine of content.split(/\r?\n/)) {
+    const line = rawLine.trim();
+    if (!line || line.startsWith("#")) continue;
+
+    const separator = line.indexOf("=");
+    if (separator === -1) continue;
+
+    const key = line.slice(0, separator).trim();
+    if (!key || process.env[key] !== undefined) continue;
+
+    let value = line.slice(separator + 1).trim();
+    if (
+      (value.startsWith('"') && value.endsWith('"')) ||
+      (value.startsWith("'") && value.endsWith("'"))
+    ) {
+      value = value.slice(1, -1);
+    }
+    process.env[key] = value;
+  }
+}
+
+loadEnvFile();
+
+const SUPABASE_URL = process.env.SUPABASE_URL;
+const SUPABASE_SERVICE_ROLE_KEY =
+  process.env.SUPABASE_SERVICE_ROLE_KEY ?? process.env.SERVICE_ROLE_KEY;
+
+if (!SUPABASE_URL) {
+  throw new Error("SUPABASE_URL nao configurada");
+}
+
+if (!SUPABASE_SERVICE_ROLE_KEY) {
+  throw new Error("SUPABASE_SERVICE_ROLE_KEY nao configurada");
+}
+
+const APP_VERSION = "5.0.8";
+
+const app = Fastify({ logger: true });
+const prisma = new PrismaClient();
+const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, {
+  realtime: { transport: WebSocket as any },
+});
+app.register(cors, { origin: true, credentials: true });
 
 // ─── RBAC ────────────────────────────────────────────────────────────────────
 const HIERARQUIA: Record<string, string[]> = {
-  suporte:     ["gestor"],
-  gestor:      ["professor","responsavel","aluno"],
-  professor:   [], responsavel: [], aluno: [], colaborador: [],
+  suporte: ["gestor"],
+  gestor: ["professor", "professor_colab", "responsavel", "aluno"],
+  professor: [],
+  professor_colab: [],
+  responsavel: [],
+  aluno: [],
+  colaborador: [],
 };
 
 async function auth(req: any, reply: any) {
@@ -61,16 +113,17 @@ app.post("/auth/logout", { preHandler:[auth] }, async () => {
 // ─── CONVITES ────────────────────────────────────────────────────────────────
 const PORTAL_URLS: Record<string,string> = {
   gestor:      process.env.PORTAL_GESTOR_URL    ?? "http://localhost:3001",
-  professor:   process.env.PORTAL_GESTOR_URL    ?? "http://localhost:3001",
-  colaborador: process.env.PORTAL_COLAB_URL     ?? "http://localhost:3002",
-  responsavel: process.env.PORTAL_RESP_URL      ?? "http://localhost:3003",
-  aluno:       process.env.PORTAL_RESP_URL      ?? "http://localhost:3003",
-  suporte:     process.env.PORTAL_SUPORTE_URL   ?? "http://localhost:3004",
+  professor:   process.env.PORTAL_PROFESSOR_URL ?? "http://localhost:3002",
+  professor_colab: process.env.PORTAL_PROFESSOR_COLAB_URL ?? process.env.PORTAL_PROFESSOR_URL ?? "http://localhost:3002",
+  colaborador: process.env.PORTAL_COLAB_URL     ?? "http://localhost:3003",
+  responsavel: process.env.PORTAL_RESP_URL      ?? "http://localhost:3004",
+  aluno:       process.env.PORTAL_RESP_URL      ?? "http://localhost:3004",
+  suporte:     process.env.PORTAL_SUPORTE_URL   ?? "http://localhost:3005",
 };
 
 app.post("/convites", { preHandler:[auth] }, async (req:any, reply) => {
   const body = z.object({
-    role_destino: z.enum(["gestor","professor","responsavel","aluno"]),
+    role_destino: z.enum(["gestor","professor","professor_colab","responsavel","aluno"]),
     email_destino: z.string().email().optional(),
     nome_destino:  z.string().optional(),
     empresa_id:    z.string().uuid().optional(),
@@ -124,7 +177,7 @@ app.post("/convites/:token/aceitar", async (req:any, reply) => {
 
     if (convite.role_destino==="gestor")
       await tx.gestores.create({ data:{ user_id:newUser.id, empresa_id:convite.empresa_id, nome } });
-    else if (convite.role_destino==="professor") {
+    else if (convite.role_destino==="professor" || convite.role_destino==="professor_colab") {
       const col = await tx.colaboradores.create({ data:{ user_id:newUser.id, empresa_id:convite.empresa_id, nome, cargo:"Professor", regime:"clt" } });
       if (meta?.turma_id) await tx.professor_turmas.create({ data:{ professor_id:col.id, turma_id:meta.turma_id, concedido_por:convite.criado_por } });
     } else if (convite.role_destino==="responsavel") {
@@ -138,11 +191,11 @@ app.post("/convites/:token/aceitar", async (req:any, reply) => {
   });
 
   const { data:session } = await supabase.auth.signInWithPassword({ email, password });
-  return reply.status(201).send({
-    access_token:session?.session?.access_token,
-    refresh_token:session?.session?.refresh_token,
-    user:{ id:resultado.id, email:resultado.email, role:resultado.role },
-    redirect_to:PORTAL_URLS[convite.role_destino],
+    return reply.status(201).send({
+      access_token:session?.session?.access_token,
+      refresh_token:session?.session?.refresh_token,
+      user:{ id:resultado.id, email:resultado.email, role:resultado.role },
+      redirect_to:PORTAL_URLS[convite.role_destino],
   });
 });
 
@@ -156,8 +209,18 @@ app.get("/convites", { preHandler:[auth] }, async (req:any, reply) => {
   return { data:convites.map(c=>({ ...c, status:c.usado?"usado":c.expira_em<new Date()?"expirado":"pendente" })) };
 });
 
+app.delete("/convites/:token", { preHandler:[auth] }, async (req:any, reply) => {
+  const convite = await prisma.convites.findUnique({ where:{ token:req.params.token } });
+  if (!convite) return reply.status(404).send({ error:"Convite não encontrado" });
+  const g = await prisma.gestores.findFirst({ where:{ user_id:req.user.id } });
+  const isOwner = convite.criado_por === req.user.id || g?.empresa_id === convite.empresa_id || req.user.role === "suporte";
+  if (!isOwner) return reply.status(403).send({ error:"Sem permissão para remover convite" });
+  await prisma.convites.delete({ where:{ token:req.params.token } });
+  return { ok:true };
+});
+
 // ─── PONTO (imutável, timestamp server-side) ─────────────────────────────────
-app.post("/ponto/registrar", { preHandler:[auth, requireRole("colaborador","professor")] }, async (req:any, reply) => {
+app.post("/ponto/registrar", { preHandler:[auth, requireRole("colaborador","professor","professor_colab")] }, async (req:any, reply) => {
   const body = z.object({
     tipo:z.enum(["entrada","inicio_intervalo","fim_intervalo","saida"]),
     latitude:z.number().optional(), longitude:z.number().optional(),
@@ -219,8 +282,8 @@ app.get("/turmas", { preHandler:[auth] }, async (req:any, reply) => {
   let empresa_id: string | null = null;
   if (["gestor","suporte"].includes(req.user.role)) {
     const g = await prisma.gestores.findFirst({ where:{ user_id:req.user.id } });
-    empresa_id = g?.empresa_id ?? (req.query as any).empresa_id;
-  } else if (req.user.role==="professor") {
+    empresa_id = g?.empresa_id ?? (req.query as any).empresa_id ?? null;
+  } else if (req.user.role==="professor" || req.user.role==="professor_colab") {
     const colab = await prisma.colaboradores.findFirst({ where:{ user_id:req.user.id } });
     if (!colab) return reply.status(404).send({ error:"Não encontrado" });
     const pts = await prisma.professor_turmas.findMany({
@@ -228,9 +291,9 @@ app.get("/turmas", { preHandler:[auth] }, async (req:any, reply) => {
     });
     return { data:pts.map(p=>({ ...p.turmas, total_alunos:p.turmas._count.matriculas })) };
   }
-  if (!empresa_id) return reply.status(422).send({ error:"empresa_id obrigatório" });
+  const where = empresa_id ? { empresa_id, ativa:true } : { ativa:true };
   const turmas = await prisma.turmas.findMany({
-    where:{ empresa_id, ativa:true },
+    where,
     include:{ _count:{ select:{ matriculas:{ where:{ status:"ativa" } } } }, colaboradores:{ select:{ nome:true } } }
   });
   return { data:turmas };
@@ -345,7 +408,9 @@ app.get("/cobrancas/:id/pix", { preHandler:[auth] }, async (req:any, reply) => {
 app.post("/cobrancas/gerar", { preHandler:[auth, requireRole("gestor","suporte")] }, async (req:any, reply) => {
   const { mes, ano } = z.object({ mes:z.number().min(1).max(12), ano:z.number() }).parse(req.body);
   const g = await prisma.gestores.findFirst({ where:{ user_id:req.user.id } });
-  const mats = await prisma.matriculas.findMany({ where:{ status:"ativa", turmas:{ empresa_id:g!.empresa_id } }, include:{ turmas:{ select:{ mensalidade:true } } } });
+  const empresa_id = g?.empresa_id ?? (req.body as any).empresa_id ?? (req.query as any).empresa_id ?? null;
+  const where: any = empresa_id ? { status:"ativa", turmas:{ empresa_id } } : { status:"ativa" };
+  const mats: any[] = await prisma.matriculas.findMany({ where, include:{ turmas:{ select:{ mensalidade:true } } } } as any);
   let criadas=0, ignoradas=0;
   for (const m of mats) {
     try {
@@ -361,9 +426,11 @@ app.get("/financeiro/dashboard", { preHandler:[auth, requireRole("gestor","supor
   const g = await prisma.gestores.findFirst({ where:{ user_id:req.user.id } });
   const { mes, ano } = req.query as any;
   const mesN=mes?Number(mes):new Date().getMonth()+1, anoN=ano?Number(ano):new Date().getFullYear();
-  const cobs = await prisma.cobrancas.findMany({
-    where:{ referencia_mes:mesN, referencia_ano:anoN, matriculas:{ turmas:{ empresa_id:g!.empresa_id } } }
-  });
+  const empresa_id = g?.empresa_id ?? (req.query as any).empresa_id ?? null;
+  const where = empresa_id
+    ? { referencia_mes:mesN, referencia_ano:anoN, matriculas:{ turmas:{ empresa_id } } }
+    : { referencia_mes:mesN, referencia_ano:anoN };
+  const cobs = await prisma.cobrancas.findMany({ where });
   const total=cobs.reduce((s,c)=>s+Number(c.valor),0);
   const recebido=cobs.filter(c=>c.status==="pago").reduce((s,c)=>s+Number(c.pago_valor??c.valor),0);
   return { mes:`${mesN}/${anoN}`, faturamento:total, recebido, inadimplencia:total-recebido,
@@ -371,7 +438,7 @@ app.get("/financeiro/dashboard", { preHandler:[auth, requireRole("gestor","supor
 });
 
 // ─── HOLERITES ───────────────────────────────────────────────────────────────
-app.get("/holerites", { preHandler:[auth, requireRole("colaborador","professor")] }, async (req:any, reply) => {
+app.get("/holerites", { preHandler:[auth, requireRole("colaborador","professor","professor_colab")] }, async (req:any, reply) => {
   const colab = await prisma.colaboradores.findFirst({ where:{ user_id:req.user.id } });
   if (!colab) return reply.status(404).send({ error:"Não encontrado" });
   const hols = await prisma.holerites.findMany({ where:{ colaborador_id:colab.id }, orderBy:[{ ano:"desc" },{ mes:"desc" }] });
@@ -379,9 +446,9 @@ app.get("/holerites", { preHandler:[auth, requireRole("colaborador","professor")
 });
 
 // ─── HEALTH CHECK ─────────────────────────────────────────────────────────────
-app.get("/health", async () => ({ status:"ok", ts:new Date().toISOString(), version:"1.0.0" }));
+app.get("/health", async () => ({ status:"ok", ts:new Date().toISOString(), version:APP_VERSION }));
 
 // ─── START ────────────────────────────────────────────────────────────────────
-app.listen({ port:Number(process.env.PORT??3000), host:"0.0.0.0" }, (err) => {
+app.listen({ port:Number(process.env.PORT??4000), host:"0.0.0.0" }, (err) => {
   if (err) { app.log.error(err); process.exit(1); }
 });

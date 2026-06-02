@@ -5,17 +5,60 @@
  * Configurações de Usuário, Contratos de Escola
  */
 
+import fs from "node:fs";
+import path from "node:path";
 import Fastify from "fastify";
+import cors from "@fastify/cors";
 import { PrismaClient } from "@prisma/client";
 import { createClient } from "@supabase/supabase-js";
 import { z } from "zod";
+import WebSocket from "ws";
+
+function loadEnvFile(envPath = path.resolve(process.cwd(), ".env")) {
+  if (!fs.existsSync(envPath)) return;
+
+  const content = fs.readFileSync(envPath, "utf8");
+  for (const rawLine of content.split(/\r?\n/)) {
+    const line = rawLine.trim();
+    if (!line || line.startsWith("#")) continue;
+
+    const separator = line.indexOf("=");
+    if (separator === -1) continue;
+
+    const key = line.slice(0, separator).trim();
+    if (!key || process.env[key] !== undefined) continue;
+
+    let value = line.slice(separator + 1).trim();
+    if (
+      (value.startsWith('"') && value.endsWith('"')) ||
+      (value.startsWith("'") && value.endsWith("'"))
+    ) {
+      value = value.slice(1, -1);
+    }
+    process.env[key] = value;
+  }
+}
+
+loadEnvFile();
+
+const SUPABASE_URL = process.env.SUPABASE_URL;
+const SUPABASE_SERVICE_ROLE_KEY =
+  process.env.SUPABASE_SERVICE_ROLE_KEY ?? process.env.SERVICE_ROLE_KEY;
+
+if (!SUPABASE_URL) {
+  throw new Error("SUPABASE_URL nao configurada");
+}
+
+if (!SUPABASE_SERVICE_ROLE_KEY) {
+  throw new Error("SUPABASE_SERVICE_ROLE_KEY nao configurada");
+}
 
 const app = Fastify({ logger: true });
 const prisma = new PrismaClient();
-const supabase = createClient(
-  process.env.SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
+const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, {
+  realtime: { transport: WebSocket as any },
+});
+app.register(cors, { origin: true, credentials: true });
 
 // ── Middleware de Auth ────────────────────────────────────────────────────────
 async function auth(req: any, reply: any) {
@@ -45,7 +88,7 @@ function role(...roles: string[]) {
  * Colaborador registra estado emocional após ponto.
  * APPEND-ONLY: nenhum UPDATE ou DELETE é possível.
  */
-app.post("/pgr/humor", { preHandler: [auth, role("colaborador", "professor_colab")] },
+app.post("/pgr/humor", { preHandler: [auth, role("colaborador", "professor", "professor_colab")] },
   async (req: any, reply) => {
     const body = z.object({
       humor: z.enum(["excelente", "bem", "neutro", "estressado", "mal"]),
@@ -98,7 +141,7 @@ app.post("/pgr/humor", { preHandler: [auth, role("colaborador", "professor_colab
  * Colaborador registra relato/ocorrência PGR.
  * CONTEÚDO IMUTÁVEL — trigger no banco bloqueia UPDATE de campos críticos.
  */
-app.post("/pgr/relato", { preHandler: [auth, role("colaborador", "professor_colab")] },
+app.post("/pgr/relato", { preHandler: [auth, role("colaborador", "professor", "professor_colab")] },
   async (req: any, reply) => {
     const body = z.object({
       categoria: z.enum(["assedio_moral", "assedio_sexual", "discriminacao", "condicoes_trabalho", "relacionamento", "outro"]),
@@ -338,10 +381,10 @@ app.get("/planos", { preHandler: [auth] }, async (req: any, reply) => {
   const { turma_id } = req.query as any;
   const g = await prisma.gestores.findFirst({ where: { user_id: req.user.id } });
   const colab = await prisma.colaboradores.findFirst({ where: { user_id: req.user.id } });
-  const empresa_id = g?.empresa_id ?? colab?.empresa_id;
+  const empresa_id = g?.empresa_id ?? colab?.empresa_id ?? (req.query as any).empresa_id ?? null;
 
   // Professor vê somente planos publicados de suas turmas
-  const where: any = { empresa_id };
+  const where: any = empresa_id ? { empresa_id } : {};
   if (turma_id) where.turma_id = turma_id;
   if (req.user.role === "professor" || req.user.role === "professor_colab") {
     where.status = "publicado";
@@ -357,7 +400,7 @@ app.get("/planos", { preHandler: [auth] }, async (req: any, reply) => {
 });
 
 app.post("/planos", { preHandler: [auth, role("gestor", "suporte")] }, async (req: any, reply) => {
-  const body = z.object({
+  const parsed = z.object({
     turma_id: z.string().uuid().optional(),
     titulo: z.string().min(3),
     descricao: z.string().optional(),
@@ -370,10 +413,18 @@ app.post("/planos", { preHandler: [auth, role("gestor", "suporte")] }, async (re
       url: z.string().url(),
       ordem: z.number().int().default(1),
     })).optional(),
-  }).parse(req.body);
+  }).safeParse(req.body);
+  if (!parsed.success) {
+    return reply.status(422).send({
+      error: "body inválido",
+      details: parsed.error.issues,
+    });
+  }
+  const body = parsed.data;
 
   const g = await prisma.gestores.findFirst({ where: { user_id: req.user.id } });
-  const empresa_id = g?.empresa_id ?? (req.body as any).empresa_id;
+  const empresa_id = g?.empresa_id ?? (req.body as any).empresa_id ?? (req.query as any).empresa_id ?? null;
+  if (!empresa_id) return reply.status(422).send({ error: "empresa_id obrigatório" });
 
   const plano = await prisma.$transaction(async (tx) => {
     const p = await tx.planos_aula.create({
@@ -391,7 +442,13 @@ app.post("/planos", { preHandler: [auth, role("gestor", "suporte")] }, async (re
 
     if (body.materiais?.length) {
       await tx.plano_materiais.createMany({
-        data: body.materiais.map(m => ({ ...m, plano_id: p.id })),
+        data: body.materiais.map(m => ({
+          plano_id: p.id,
+          tipo: m.tipo,
+          nome: m.nome,
+          url: m.url,
+          ordem: m.ordem,
+        })),
       });
     }
 
@@ -444,8 +501,14 @@ app.get("/notificacoes", { preHandler: [auth] }, async (req: any, reply) => {
 });
 
 app.patch("/notificacoes/:id/lida", { preHandler: [auth] }, async (req: any, reply) => {
-  await prisma.notificacoes.update({
+  const notif = await prisma.notificacoes.findFirst({
     where: { id: req.params.id, user_id: req.user.id },
+    select: { id: true },
+  });
+  if (!notif) return reply.status(404).send({ error: "Notificação não encontrada" });
+
+  await prisma.notificacoes.update({
+    where: { id: notif.id },
     data: { lida: true, lida_em: new Date() },
   });
   return reply.send({ ok: true });
@@ -642,5 +705,8 @@ app.post("/cron/verificar-inadimplencia", { preHandler: [auth, role("suporte")] 
   }
 );
 
+// ─── HEALTH CHECK ────────────────────────────────────────────────────────────
+app.get("/health", async () => ({ status: "ok", ts: new Date().toISOString(), version: "5.0.8-v2" }));
+
 // START
-app.listen({ port: Number(process.env.PORT ?? 4000), host: "0.0.0.0" });
+app.listen({ port: Number(process.env.PORT ?? 4001), host: "0.0.0.0" });

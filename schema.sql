@@ -7,7 +7,7 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 CREATE EXTENSION IF NOT EXISTS "pgcrypto";
 
 -- ENUMS
-CREATE TYPE role_usuario    AS ENUM ('suporte','gestor','professor','colaborador','responsavel','aluno');
+CREATE TYPE role_usuario    AS ENUM ('suporte','gestor','professor','professor_colab','colaborador','responsavel','aluno');
 CREATE TYPE regime_trabalho AS ENUM ('clt','pj','estagio');
 CREATE TYPE tipo_marcacao   AS ENUM ('entrada','inicio_intervalo','fim_intervalo','saida');
 CREATE TYPE status_matricula AS ENUM ('ativa','cancelada','suspensa','inadimplente');
