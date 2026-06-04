@@ -178,6 +178,9 @@ body{display:flex;align-items:center;justify-content:center}
   <button class="btn b-full" style="background:rgba(255,255,255,.1);color:#fff;border:.5px solid rgba(255,255,255,.2);padding:13px;font-size:13px;border-radius:12px;margin-bottom:10px" onclick="startGoogleOAuth()">
     <i class="ti ti-brand-google" style="font-size:18px"></i> Entrar com Google
   </button>
+  <button class="btn b-full" style="background:rgba(255,255,255,.08);color:#fff;border:.5px solid rgba(255,255,255,.18);padding:12px;font-size:12px;border-radius:12px;margin-bottom:10px" onclick="requestPasswordAccess()">
+    Solicitar primeiro acesso
+  </button>
   <button class="btn b-full" style="background:rgba(255,255,255,.1);color:#fff;border:.5px solid rgba(255,255,255,.2);padding:13px;font-size:13px;border-radius:12px;margin-bottom:20px" onclick="doBio()">
     <i class="ti ti-fingerprint" style="font-size:18px"></i> Entrar com biometria
   </button>
@@ -515,6 +518,7 @@ const NAV={
 // ════ HELPERS ════════════════════════════════════════════════════════════════
 const API_BASE = localStorage.getItem('i9_api_base') || 'http://127.0.0.1:4000';
 const API_V2_BASE = localStorage.getItem('i9_api_v2_base') || 'http://127.0.0.1:4001';
+const ACCESS_API='/.netlify/functions/access-requests';
 const SUPABASE_AUTH_URL='https://tofszwegngqzlcfuzjfg.supabase.co/auth/v1/authorize';
 const PORTAL_ROLE = window.I9_PORTAL_ROLE || null;
 const AUTHORIZED_OAUTH_USERS={
@@ -531,7 +535,22 @@ function oauthRedirectTo(){const path=window.location.pathname||'/';const origin
 function startGoogleOAuth(){const redirectTo=oauthRedirectTo();window.location.href=`${SUPABASE_AUTH_URL}?provider=google&redirect_to=${encodeURIComponent(redirectTo)}`}
 function jwtPayload(token){try{const p=token.split('.')[1].replace(/-/g,'+').replace(/_/g,'/');return JSON.parse(decodeURIComponent(escape(atob(p))))}catch{return {}}}
 function roleFromPath(){const p=window.location.pathname.replace(/^\/+/,'').split('/')[0];return ({suporte:'suporte',gestor:'gestor',professor:'professor_colab',colaborador:'colaborador',responsavel:'responsavel',aluno:'aluno'})[p]||null}
-function finishOAuthCallback(){
+async function accessRequest(action,payload={},token){
+  const res=await fetch(ACCESS_API,{method:'POST',headers:{'Content-Type':'application/json',...(token?{Authorization:`Bearer ${token}`}:{})},body:JSON.stringify({action,...payload})});
+  const data=await res.json().catch(()=>({}));
+  if(!res.ok) throw new Error(data.error||`Erro HTTP ${res.status}`);
+  return data;
+}
+async function requestPasswordAccess(){
+  const email=document.getElementById('lemail')?.value.trim();
+  const password=document.getElementById('lsenha')?.value;
+  if(!email||!password){toast('Preencha e-mail e senha para solicitar acesso.');return}
+  try{
+    await accessRequest('signup',{email,password,requested_role:PORTAL_ROLE||roleFromPath()||'responsavel'});
+    toast('Cadastro recebido. Aguarde aprovação do suporte ou gestor.',6000);
+  }catch(err){toast(`Falha ao solicitar acesso: ${err.message}`,6000)}
+}
+async function finishOAuthCallback(){
   const hash=window.location.hash?.slice(1);
   if(!hash) return false;
   const params=new URLSearchParams(hash);
@@ -539,8 +558,24 @@ function finishOAuthCallback(){
   if(!token) return false;
   const payload=jwtPayload(token);
   const email=String(payload.email||'').toLowerCase();
-  const role=oauthRoleForEmail(email);
-  if(!role||!roleAllowed(role)){
+  let role=oauthRoleForEmail(email);
+  if(!role){
+    history.replaceState(null,document.title,window.location.pathname);
+    try{
+      const result=await accessRequest('request',{requested_role:PORTAL_ROLE||roleFromPath()||'responsavel'},token);
+      if(result.status==='approved'&&result.user?.role){role=result.user.role}
+      else{
+        localStorage.removeItem('i9_access_token');localStorage.removeItem('i9_refresh_token');localStorage.removeItem('i9_user');
+        toast('Cadastro recebido. Aguarde aprovação do suporte ou gestor.',6000);
+        return true;
+      }
+    }catch(err){
+      localStorage.removeItem('i9_access_token');localStorage.removeItem('i9_refresh_token');localStorage.removeItem('i9_user');
+      toast(`Falha ao solicitar acesso: ${err.message}`,6000);
+      return true;
+    }
+  }
+  if(!roleAllowed(role)){
     localStorage.removeItem('i9_access_token');
     localStorage.removeItem('i9_refresh_token');
     localStorage.removeItem('i9_user');
@@ -1623,22 +1658,25 @@ function changeRole(r, keepLogged=false){
 }
 
 // INIT
-const savedUser = JSON.parse(localStorage.getItem('i9_user') || '{}');
-if(finishOAuthCallback()){
-  // OAuth callback handled.
-} else if(localStorage.getItem('i9_access_token') && savedUser?.role && roleAllowed(savedUser.role)){
-  S.token = localStorage.getItem('i9_access_token');
-  S.refreshToken = localStorage.getItem('i9_refresh_token');
-  S.user = savedUser;
-  changeRole(savedUser.role,true);
-} else {
-  changeRole(PORTAL_ROLE || 'colaborador');
+async function initApp(){
+  const savedUser = JSON.parse(localStorage.getItem('i9_user') || '{}');
+  if(await finishOAuthCallback()){
+    // OAuth callback handled.
+  } else if(localStorage.getItem('i9_access_token') && savedUser?.role && roleAllowed(savedUser.role)){
+    S.token = localStorage.getItem('i9_access_token');
+    S.refreshToken = localStorage.getItem('i9_refresh_token');
+    S.user = savedUser;
+    changeRole(savedUser.role,true);
+  } else {
+    changeRole(PORTAL_ROLE || 'colaborador');
+  }
+  document.getElementById('rsel').value=S.role;
+  if(S.logado){document.getElementById('lscr').classList.add('hidden');setAppShellVisible(true)}
+  else{setAppShellVisible(false)}
+  setPortalSwitcherVisible();
+  render();
 }
-document.getElementById('rsel').value=S.role;
-if(S.logado){document.getElementById('lscr').classList.add('hidden');setAppShellVisible(true)}
-else{setAppShellVisible(false)}
-setPortalSwitcherVisible();
-render();
+initApp();
 </script>
 </body>
 </html>

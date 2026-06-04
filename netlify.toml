@@ -2,6 +2,9 @@
   command = "npm run build:netlify"
   publish = "public"
 
+[functions]
+  directory = "netlify/functions"
+
 [build.environment]
   NODE_VERSION = "20"
 

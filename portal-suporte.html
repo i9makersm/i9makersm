@@ -176,6 +176,7 @@ body{display:flex;align-items:center;justify-content:center}
   <button class="l-btn l-btn-bio" onclick="startGoogleOAuth()">
     <i class="ti ti-brand-google" style="margin-right:6px"></i>Entrar com Google
   </button>
+  <button class="l-btn l-btn-bio" onclick="requestPasswordAccess()">Solicitar primeiro acesso</button>
   <button class="l-btn l-btn-bio" onclick="doBio()">
     <i class="ti ti-fingerprint" style="margin-right:6px"></i>Biometria
   </button>
@@ -300,6 +301,7 @@ const NAV_ITEMS=[
 ];
 let page='escolas';
 const hist=[];
+let accessRequests=[];
 
 function toast(m,ms=3000){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),ms)}
 function cm(id,e){if(e.target.id===id)document.getElementById(id).classList.remove('open')}
@@ -310,14 +312,18 @@ function goBack(){if(hist.length){page=hist.pop();renderNav();renderScr()}}
 function loadLogo(inp){if(inp.files&&inp.files[0]){const r=new FileReader();r.onload=e=>{const p=document.getElementById('logoprev');p.innerHTML=`<img src="${e.target.result}" alt="Logo">`;toast('Logo carregada! Clique Salvar.')};r.readAsDataURL(inp.files[0])}}
 function genConv(){const n=document.getElementById('cnome').value.trim(),e=document.getElementById('cemail').value.trim();if(!n||!e.includes('@')){toast('Preencha nome e e-mail');return}const tok=[...Array(32)].map(()=>Math.floor(Math.random()*16).toString(16)).join('');document.getElementById('clink').textContent=`https://app.i9smart.com.br/instalar/gestor?token=${tok}`;document.getElementById('cresult').style.display='block';toast('✅ Convite de gestor gerado!')}
 
+const ACCESS_API='/.netlify/functions/access-requests';
 const SUPABASE_AUTH_URL='https://tofszwegngqzlcfuzjfg.supabase.co/auth/v1/authorize';
 const PORTAL_ROLE='suporte';
 const AUTHORIZED_OAUTH_USERS={'suporte@erp.com':'suporte','clean01analyticsystem@gmail.com':'suporte','gestor@arteemmovimento.com':'gestor','anapaula@arteemmovimento.com':'professor_colab','carla@email.com':'responsavel','sofia@email.com':'aluno'};
 function oauthRedirectTo(){const path=window.location.pathname||'/';const origin=window.location.origin&&window.location.origin.startsWith('https://i9smart.netlify.app')?window.location.origin:'https://i9smart.netlify.app';return origin+path}
 function startGoogleOAuth(){const redirectTo=oauthRedirectTo();window.location.href=`${SUPABASE_AUTH_URL}?provider=google&redirect_to=${encodeURIComponent(redirectTo)}`}
 function jwtPayload(token){try{const p=token.split('.')[1].replace(/-/g,'+').replace(/_/g,'/');return JSON.parse(decodeURIComponent(escape(atob(p))))}catch{return {}}}
-function handleOAuthCallback(){const hash=window.location.hash?.slice(1);if(!hash)return;const params=new URLSearchParams(hash);const token=params.get('access_token');if(!token)return;const payload=jwtPayload(token),email=String(payload.email||'').toLowerCase(),role=AUTHORIZED_OAUTH_USERS[email];history.replaceState(null,document.title,window.location.pathname);if(role!==PORTAL_ROLE){localStorage.removeItem('i9_access_token');localStorage.removeItem('i9_refresh_token');localStorage.removeItem('i9_user');toast('Acesso Google não autorizado para este portal.',5000);return}localStorage.setItem('i9_access_token',token);localStorage.setItem('i9_refresh_token',params.get('refresh_token')||'');localStorage.setItem('i9_user',JSON.stringify({id:payload.sub,email,role:PORTAL_ROLE,name:payload.user_metadata?.full_name||email}));doLogin();toast('✅ Login Google realizado!')}
-function doLogin(){document.getElementById('lscr').classList.add('hidden');document.getElementById('hdr').style.display='block';document.getElementById('scr').style.display='block';document.getElementById('bnav').style.display='flex';renderNav();renderScr();toast('✅ Bem-vindo, Suporte!')}
+async function accessRequest(action,payload={},token){const res=await fetch(ACCESS_API,{method:'POST',headers:{'Content-Type':'application/json',...(token?{Authorization:`Bearer ${token}`}:{})},body:JSON.stringify({action,...payload})});const data=await res.json().catch(()=>({}));if(!res.ok)throw new Error(data.error||`Erro HTTP ${res.status}`);return data}
+async function requestPasswordAccess(){const email=document.getElementById('lemail')?.value.trim(),password=document.getElementById('lsenha')?.value;if(!email||!password){toast('Preencha e-mail e senha para solicitar acesso.');return}try{await accessRequest('signup',{email,password,requested_role:PORTAL_ROLE});toast('Cadastro recebido. Aguarde aprovação do suporte.',6000)}catch(err){toast(`Falha ao solicitar acesso: ${err.message}`,6000)}}
+function openSupport(){document.getElementById('lscr').classList.add('hidden');document.getElementById('hdr').style.display='block';document.getElementById('scr').style.display='block';document.getElementById('bnav').style.display='flex';renderNav();renderScr()}
+async function handleOAuthCallback(){const hash=window.location.hash?.slice(1);if(!hash)return;const params=new URLSearchParams(hash);const token=params.get('access_token');if(!token)return;const payload=jwtPayload(token),email=String(payload.email||'').toLowerCase(),role=AUTHORIZED_OAUTH_USERS[email];history.replaceState(null,document.title,window.location.pathname);if(role!==PORTAL_ROLE){try{const result=await accessRequest('request',{requested_role:PORTAL_ROLE},token);toast(result.status==='pending'?'Cadastro recebido. Aguarde aprovação do suporte.':'Acesso liberado. Entre novamente.',6000)}catch(err){toast(`Falha ao solicitar acesso: ${err.message}`,6000)}localStorage.removeItem('i9_access_token');localStorage.removeItem('i9_refresh_token');localStorage.removeItem('i9_user');return}localStorage.setItem('i9_access_token',token);localStorage.setItem('i9_refresh_token',params.get('refresh_token')||'');localStorage.setItem('i9_user',JSON.stringify({id:payload.sub,email,role:PORTAL_ROLE,name:payload.user_metadata?.full_name||email}));openSupport();toast('✅ Login Google realizado!')}
+async function doLogin(){const email=document.getElementById('lemail')?.value.trim(),password=document.getElementById('lsenha')?.value;if(email&&password){try{const data=await accessRequest('password-login',{email,password});localStorage.setItem('i9_access_token',data.session.access_token);localStorage.setItem('i9_refresh_token',data.session.refresh_token||'');localStorage.setItem('i9_user',JSON.stringify(data.user));openSupport();toast('✅ Bem-vindo, Suporte!');return}catch(err){toast(`Falha no login: ${err.message}`,5000);return}}openSupport();toast('✅ Bem-vindo, Suporte!')}
 function doBio(){document.getElementById('lscr').classList.add('hidden');document.getElementById('hdr').style.display='block';document.getElementById('scr').style.display='block';document.getElementById('bnav').style.display='flex';renderNav();renderScr();toast('🔐 Biometria reconhecida!')}
 handleOAuthCallback();
 
@@ -330,6 +336,8 @@ function renderScr(){
   const fn=views[page];
   document.getElementById('scr').innerHTML=fn?fn():'';
 }
+async function loadAccessRequests(){try{const token=localStorage.getItem('i9_access_token');const data=await accessRequest('list',{},token);accessRequests=data.data||[];renderScr();toast('Solicitações atualizadas.')}catch(err){toast(`Falha ao carregar solicitações: ${err.message}`,5000)}}
+async function approveAccess(id,role){try{const token=localStorage.getItem('i9_access_token');await accessRequest('approve',{id,role},token);accessRequests=accessRequests.filter(r=>r.id!==id);renderScr();toast('✅ Acesso aprovado!')}catch(err){toast(`Falha ao aprovar: ${err.message}`,5000)}}
 
 function vEscolas(){return`
   <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
@@ -365,6 +373,21 @@ function vConvites(){return`
   <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
     <div><p style="font-size:16px;font-weight:700;color:var(--tx)">Convites enviados</p><p style="font-size:11px;color:var(--tx3);margin-top:2px">Links únicos com instalador do app</p></div>
     <button class="btn b-i9" style="font-size:12px" onclick="op('m-conv')">+ Novo</button>
+  </div>
+  <div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+      <div><p class="ct" style="margin-bottom:2px">🛂 Primeiros acessos pendentes</p><p style="font-size:10px;color:var(--tx3)">Usuários que se cadastraram com Google e aguardam aprovação</p></div>
+      <button class="btn" style="font-size:11px" onclick="loadAccessRequests()">Atualizar</button>
+    </div>
+    ${accessRequests.length?accessRequests.map(r=>`
+      <div class="row">
+        <div class="avr" style="background:var(--blue-l);color:var(--blue)">${(r.name||r.email||'?').slice(0,2).toUpperCase()}</div>
+        <div style="flex:1;min-width:0">
+          <p style="font-size:12px;font-weight:700;color:var(--tx);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${r.name||r.email}</p>
+          <p style="font-size:10px;color:var(--tx3);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${r.email} · solicitado: ${r.requested_role}</p>
+        </div>
+        <button class="btn b-i9" style="font-size:10px;padding:6px 8px" onclick="approveAccess('${r.id}','${r.requested_role}')">Aprovar</button>
+      </div>`).join(''):`<p style="font-size:11px;color:var(--tx3);padding:8px 0">Nenhuma solicitação carregada. Clique em Atualizar.</p>`}
   </div>
   <div class="card" style="padding:0 16px">
     ${[{n:'Maria Fernanda',escola:'Studio Arte',role:'Gestor',st:'aceito',dt:'22/05'},
