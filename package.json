@@ -17,6 +17,7 @@
     "db:seed": "node scripts/provision-test-env.js",
     "db:bootstrap": "npm run db:push && npm run db:seed",
     "setup:access": "node scripts/setup-access-flow.js",
+    "ensure:admin": "node scripts/ensure-admin-access.js",
     "setup": "node scripts/setup.js",
     "start": "node dist/api-backend.js"
   },
