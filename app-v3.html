@@ -518,7 +518,8 @@ const API_V2_BASE = localStorage.getItem('i9_api_v2_base') || 'http://127.0.0.1:
 const SUPABASE_AUTH_URL='https://tofszwegngqzlcfuzjfg.supabase.co/auth/v1/authorize';
 const PORTAL_ROLE = window.I9_PORTAL_ROLE || null;
 function roleAllowed(role){return !PORTAL_ROLE || role===PORTAL_ROLE}
-function startGoogleOAuth(){const redirectTo=window.location.origin+window.location.pathname;window.location.href=`${SUPABASE_AUTH_URL}?provider=google&redirect_to=${encodeURIComponent(redirectTo)}`}
+function oauthRedirectTo(){const path=window.location.pathname||'/';const origin=window.location.origin&&window.location.origin.startsWith('https://i9smart.netlify.app')?window.location.origin:'https://i9smart.netlify.app';return origin+path}
+function startGoogleOAuth(){const redirectTo=oauthRedirectTo();window.location.href=`${SUPABASE_AUTH_URL}?provider=google&redirect_to=${encodeURIComponent(redirectTo)}`}
 function fc2(f){return f>=80?'#16a34a':f>=60?'#d97706':'#ef4444'}
 function fb2(f){return f>=80?'#f0fdf4':f>=60?'#fffbeb':'#fef2f2'}
 function nt(){return new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})}

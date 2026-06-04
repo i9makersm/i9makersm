@@ -311,7 +311,8 @@ function loadLogo(inp){if(inp.files&&inp.files[0]){const r=new FileReader();r.on
 function genConv(){const n=document.getElementById('cnome').value.trim(),e=document.getElementById('cemail').value.trim();if(!n||!e.includes('@')){toast('Preencha nome e e-mail');return}const tok=[...Array(32)].map(()=>Math.floor(Math.random()*16).toString(16)).join('');document.getElementById('clink').textContent=`https://app.i9smart.com.br/instalar/gestor?token=${tok}`;document.getElementById('cresult').style.display='block';toast('✅ Convite de gestor gerado!')}
 
 const SUPABASE_AUTH_URL='https://tofszwegngqzlcfuzjfg.supabase.co/auth/v1/authorize';
-function startGoogleOAuth(){const redirectTo=window.location.origin+window.location.pathname;window.location.href=`${SUPABASE_AUTH_URL}?provider=google&redirect_to=${encodeURIComponent(redirectTo)}`}
+function oauthRedirectTo(){const path=window.location.pathname||'/';const origin=window.location.origin&&window.location.origin.startsWith('https://i9smart.netlify.app')?window.location.origin:'https://i9smart.netlify.app';return origin+path}
+function startGoogleOAuth(){const redirectTo=oauthRedirectTo();window.location.href=`${SUPABASE_AUTH_URL}?provider=google&redirect_to=${encodeURIComponent(redirectTo)}`}
 function doLogin(){document.getElementById('lscr').classList.add('hidden');document.getElementById('hdr').style.display='block';document.getElementById('scr').style.display='block';document.getElementById('bnav').style.display='flex';renderNav();renderScr();toast('✅ Bem-vindo, Suporte!')}
 function doBio(){document.getElementById('lscr').classList.add('hidden');document.getElementById('hdr').style.display='block';document.getElementById('scr').style.display='block';document.getElementById('bnav').style.display='flex';renderNav();renderScr();toast('🔐 Biometria reconhecida!')}
 
