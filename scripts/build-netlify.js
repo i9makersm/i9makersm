@@ -5,11 +5,12 @@ const root = path.resolve(__dirname, "..");
 const outDir = path.join(root, "public");
 
 const files = [
-  ["app-v3.html", "index.html"],
+  ["portal-suporte.html", "index.html"],
   ["app-v3.html", "app-v3.html"],
   ["app-integrado.html", "app-integrado.html"],
   ["backend-test.html", "backend-test.html"],
   ["portal-aluno.html", "portal-aluno.html"],
+  ["app-v3.html", "portal-colaborador.html"],
   ["portal-gestor.html", "portal-gestor.html"],
   ["portal-professor.html", "portal-professor.html"],
   ["portal-responsavel.html", "portal-responsavel.html"],
@@ -30,6 +31,14 @@ for (const [source, target] of files) {
   const targetPath = path.join(outDir, target);
   if (source.endsWith(".html")) {
     let html = fs.readFileSync(sourcePath, "utf8");
+    if (target === "portal-colaborador.html") {
+      html = html
+        .replace("<title>i9 Smart ERP v5.0.8</title>", "<title>i9 Smart — Portal Colaborador</title>")
+        .replace(
+          "<script>\n// ════ ESTADO",
+          "<script>window.I9_PORTAL_ROLE='colaborador';</script>\n<script>\n// ════ ESTADO"
+        );
+    }
     if (apiBase) {
       html = html.replace(
         "localStorage.getItem('i9_api_base') || 'http://127.0.0.1:4000'",
@@ -64,6 +73,7 @@ fs.writeFileSync(
     "/app /index.html 200",
     "/gestor /portal-gestor.html 200",
     "/professor /portal-professor.html 200",
+    "/colaborador /portal-colaborador.html 200",
     "/responsavel /portal-responsavel.html 200",
     "/aluno /portal-aluno.html 200",
     "/suporte /portal-suporte.html 200",

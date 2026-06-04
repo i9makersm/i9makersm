@@ -26,6 +26,11 @@
   status = 200
 
 [[redirects]]
+  from = "/colaborador"
+  to = "/portal-colaborador.html"
+  status = 200
+
+[[redirects]]
   from = "/responsavel"
   to = "/portal-responsavel.html"
   status = 200

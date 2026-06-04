@@ -101,7 +101,8 @@ body{display:flex;align-items:center;justify-content:center}
 .logo-up{width:68px;height:68px;border-radius:50%;border:2px dashed var(--bdr);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;transition:all .2s;background:#f9fafb;overflow:hidden;flex-shrink:0}
 .logo-up:hover{border-color:var(--purple);background:var(--purple-l)}
 .logo-up img{width:100%;height:100%;object-fit:cover;border-radius:50%}
-.rs{position:fixed;top:10px;left:10px;z-index:500;background:rgba(255,255,255,.95);border:.5px solid var(--bdr);border-radius:10px;padding:5px 8px;box-shadow:0 4px 16px rgba(0,0,0,.15)}
+.rs{position:fixed;top:10px;left:10px;z-index:500;background:rgba(255,255,255,.95);border:.5px solid var(--bdr);border-radius:10px;padding:5px 8px;box-shadow:0 4px 16px rgba(0,0,0,.15);display:none}
+.rs.auth{display:block}
 .rs select{border:none;background:transparent;font-size:11px;font-weight:600;color:var(--purple);cursor:pointer;outline:none;font-family:inherit}
 .toast{position:absolute;top:12px;left:50%;transform:translateX(-50%);background:#111827;color:#fff;padding:8px 15px;border-radius:10px;font-size:12px;font-weight:500;z-index:300;white-space:nowrap;opacity:0;transition:opacity .2s;pointer-events:none;box-shadow:0 4px 20px rgba(0,0,0,.25)}
 .toast.show{opacity:1}
@@ -144,7 +145,7 @@ body{display:flex;align-items:center;justify-content:center}
 <body>
 
 <!-- Role switcher -->
-<div class="rs"><select id="rsel" onchange="changeRole(this.value)">
+<div class="rs" id="role-switcher"><select id="rsel" onchange="changeRole(this.value)">
   <option value="suporte">👑 Suporte (i9 Smart)</option>
   <option value="gestor">👔 Gestor</option>
   <option value="professor_colab">📚 Prof+Colab</option>
@@ -446,10 +447,10 @@ body{display:flex;align-items:center;justify-content:center}
 </div></div>
 
 <!-- APP -->
-<div class="hdr" id="hdr"></div>
+<div class="hdr" id="hdr" style="display:none"></div>
 <div id="fc" style="display:none"></div>
-<div class="scr" id="scr"></div>
-<nav class="bnav" id="bnav"></nav>
+<div class="scr" id="scr" style="display:none"></div>
+<nav class="bnav" id="bnav" style="display:none"></nav>
 </div>
 
 <script>
@@ -511,6 +512,8 @@ const NAV={
 // ════ HELPERS ════════════════════════════════════════════════════════════════
 const API_BASE = localStorage.getItem('i9_api_base') || 'http://127.0.0.1:4000';
 const API_V2_BASE = localStorage.getItem('i9_api_v2_base') || 'http://127.0.0.1:4001';
+const PORTAL_ROLE = window.I9_PORTAL_ROLE || null;
+function roleAllowed(role){return !PORTAL_ROLE || role===PORTAL_ROLE}
 function fc2(f){return f>=80?'#16a34a':f>=60?'#d97706':'#ef4444'}
 function fb2(f){return f>=80?'#f0fdf4':f>=60?'#fffbeb':'#fef2f2'}
 function nt(){return new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})}
@@ -525,6 +528,22 @@ function setApiOnline(online){
     badge.style.background = online ? 'rgba(34,197,94,.18)' : 'rgba(245,158,11,.18)';
     badge.style.color = online ? '#16a34a' : '#d97706';
   }
+}
+function setAppShellVisible(visible){
+  const hdr=document.getElementById('hdr');
+  const scr=document.getElementById('scr');
+  const nav=document.getElementById('bnav');
+  if(hdr) hdr.style.display=visible?'block':'none';
+  if(scr) scr.style.display=visible?'block':'none';
+  if(nav) nav.style.display=visible?'flex':'none';
+  if(!visible){
+    const fc=document.getElementById('fc');
+    if(fc) fc.style.display='none';
+  }
+}
+function setPortalSwitcherVisible(){
+  const sw=document.getElementById('role-switcher');
+  if(sw) sw.classList.toggle('auth', Boolean(!PORTAL_ROLE && S.logado && S.role==='suporte'));
 }
 async function api(path, { method='GET', body, auth=true, v2=false, headers={} } = {}){
   const token = S.token || localStorage.getItem('i9_access_token');
@@ -563,6 +582,8 @@ function setSession(session, user){
   localStorage.setItem('i9_refresh_token', S.refreshToken || '');
   localStorage.setItem('i9_user', JSON.stringify(S.user || {}));
   document.getElementById('lscr').classList.add('hidden');
+  setAppShellVisible(true);
+  setPortalSwitcherVisible();
   loadRemoteData();
 }
 function clearSession(){
@@ -574,6 +595,8 @@ function clearSession(){
   localStorage.removeItem('i9_refresh_token');
   localStorage.removeItem('i9_user');
   document.getElementById('lscr').classList.remove('hidden');
+  setAppShellVisible(false);
+  setPortalSwitcherVisible();
 }
 async function loadRemoteData(){
   if(!S.logado || !S.token) return;
@@ -1490,6 +1513,11 @@ async function doLogin(){
   if(!e||!s){toast('Preencha e-mail e senha');return}
   try{
     const data = await api('/auth/login',{method:'POST',auth:false,body:{email:e,password:s}});
+    if(!roleAllowed(data.user.role)){
+      toast('Este login não pertence a este portal.',5000);
+      clearSession();
+      return;
+    }
     setSession(data,{...data.user});
     changeRole(data.user.role,true);
     toast('✅ Login realizado com sucesso!');
@@ -1502,12 +1530,19 @@ function doBio(){
   const storedUser = JSON.parse(localStorage.getItem('i9_user') || '{}');
   const storedToken = localStorage.getItem('i9_access_token');
   if(storedToken){
+    if(storedUser.role && !roleAllowed(storedUser.role)){
+      toast('Sessão salva pertence a outro portal.',5000);
+      clearSession();
+      return;
+    }
     S.token = storedToken;
     S.refreshToken = localStorage.getItem('i9_refresh_token');
     S.user = storedUser;
     S.logado = true;
     document.getElementById('lscr').classList.add('hidden');
+    setAppShellVisible(true);
     if(storedUser.role){ changeRole(storedUser.role,true); }
+    setPortalSwitcherVisible();
     toast('🔐 Biometria reconhecida!');
     render();
     return;
@@ -1531,25 +1566,30 @@ function changeRole(r, keepLogged=false){
   if(!keepLogged){
     document.getElementById('lscr').classList.remove('hidden');
     S.logado=false;
+    setAppShellVisible(false);
   } else {
     document.getElementById('lscr').classList.add('hidden');
     S.logado=true;
+    setAppShellVisible(true);
     if (S.token) loadRemoteData();
   }
+  setPortalSwitcherVisible();
 }
 
 // INIT
 const savedUser = JSON.parse(localStorage.getItem('i9_user') || '{}');
-if(localStorage.getItem('i9_access_token') && savedUser?.role){
+if(localStorage.getItem('i9_access_token') && savedUser?.role && roleAllowed(savedUser.role)){
   S.token = localStorage.getItem('i9_access_token');
   S.refreshToken = localStorage.getItem('i9_refresh_token');
   S.user = savedUser;
   changeRole(savedUser.role,true);
 } else {
-  changeRole('colaborador');
+  changeRole(PORTAL_ROLE || 'colaborador');
 }
 document.getElementById('rsel').value=S.role;
-if(S.logado){document.getElementById('lscr').classList.add('hidden')}
+if(S.logado){document.getElementById('lscr').classList.add('hidden');setAppShellVisible(true)}
+else{setAppShellVisible(false)}
+setPortalSwitcherVisible();
 render();
 </script>
 </body>
