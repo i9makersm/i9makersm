@@ -11,6 +11,7 @@
     "dev:api2": "node scripts/dev-api2.js",
     "dev": "concurrently \"npm run dev:api\" \"npm run dev:api2\"",
     "build": "tsc -p tsconfig.json",
+    "build:netlify": "npm run build && node scripts/build-netlify.js",
     "db:generate": "prisma generate",
     "db:push": "prisma db push",
     "db:seed": "node scripts/provision-test-env.js",

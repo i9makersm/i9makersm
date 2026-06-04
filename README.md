@@ -128,6 +128,12 @@ Cada convite gera um link com instalador do app específico:
 
 ## 🚀 Deploy rápido
 
+Ambientes configurados para este projeto:
+
+- GitHub: https://github.com/i9makersm/i9-smart-erp.git
+- Netlify: https://i9smart.netlify.app/
+- Supabase: https://tofszwegngqzlcfuzjfg.supabase.co
+
 ### 1. Banco de dados (Supabase)
 ```bash
 npm run db:bootstrap
@@ -147,8 +153,12 @@ npm run setup
 ```bash
 # Abrir app-v3.html diretamente no browser para testes
 # Abrir backend-test.html para validar a API sem abrir os portais
-# Para produção: hospedar no Vercel ou Netlify
+# Para produção no Netlify:
+npm run build:netlify
 ```
+
+O Netlify publica a pasta `public/`, gerada automaticamente pelo build.
+Defina `I9_API_BASE` e `I9_API_V2_BASE` no Netlify quando a API estiver em uma URL publica.
 
 ---
 

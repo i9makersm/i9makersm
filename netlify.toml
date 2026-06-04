@@ -1,0 +1,41 @@
+[build]
+  command = "npm run build:netlify"
+  publish = "public"
+
+[build.environment]
+  NODE_VERSION = "20"
+
+[[redirects]]
+  from = "/"
+  to = "/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/app"
+  to = "/index.html"
+  status = 200
+
+[[redirects]]
+  from = "/gestor"
+  to = "/portal-gestor.html"
+  status = 200
+
+[[redirects]]
+  from = "/professor"
+  to = "/portal-professor.html"
+  status = 200
+
+[[redirects]]
+  from = "/responsavel"
+  to = "/portal-responsavel.html"
+  status = 200
+
+[[redirects]]
+  from = "/aluno"
+  to = "/portal-aluno.html"
+  status = 200
+
+[[redirects]]
+  from = "/suporte"
+  to = "/portal-suporte.html"
+  status = 200

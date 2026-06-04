@@ -2,7 +2,7 @@
 
 ## ─── PASSO 1: Supabase (banco de dados) ─────────────────────────────────────
 
-1. Acesse https://supabase.com e crie um projeto
+1. Use o projeto Supabase: https://tofszwegngqzlcfuzjfg.supabase.co
 2. Copie: **Project URL** e **service_role key**
 3. Preencha o `.env`
 4. Rode:
@@ -23,13 +23,17 @@ cp .env.example .env
 
 Edite `.env`:
 ```env
-SUPABASE_URL=https://SEU-PROJETO.supabase.co
+SUPABASE_URL=https://tofszwegngqzlcfuzjfg.supabase.co
 SUPABASE_ANON_KEY=eyJ...
 SUPABASE_SERVICE_ROLE_KEY=eyJ...
 SERVICE_ROLE_KEY=eyJ... # alias opcional para compatibilidade
-DATABASE_URL=postgresql://postgres:SENHA@db.SEU-PROJETO.supabase.co:5432/postgres
+DATABASE_URL=postgresql://postgres:SENHA@db.tofszwegngqzlcfuzjfg.supabase.co:5432/postgres
 PORT=4000
 NODE_ENV=production
+
+# Usado apenas no build do Netlify, quando a API estiver hospedada publicamente.
+I9_API_BASE=https://sua-api.example.com
+I9_API_V2_BASE=https://sua-api-v2.example.com
 ```
 
 ---
@@ -128,11 +132,18 @@ curl -X POST http://localhost:4001/cron/verificar-inadimplencia \
 # Testar localmente — abrir no browser
 open app-v3.html
 
-# Produção — Vercel
-npx vercel --prod
+# Produção — Netlify conectado ao GitHub
+git remote add origin https://github.com/i9makersm/i9-smart-erp.git
+git push -u origin main
 
-# Ou arrastar app-v3.html para netlify.com/drop
+# No Netlify, usar:
+# Site: https://i9smart.netlify.app/
+# Build command: npm run build:netlify
+# Publish directory: public
 ```
+
+O arquivo `netlify.toml` ja define essas configuracoes. Para o frontend acessar uma API
+publica, defina `I9_API_BASE` e `I9_API_V2_BASE` nas variaveis de ambiente do Netlify.
 
 **Seletor de portais (demo):** canto superior esquerdo da tela.
 Em produção, cada perfil recebe seu próprio link de convite com o app instalador.
@@ -149,7 +160,7 @@ Em produção, cada perfil recebe seu próprio link de convite com o app instala
 
 ```bash
 # Criar senha para o gestor de teste
-curl -X PUT "https://SEU-PROJETO.supabase.co/auth/v1/admin/users/USER_UUID" \
+curl -X PUT "https://tofszwegngqzlcfuzjfg.supabase.co/auth/v1/admin/users/USER_UUID" \
   -H "apikey: $SUPABASE_SERVICE_ROLE_KEY" \
   -H "Authorization: Bearer $SUPABASE_SERVICE_ROLE_KEY" \
   -H "Content-Type: application/json" \
