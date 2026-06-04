@@ -249,10 +249,14 @@ function gp(p){hist.push(page);page=p;renderNav();renderScr();renderFC();updateB
 function goBack(){if(hist.length){page=hist.pop();renderNav();renderScr();renderFC();updateBack()}}
 function updateBack(){const bw=document.getElementById('bwrap');const root=['turmas','chamada','planos','ponto','perfil'];bw.innerHTML=!root.includes(page)&&hist.length?'<button class="back-btn" onclick="goBack()"><i class="ti ti-arrow-left" style="font-size:16px"></i> Voltar</button>':'';}
 const SUPABASE_AUTH_URL='https://tofszwegngqzlcfuzjfg.supabase.co/auth/v1/authorize';
+const PORTAL_ROLE='professor_colab';
 function oauthRedirectTo(){const path=window.location.pathname||'/';const origin=window.location.origin&&window.location.origin.startsWith('https://i9smart.netlify.app')?window.location.origin:'https://i9smart.netlify.app';return origin+path}
 function startGoogleOAuth(){const redirectTo=oauthRedirectTo();window.location.href=`${SUPABASE_AUTH_URL}?provider=google&redirect_to=${encodeURIComponent(redirectTo)}`}
+function jwtPayload(token){try{const p=token.split('.')[1].replace(/-/g,'+').replace(/_/g,'/');return JSON.parse(decodeURIComponent(escape(atob(p))))}catch{return {}}}
+function handleOAuthCallback(){const hash=window.location.hash?.slice(1);if(!hash)return;const params=new URLSearchParams(hash);const token=params.get('access_token');if(!token)return;const payload=jwtPayload(token);localStorage.setItem('i9_access_token',token);localStorage.setItem('i9_refresh_token',params.get('refresh_token')||'');localStorage.setItem('i9_user',JSON.stringify({id:payload.sub,email:payload.email,role:PORTAL_ROLE,name:payload.user_metadata?.full_name||payload.email}));history.replaceState(null,document.title,window.location.pathname);doLogin();toast('✅ Login Google realizado!')}
 function doLogin(){document.getElementById('lscr').classList.add('hidden');['hdr','scr','bnav'].forEach(id=>{const el=document.getElementById(id);el.style.display=id==='bnav'?'flex':'block'});renderNav();renderScr();renderFC();toast('✅ Bem-vinda, Ana Paula!')}
 function doBio(){doLogin();toast('🔐 Biometria reconhecida!')}
+handleOAuthCallback();
 function renderNav(){document.getElementById('bnav').innerHTML=NAV.map(it=>`<button class="nb${it.id===page?' on':''}" onclick="gp('${it.id}')"><i class="ti ${it.i}"></i><span>${it.l}</span></button>`).join('')}
 
 let clkI=null;

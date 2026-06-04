@@ -520,6 +520,28 @@ const PORTAL_ROLE = window.I9_PORTAL_ROLE || null;
 function roleAllowed(role){return !PORTAL_ROLE || role===PORTAL_ROLE}
 function oauthRedirectTo(){const path=window.location.pathname||'/';const origin=window.location.origin&&window.location.origin.startsWith('https://i9smart.netlify.app')?window.location.origin:'https://i9smart.netlify.app';return origin+path}
 function startGoogleOAuth(){const redirectTo=oauthRedirectTo();window.location.href=`${SUPABASE_AUTH_URL}?provider=google&redirect_to=${encodeURIComponent(redirectTo)}`}
+function jwtPayload(token){try{const p=token.split('.')[1].replace(/-/g,'+').replace(/_/g,'/');return JSON.parse(decodeURIComponent(escape(atob(p))))}catch{return {}}}
+function roleFromPath(){const p=window.location.pathname.replace(/^\/+/,'').split('/')[0];return ({suporte:'suporte',gestor:'gestor',professor:'professor_colab',colaborador:'colaborador',responsavel:'responsavel',aluno:'aluno'})[p]||null}
+function finishOAuthCallback(){
+  const hash=window.location.hash?.slice(1);
+  if(!hash) return false;
+  const params=new URLSearchParams(hash);
+  const token=params.get('access_token');
+  if(!token) return false;
+  const payload=jwtPayload(token);
+  const role=PORTAL_ROLE||roleFromPath()||'suporte';
+  localStorage.setItem('i9_access_token',token);
+  localStorage.setItem('i9_refresh_token',params.get('refresh_token')||'');
+  localStorage.setItem('i9_user',JSON.stringify({id:payload.sub,email:payload.email,role,name:payload.user_metadata?.full_name||payload.email}));
+  S.token=token;
+  S.refreshToken=params.get('refresh_token')||null;
+  S.user={id:payload.sub,email:payload.email,role};
+  history.replaceState(null,document.title,window.location.pathname);
+  changeRole(role,true);
+  toast('✅ Login Google realizado!');
+  render();
+  return true;
+}
 function fc2(f){return f>=80?'#16a34a':f>=60?'#d97706':'#ef4444'}
 function fb2(f){return f>=80?'#f0fdf4':f>=60?'#fffbeb':'#fef2f2'}
 function nt(){return new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})}
@@ -1584,7 +1606,9 @@ function changeRole(r, keepLogged=false){
 
 // INIT
 const savedUser = JSON.parse(localStorage.getItem('i9_user') || '{}');
-if(localStorage.getItem('i9_access_token') && savedUser?.role && roleAllowed(savedUser.role)){
+if(finishOAuthCallback()){
+  // OAuth callback handled.
+} else if(localStorage.getItem('i9_access_token') && savedUser?.role && roleAllowed(savedUser.role)){
   S.token = localStorage.getItem('i9_access_token');
   S.refreshToken = localStorage.getItem('i9_refresh_token');
   S.user = savedUser;
