@@ -127,7 +127,7 @@ body{display:flex;align-items:center;justify-content:center}
   </div>
   <button class="l-btn l-btn-main" onclick="doLogin()">Entrar no sistema</button>
   <button class="l-btn l-btn-bio" onclick="startGoogleOAuth()"><i class="ti ti-brand-google" style="margin-right:6px"></i>Entrar com Google</button>
-  <button class="l-btn l-btn-bio" onclick="requestPasswordAccess()">Solicitar primeiro acesso</button>
+  <button class="l-btn l-btn-bio" onclick="requestPasswordAccess()">Inscrever-se / Solicitar acesso</button>
   <button class="l-btn l-btn-bio" onclick="doBio()"><i class="ti ti-fingerprint" style="margin-right:6px"></i>Entrar com biometria</button>
   <p style="color:rgba(255,255,255,.25);font-size:10px;margin-top:22px;text-align:center">i9 Smart ERP · Versão 5.0.8</p>
 </div>
@@ -279,6 +279,7 @@ const NAV_ITEMS=[
 ];
 let page='dashboard';
 const hist=[];
+let accessRequests=[], adminUsers=[];
 const planos=[
   {titulo:'Variações de Barra — Básico',turma:'Ballet Infantil B',ordem:1,dur:60,status:'publicado',mats:['PDF','Vídeo']},
   {titulo:'Pliés e Relevés',turma:'Ballet Infantil B',ordem:2,dur:60,status:'publicado',mats:['PDF']},
@@ -315,9 +316,17 @@ function jwtPayload(token){try{const p=token.split('.')[1].replace(/-/g,'+').rep
 async function accessRequest(action,payload={},token){const res=await fetch(ACCESS_API,{method:'POST',headers:{'Content-Type':'application/json',...(token?{Authorization:`Bearer ${token}`}:{})},body:JSON.stringify({action,...payload})});const data=await res.json().catch(()=>({}));if(!res.ok)throw new Error(data.error||`Erro HTTP ${res.status}`);return data}
 async function requestPasswordAccess(){const email=document.querySelector('#lscr input[type=email]')?.value.trim(),password=document.querySelector('#lscr input[type=password]')?.value;if(!email||!password){toast('Preencha e-mail e senha para solicitar acesso.');return}try{await accessRequest('signup',{email,password,requested_role:PORTAL_ROLE});toast('Cadastro recebido. Aguarde aprovação do suporte.',6000)}catch(err){toast(`Falha ao solicitar acesso: ${err.message}`,6000)}}
 async function handleOAuthCallback(){const hash=window.location.hash?.slice(1);if(!hash)return;const params=new URLSearchParams(hash);const token=params.get('access_token');if(!token)return;const payload=jwtPayload(token),email=String(payload.email||'').toLowerCase(),role=AUTHORIZED_OAUTH_USERS[email];history.replaceState(null,document.title,window.location.pathname);if(role!==PORTAL_ROLE){try{await accessRequest('request',{requested_role:PORTAL_ROLE},token);toast('Cadastro recebido. Aguarde aprovação do suporte.',6000)}catch(err){toast(`Falha ao solicitar acesso: ${err.message}`,6000)}localStorage.removeItem('i9_access_token');localStorage.removeItem('i9_refresh_token');localStorage.removeItem('i9_user');return}localStorage.setItem('i9_access_token',token);localStorage.setItem('i9_refresh_token',params.get('refresh_token')||'');localStorage.setItem('i9_user',JSON.stringify({id:payload.sub,email,role:PORTAL_ROLE,name:payload.user_metadata?.full_name||email}));doLogin();toast('✅ Login Google realizado!')}
-function doLogin(){['lscr'].forEach(id=>document.getElementById(id).classList.add('hidden'));['hdr','scr','bnav'].forEach(id=>{const el=document.getElementById(id);el.style.display=id==='bnav'?'flex':'block'});renderNav();renderScr();toast('✅ Bem-vinda, Maria Fernanda!')}
+function openGestor(){['lscr'].forEach(id=>document.getElementById(id).classList.add('hidden'));['hdr','scr','bnav'].forEach(id=>{const el=document.getElementById(id);el.style.display=id==='bnav'?'flex':'block'});renderNav();renderScr()}
+async function doLogin(){const email=document.querySelector('#lscr input[type=email]')?.value.trim(),password=document.querySelector('#lscr input[type=password]')?.value;if(!email||!password){toast('Preencha e-mail e senha.');return}try{const data=await accessRequest('password-login',{email,password});if(data.user.role!=='gestor'&&data.user.role!=='suporte'){toast('Conta sem permissão de admin.',5000);return}localStorage.setItem('i9_access_token',data.session.access_token);localStorage.setItem('i9_refresh_token',data.session.refresh_token||'');localStorage.setItem('i9_user',JSON.stringify(data.user));openGestor();toast('✅ Bem-vindo, Admin!')}catch(err){toast(`Falha no login: ${err.message}`,5000)}}
 function doBio(){doLogin();toast('🔐 Biometria reconhecida!')}
 handleOAuthCallback();
+async function loadAccessRequests(){const token=localStorage.getItem('i9_access_token');const data=await accessRequest('list',{},token);accessRequests=data.data||[]}
+async function loadAdminUsers(){const token=localStorage.getItem('i9_access_token');const data=await accessRequest('list-users',{},token);adminUsers=data.data||[]}
+async function loadAdminData(){try{await Promise.all([loadAccessRequests(),loadAdminUsers()]);renderScr();toast('Painel admin atualizado.')}catch(err){toast(`Falha ao carregar admin: ${err.message}`,5000)}}
+async function approveAccess(id,role){try{const token=localStorage.getItem('i9_access_token');await accessRequest('approve',{id,role},token);accessRequests=accessRequests.filter(r=>r.id!==id);renderScr();toast('✅ Acesso aprovado!')}catch(err){toast(`Falha ao aprovar: ${err.message}`,5000)}}
+async function rejectAccess(id){try{const token=localStorage.getItem('i9_access_token');await accessRequest('reject',{id},token);accessRequests=accessRequests.filter(r=>r.id!==id);renderScr();toast('Solicitação rejeitada.')}catch(err){toast(`Falha ao rejeitar: ${err.message}`,5000)}}
+async function updateAdminUser(id,role,ativo){try{const token=localStorage.getItem('i9_access_token');await accessRequest('update-user',{id,role,ativo},token);await loadAdminData();toast('Usuário atualizado.')}catch(err){toast(`Falha ao atualizar: ${err.message}`,5000)}}
+async function deleteAdminUser(id){if(!confirm('Remover esta conta e revogar o acesso?'))return;try{const token=localStorage.getItem('i9_access_token');await accessRequest('delete-user',{id},token);await loadAdminData();toast('Conta removida.')}catch(err){toast(`Falha ao remover: ${err.message}`,5000)}}
 
 function renderNav(){document.getElementById('bnav').innerHTML=NAV_ITEMS.map(it=>`<button class="nb${it.id===page?' on':''}" onclick="gp('${it.id}')"><i class="ti ${it.i}"></i><span>${it.l}</span></button>`).join('')}
 
@@ -449,8 +458,42 @@ function vPlanos(){return`
 
 function vConvites(){return`
   <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
-    <p style="font-size:16px;font-weight:700;color:var(--tx)">Convites de acesso</p>
+    <div><p style="font-size:16px;font-weight:700;color:var(--tx)">Admin de contas</p><p style="font-size:11px;color:var(--tx3);margin-top:2px">Aprovar, alterar, bloquear e remover acessos</p></div>
+    <button class="btn" style="font-size:12px" onclick="loadAdminData()">Atualizar</button>
     <button class="btn b-prim" style="font-size:12px" onclick="op('m-conv')">+ Novo</button>
+  </div>
+  <div class="card">
+    <p class="ct">🛂 Primeiros acessos pendentes</p>
+    ${accessRequests.length?accessRequests.map(r=>`
+    <div class="row">
+      <div class="avr" style="background:var(--blue-l);color:var(--blue)">${(r.name||r.email||'?').slice(0,2).toUpperCase()}</div>
+      <div style="flex:1;min-width:0">
+        <p style="font-size:12px;font-weight:700;color:var(--tx);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${r.name||r.email}</p>
+        <p style="font-size:10px;color:var(--tx3);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${r.email} · solicitado: ${r.requested_role}</p>
+      </div>
+      <select style="font-size:10px;border:.5px solid var(--bdr);border-radius:8px;padding:5px" id="role-${r.id}">
+        ${['professor_colab','colaborador','responsavel','aluno'].map(role=>`<option value="${role}" ${role===r.requested_role?'selected':''}>${role}</option>`).join('')}
+      </select>
+      <button class="btn b-prim" style="font-size:10px;padding:6px 8px" onclick="approveAccess('${r.id}',document.getElementById('role-${r.id}').value)">Aprovar</button>
+      <button class="btn b-err" style="font-size:10px;padding:6px 8px" onclick="rejectAccess('${r.id}')">Rejeitar</button>
+    </div>`).join(''):`<p style="font-size:11px;color:var(--tx3);padding:8px 0">Nenhuma solicitação carregada. Clique em Atualizar.</p>`}
+  </div>
+  <div class="card">
+    <p class="ct">👥 Contas cadastradas</p>
+    ${adminUsers.length?adminUsers.map(u=>`
+    <div class="row">
+      <div class="avr" style="background:${u.ativo?'var(--green-l)':'var(--red-l)'};color:${u.ativo?'var(--green)':'var(--red)'}">${u.ativo?'✓':'!'}</div>
+      <div style="flex:1;min-width:0">
+        <p style="font-size:12px;font-weight:700;color:var(--tx);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${u.email}</p>
+        <p style="font-size:10px;color:var(--tx3)">status: ${u.ativo?'ativo':'bloqueado'}</p>
+      </div>
+      <select id="u-role-${u.id}" style="font-size:10px;border:.5px solid var(--bdr);border-radius:8px;padding:5px">
+        ${['suporte','gestor','professor_colab','colaborador','responsavel','aluno'].map(role=>`<option value="${role}" ${role===u.role?'selected':''}>${role}</option>`).join('')}
+      </select>
+      <button class="btn" style="font-size:10px;padding:6px 8px" onclick="updateAdminUser('${u.id}',document.getElementById('u-role-${u.id}').value,${!u.ativo})">${u.ativo?'Bloquear':'Ativar'}</button>
+      <button class="btn b-prim" style="font-size:10px;padding:6px 8px" onclick="updateAdminUser('${u.id}',document.getElementById('u-role-${u.id}').value,${u.ativo})">Salvar</button>
+      <button class="btn b-err" style="font-size:10px;padding:6px 8px" onclick="deleteAdminUser('${u.id}')">Remover</button>
+    </div>`).join(''):`<p style="font-size:11px;color:var(--tx3);padding:8px 0">Clique em Atualizar para carregar contas.</p>`}
   </div>
   <div class="card" style="padding:0 16px">
     ${convites.map((c,i)=>`

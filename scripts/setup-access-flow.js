@@ -72,29 +72,35 @@ async function main() {
     CREATE INDEX IF NOT EXISTS access_requests_status_idx ON public.access_requests(status)
   `);
 
-  const email = "i9smarterp1@i9smart.local";
-  const password = "123456";
-  const authUser = await ensureAuthUser(email, password);
+  const admins = [
+    { email: "i9smarterp1@i9smart.local", password: "123456", role: "suporte" },
+    { email: "gestor1@i9smart.local", password: "123456", role: "gestor" },
+  ];
 
-  await prisma.users.upsert({
-    where: { email },
-    update: {
-      id: authUser.id,
-      role: "suporte",
-      ativo: true,
-      removido_em: null,
-      removido_por: null,
-      motivo_remocao: null,
-    },
-    create: {
-      id: authUser.id,
-      email,
-      role: "suporte",
-      ativo: true,
-    },
-  });
+  const createdAdmins = [];
+  for (const admin of admins) {
+    const authUser = await ensureAuthUser(admin.email, admin.password);
+    await prisma.users.upsert({
+      where: { email: admin.email },
+      update: {
+        id: authUser.id,
+        role: admin.role,
+        ativo: true,
+        removido_em: null,
+        removido_por: null,
+        motivo_remocao: null,
+      },
+      create: {
+        id: authUser.id,
+        email: admin.email,
+        role: admin.role,
+        ativo: true,
+      },
+    });
+    createdAdmins.push({ email: admin.email, password: admin.password, role: admin.role, id: authUser.id });
+  }
 
-  console.log(JSON.stringify({ ok: true, support: { email, password, role: "suporte", id: authUser.id } }, null, 2));
+  console.log(JSON.stringify({ ok: true, admins: createdAdmins }, null, 2));
 }
 
 main()

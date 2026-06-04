@@ -81,8 +81,8 @@ exports.handler = async (event) => {
         .eq("email", email)
         .eq("ativo", true)
         .maybeSingle();
-      if (!user || user.role !== "suporte") {
-        return json(403, { error: "Conta sem acesso de suporte" });
+      if (!user) {
+        return json(403, { error: "Conta ainda nao aprovada" });
       }
       return json(200, {
         session: auth.data.session,
@@ -192,6 +192,19 @@ exports.handler = async (event) => {
       return json(200, { data });
     }
 
+    if (body.action === "list-users") {
+      const requester = await currentUserRole(supabase, bearer(event));
+      if (!requester || !["suporte", "gestor"].includes(requester.role)) {
+        return json(403, { error: "Sem permissao" });
+      }
+      const { data, error } = await supabase
+        .from("users")
+        .select("id,email,role,ativo,created_at")
+        .order("created_at", { ascending: false });
+      if (error) throw error;
+      return json(200, { data });
+    }
+
     if (body.action === "approve") {
       const id = body.id;
       const approvedRole = String(body.role || body.approved_role || "");
@@ -220,6 +233,52 @@ exports.handler = async (event) => {
         .eq("id", id);
       if (update.error) throw update.error;
       return json(200, { ok: true, email, role: approvedRole });
+    }
+
+    if (body.action === "reject") {
+      const requester = await currentUserRole(supabase, bearer(event));
+      if (!requester || !["suporte", "gestor"].includes(requester.role)) {
+        return json(403, { error: "Sem permissao" });
+      }
+      const id = body.id;
+      if (!id) return json(400, { error: "id obrigatorio" });
+      const update = await supabase
+        .from("access_requests")
+        .update({ status: "rejected", approved_by: requester.id, approved_at: new Date().toISOString() })
+        .eq("id", id);
+      if (update.error) throw update.error;
+      return json(200, { ok: true });
+    }
+
+    if (body.action === "update-user") {
+      const requester = await currentUserRole(supabase, bearer(event));
+      if (!requester || !["suporte", "gestor"].includes(requester.role)) {
+        return json(403, { error: "Sem permissao" });
+      }
+      const id = body.id;
+      const patch = {};
+      if (body.role) patch.role = String(body.role);
+      if (body.ativo !== undefined) patch.ativo = Boolean(body.ativo);
+      if (!id || Object.keys(patch).length === 0) return json(400, { error: "id e alteracao obrigatorios" });
+      const { error } = await supabase.from("users").update(patch).eq("id", id);
+      if (error) throw error;
+      return json(200, { ok: true });
+    }
+
+    if (body.action === "delete-user") {
+      const requester = await currentUserRole(supabase, bearer(event));
+      if (!requester || !["suporte", "gestor"].includes(requester.role)) {
+        return json(403, { error: "Sem permissao" });
+      }
+      const id = body.id;
+      if (!id) return json(400, { error: "id obrigatorio" });
+      const { error } = await supabase
+        .from("users")
+        .update({ ativo: false, removido_em: new Date().toISOString(), removido_por: requester.id, motivo_remocao: "Removido pelo painel admin" })
+        .eq("id", id);
+      if (error) throw error;
+      await supabase.auth.admin.deleteUser(id);
+      return json(200, { ok: true });
     }
 
     return json(400, { error: "Acao invalida" });
