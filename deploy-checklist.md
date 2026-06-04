@@ -182,6 +182,26 @@ SELECT cron.schedule(
 
 ---
 
+## ─── PASSO 8: Google OAuth (Supabase Auth) ──────────────────────────────────
+
+No Supabase, acesse **Authentication -> Providers -> Google** e habilite o provider.
+Configure tambem os Redirect URLs em **Authentication -> URL Configuration**:
+
+```text
+https://i9smart.netlify.app/
+https://i9smart.netlify.app/suporte
+https://i9smart.netlify.app/gestor
+https://i9smart.netlify.app/professor
+https://i9smart.netlify.app/colaborador
+https://i9smart.netlify.app/responsavel
+https://i9smart.netlify.app/aluno
+```
+
+Use o `Client ID` e `Client Secret` do Google Cloud Console no provider do Supabase.
+Nunca use `service_role` no frontend.
+
+---
+
 ## ─── Contas de teste (seed) ─────────────────────────────────────────────────
 
 | E-mail | Perfil | Senha sugerida |

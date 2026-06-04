@@ -104,6 +104,7 @@ body{display:flex;align-items:center;justify-content:center}
     <input class="l-inp" type="password" placeholder="Senha">
   </div>
   <button class="l-btn l-btn-main" onclick="doLogin()">Entrar</button>
+  <button class="l-btn l-btn-bio" onclick="startGoogleOAuth()"><i class="ti ti-brand-google" style="margin-right:6px"></i>Entrar com Google</button>
   <button class="l-btn l-btn-bio" onclick="doBio()"><i class="ti ti-fingerprint" style="margin-right:6px"></i>Biometria</button>
   <p style="color:rgba(255,255,255,.25);font-size:10px;margin-top:22px;text-align:center">i9 Smart ERP · v5.0.8</p>
 </div>
@@ -165,6 +166,8 @@ function cl(id){document.getElementById(id).classList.remove("open")}
 function op(id){document.getElementById(id).classList.add("open")}
 function selAv(v){avalSel=v;["feliz","mmm","triste"].forEach(x=>{document.getElementById("av-"+x).className="abtn"+(x===v?" sel-"+x:"")})}
 function saveAval(){if(!avalSel){toast("Selecione uma opção 😊");return}toast("⭐ Avaliação salva! Pode alterar quando quiser.");cl("m-aval");avalSel=null}
+const SUPABASE_AUTH_URL='https://tofszwegngqzlcfuzjfg.supabase.co/auth/v1/authorize';
+function startGoogleOAuth(){const redirectTo=window.location.origin+window.location.pathname;window.location.href=`${SUPABASE_AUTH_URL}?provider=google&redirect_to=${encodeURIComponent(redirectTo)}`}
 function doLogin(){document.getElementById("lscr").classList.add("hidden");["hdr","scr","bnav"].forEach(id=>{const el=document.getElementById(id);el.style.display=id==="bnav"?"flex":"block"});renderNav();renderScr();toast("👋 Bem-vinda, Sofia!")}
 function doBio(){doLogin();toast("🔐 Biometria reconhecida!")}
 function gp(p){page=p;if(p==="cfg"){op("m-cfg");return}renderNav();renderScr()}

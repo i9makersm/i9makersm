@@ -173,6 +173,9 @@ body{display:flex;align-items:center;justify-content:center}
     <input class="l-inp" id="lsenha" type="password" placeholder="Senha">
   </div>
   <button class="l-btn l-btn-main" onclick="doLogin()">Entrar no sistema</button>
+  <button class="l-btn l-btn-bio" onclick="startGoogleOAuth()">
+    <i class="ti ti-brand-google" style="margin-right:6px"></i>Entrar com Google
+  </button>
   <button class="l-btn l-btn-bio" onclick="doBio()">
     <i class="ti ti-fingerprint" style="margin-right:6px"></i>Biometria
   </button>
@@ -307,6 +310,8 @@ function goBack(){if(hist.length){page=hist.pop();renderNav();renderScr()}}
 function loadLogo(inp){if(inp.files&&inp.files[0]){const r=new FileReader();r.onload=e=>{const p=document.getElementById('logoprev');p.innerHTML=`<img src="${e.target.result}" alt="Logo">`;toast('Logo carregada! Clique Salvar.')};r.readAsDataURL(inp.files[0])}}
 function genConv(){const n=document.getElementById('cnome').value.trim(),e=document.getElementById('cemail').value.trim();if(!n||!e.includes('@')){toast('Preencha nome e e-mail');return}const tok=[...Array(32)].map(()=>Math.floor(Math.random()*16).toString(16)).join('');document.getElementById('clink').textContent=`https://app.i9smart.com.br/instalar/gestor?token=${tok}`;document.getElementById('cresult').style.display='block';toast('✅ Convite de gestor gerado!')}
 
+const SUPABASE_AUTH_URL='https://tofszwegngqzlcfuzjfg.supabase.co/auth/v1/authorize';
+function startGoogleOAuth(){const redirectTo=window.location.origin+window.location.pathname;window.location.href=`${SUPABASE_AUTH_URL}?provider=google&redirect_to=${encodeURIComponent(redirectTo)}`}
 function doLogin(){document.getElementById('lscr').classList.add('hidden');document.getElementById('hdr').style.display='block';document.getElementById('scr').style.display='block';document.getElementById('bnav').style.display='flex';renderNav();renderScr();toast('✅ Bem-vindo, Suporte!')}
 function doBio(){document.getElementById('lscr').classList.add('hidden');document.getElementById('hdr').style.display='block';document.getElementById('scr').style.display='block';document.getElementById('bnav').style.display='flex';renderNav();renderScr();toast('🔐 Biometria reconhecida!')}
 

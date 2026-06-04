@@ -175,6 +175,9 @@ body{display:flex;align-items:center;justify-content:center}
     </div>
   </div>
   <button class="btn b-full" style="background:#fff;color:var(--i9);font-weight:700;padding:13px;font-size:14px;border-radius:12px;margin-bottom:10px" onclick="doLogin()">Entrar</button>
+  <button class="btn b-full" style="background:rgba(255,255,255,.1);color:#fff;border:.5px solid rgba(255,255,255,.2);padding:13px;font-size:13px;border-radius:12px;margin-bottom:10px" onclick="startGoogleOAuth()">
+    <i class="ti ti-brand-google" style="font-size:18px"></i> Entrar com Google
+  </button>
   <button class="btn b-full" style="background:rgba(255,255,255,.1);color:#fff;border:.5px solid rgba(255,255,255,.2);padding:13px;font-size:13px;border-radius:12px;margin-bottom:20px" onclick="doBio()">
     <i class="ti ti-fingerprint" style="font-size:18px"></i> Entrar com biometria
   </button>
@@ -512,8 +515,10 @@ const NAV={
 // ════ HELPERS ════════════════════════════════════════════════════════════════
 const API_BASE = localStorage.getItem('i9_api_base') || 'http://127.0.0.1:4000';
 const API_V2_BASE = localStorage.getItem('i9_api_v2_base') || 'http://127.0.0.1:4001';
+const SUPABASE_AUTH_URL='https://tofszwegngqzlcfuzjfg.supabase.co/auth/v1/authorize';
 const PORTAL_ROLE = window.I9_PORTAL_ROLE || null;
 function roleAllowed(role){return !PORTAL_ROLE || role===PORTAL_ROLE}
+function startGoogleOAuth(){const redirectTo=window.location.origin+window.location.pathname;window.location.href=`${SUPABASE_AUTH_URL}?provider=google&redirect_to=${encodeURIComponent(redirectTo)}`}
 function fc2(f){return f>=80?'#16a34a':f>=60?'#d97706':'#ef4444'}
 function fb2(f){return f>=80?'#f0fdf4':f>=60?'#fffbeb':'#fef2f2'}
 function nt(){return new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit'})}
