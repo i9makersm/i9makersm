@@ -9,3 +9,6 @@ coverage/
 .DS_Store
 files.zip
 *.odt
+
+# Local Netlify folder
+.netlify
